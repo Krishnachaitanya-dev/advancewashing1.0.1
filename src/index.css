@@ -99,3 +99,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Water Wave Effect */
+.water-wave {
+  position: absolute;
+  top: -20%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 40%;
+  animation: wave 15s linear infinite;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+.water-wave-2 {
+  top: -30%;
+  left: -30%;
+  animation: wave 20s linear infinite;
+  animation-delay: -5s;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+@keyframes wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card styles */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
