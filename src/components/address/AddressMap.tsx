@@ -55,28 +55,33 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
   }, [initialPosition.lat, initialPosition.lng]);
 
   // Set up map events when map is ready
-  const onMapReady = (map: L.Map) => {
-    mapRef.current = map;
-    
-    // Add click event listener to the map
-    map.on('click', async (e: L.LeafletMouseEvent) => {
-      const { lat, lng } = e.latlng;
-      console.log('Map clicked:', { lat, lng });
+  const onMapReady = () => {
+    // Access the map instance through the MapContainer ref
+    const mapContainer = document.querySelector('.leaflet-container') as any;
+    if (mapContainer && mapContainer._leaflet_map) {
+      const map = mapContainer._leaflet_map as L.Map;
+      mapRef.current = map;
       
-      // Update marker position immediately
-      setMarkerPosition([lat, lng]);
-      onPositionChange({ lat, lng });
-      
-      try {
-        const address = await reverseGeocode(lat, lng);
-        if (address) {
-          console.log('Address found:', address);
-          onAddressChange(address);
+      // Add click event listener to the map
+      map.on('click', async (e: L.LeafletMouseEvent) => {
+        const { lat, lng } = e.latlng;
+        console.log('Map clicked:', { lat, lng });
+        
+        // Update marker position immediately
+        setMarkerPosition([lat, lng]);
+        onPositionChange({ lat, lng });
+        
+        try {
+          const address = await reverseGeocode(lat, lng);
+          if (address) {
+            console.log('Address found:', address);
+            onAddressChange(address);
+          }
+        } catch (error) {
+          console.error('Error in reverse geocoding:', error);
         }
-      } catch (error) {
-        console.error('Error in reverse geocoding:', error);
-      }
-    });
+      });
+    }
   };
 
   return (
@@ -87,7 +92,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
-          whenReady={(e) => onMapReady(e.target)}
+          whenReady={onMapReady}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
