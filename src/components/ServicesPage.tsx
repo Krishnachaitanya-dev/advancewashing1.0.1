@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -81,11 +80,7 @@ const ServicesPage = () => {
 
     const total = calculateTotal();
 
-    toast({
-      title: "Services Selected!",
-      description: `Proceeding to pickup details with ${selectedServices.length} services.`,
-    });
-
+    // Navigate directly without showing toast notification
     navigate('/pickup-details', { 
       state: { 
         selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
