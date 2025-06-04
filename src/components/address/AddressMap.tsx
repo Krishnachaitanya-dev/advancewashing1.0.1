@@ -41,13 +41,39 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
-  const [mapPosition, setMapPosition] = useState(initialPosition);
+// Simple marker component that handles drag events
+const DraggableMarker = ({ position, onPositionChange }: { 
+  position: [number, number]; 
+  onPositionChange: (pos: { lat: number; lng: number }) => void; 
+}) => {
   const markerRef = useRef<any>(null);
+
+  const eventHandlers = {
+    dragend() {
+      const marker = markerRef.current;
+      if (marker != null) {
+        const newPos = marker.getLatLng();
+        onPositionChange({ lat: newPos.lat, lng: newPos.lng });
+      }
+    },
+  };
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+    />
+  );
+};
+
+const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
+  const [mapPosition, setMapPosition] = useState<[number, number]>([initialPosition.lat, initialPosition.lng]);
 
   const handlePositionChange = async (newPosition: { lat: number; lng: number }) => {
     console.log('Position changed:', newPosition);
-    setMapPosition(newPosition);
+    setMapPosition([newPosition.lat, newPosition.lng]);
     onPositionChange(newPosition);
     
     try {
@@ -61,40 +87,27 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
     }
   };
 
-  const eventHandlers = {
-    dragend() {
-      const marker = markerRef.current;
-      if (marker != null) {
-        const newPos = marker.getLatLng();
-        handlePositionChange(newPos);
-      }
-    },
-  };
-
   useEffect(() => {
     console.log('Map position updated:', initialPosition);
-    setMapPosition(initialPosition);
-  }, [initialPosition]);
+    setMapPosition([initialPosition.lat, initialPosition.lng]);
+  }, [initialPosition.lat, initialPosition.lng]);
 
   return (
     <div className="glass-card overflow-hidden">
       <div className="h-64 w-full">
         <MapContainer
-          center={[mapPosition.lat, mapPosition.lng]}
+          center={mapPosition}
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
-          key={`${mapPosition.lat}-${mapPosition.lng}`}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Marker
-            draggable={true}
-            eventHandlers={eventHandlers}
-            position={[mapPosition.lat, mapPosition.lng]}
-            ref={markerRef}
+          <DraggableMarker 
+            position={mapPosition} 
+            onPositionChange={handlePositionChange}
           />
         </MapContainer>
       </div>
