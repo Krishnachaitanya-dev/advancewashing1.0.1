@@ -8,10 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AddressLabelSelector from './AddressLabelSelector';
-import LocationPermission from './LocationPermission';
-import AddressMap from './AddressMap';
 import { AddressFormData, Address } from '@/types/address';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 
 const addressSchema = z.object({
   doorNo: z.string().min(1, 'Door/Flat number is required'),
@@ -33,8 +31,7 @@ interface AddressFormProps {
 }
 
 const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressFormProps) => {
-  const [showMap, setShowMap] = useState(false);
-  const [mapPosition, setMapPosition] = useState({ lat: 28.6139, lng: 77.2090 }); // Default to Delhi
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   
   const {
     register,
@@ -59,15 +56,30 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
 
   const selectedLabel = watch('label');
 
-  const handleLocationGranted = (position: { lat: number; lng: number }) => {
-    setMapPosition(position);
-    setShowMap(true);
-    // Trigger reverse geocoding
-    reverseGeocode(position.lat, position.lng);
-  };
-
-  const reverseGeocode = async (lat: number, lng: number) => {
+  const handleGetCurrentLocation = async () => {
+    setIsGettingLocation(true);
     try {
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        throw new Error('Geolocation is not supported by this browser');
+      }
+
+      // Get current position
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutes
+          }
+        );
+      });
+
+      const { latitude: lat, longitude: lng } = position.coords;
+      
+      // Reverse geocode to get address
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
       );
@@ -86,49 +98,41 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
         }
       }
     } catch (error) {
-      console.error('Reverse geocoding failed:', error);
+      console.error('Error getting location:', error);
+      // Handle errors silently for now
+    } finally {
+      setIsGettingLocation(false);
     }
-  };
-
-  const handleAddressChange = (addressData: any) => {
-    if (addressData.street) setValue('street', addressData.street);
-    if (addressData.city) setValue('city', addressData.city);
-    if (addressData.state) setValue('state', addressData.state);
-    if (addressData.pincode) setValue('pincode', addressData.pincode);
-    if (addressData.landmark) setValue('landmark', addressData.landmark);
-  };
-
-  const handleMapPositionChange = (position: { lat: number; lng: number }) => {
-    setMapPosition(position);
   };
 
   return (
     <div className="space-y-6">
-      {/* Location Permission / Map Section */}
-      {!showMap ? (
-        <LocationPermission onLocationGranted={handleLocationGranted} />
-      ) : (
-        <AddressMap
-          initialPosition={mapPosition}
-          onPositionChange={handleMapPositionChange}
-          onAddressChange={handleAddressChange}
-        />
-      )}
-
-      {/* Manual Address Toggle */}
-      {!showMap && (
-        <div className="text-center">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowMap(true)}
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            <MapPin className="mr-2 h-4 w-4" />
-            Enter Address Manually
-          </Button>
-        </div>
-      )}
+      {/* Location Detection Section */}
+      <div className="glass-card p-4 text-center">
+        <MapPin className="mx-auto text-green-400 mb-3" size={32} />
+        <h3 className="text-base font-medium text-white mb-2">Auto-fill Address</h3>
+        <p className="text-white/70 text-sm mb-3">
+          Use your current location to automatically fill address details
+        </p>
+        <Button
+          type="button"
+          onClick={handleGetCurrentLocation}
+          disabled={isGettingLocation}
+          className="bg-green-500 hover:bg-green-600 text-white"
+        >
+          {isGettingLocation ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Getting Location...
+            </>
+          ) : (
+            <>
+              <MapPin className="mr-2 h-4 w-4" />
+              Use My Location
+            </>
+          )}
+        </Button>
+      </div>
 
       {/* Address Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
