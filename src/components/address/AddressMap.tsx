@@ -18,6 +18,29 @@ interface AddressMapProps {
   onAddressChange: (address: any) => void;
 }
 
+const reverseGeocode = async (lat: number, lng: number) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+    );
+    const data = await response.json();
+    
+    if (data && data.address) {
+      const address = data.address;
+      return {
+        street: `${address.house_number || ''} ${address.road || address.pedestrian || ''}`.trim(),
+        city: address.city || address.town || address.village || '',
+        state: address.state || '',
+        pincode: address.postcode || '',
+        landmark: address.amenity || address.shop || ''
+      };
+    }
+  } catch (error) {
+    console.error('Reverse geocoding failed:', error);
+  }
+  return null;
+};
+
 const DraggableMarker = ({ position, onPositionChange, onAddressChange }: any) => {
   const [markerPosition, setMarkerPosition] = useState(position);
   const markerRef = useRef<any>(null);
@@ -29,31 +52,13 @@ const DraggableMarker = ({ position, onPositionChange, onAddressChange }: any) =
         const newPos = marker.getLatLng();
         setMarkerPosition(newPos);
         onPositionChange(newPos);
-        reverseGeocode(newPos.lat, newPos.lng);
-      }
-    },
-  };
-
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-      );
-      const data = await response.json();
-      
-      if (data && data.address) {
-        const address = data.address;
-        onAddressChange({
-          street: `${address.house_number || ''} ${address.road || address.pedestrian || ''}`.trim(),
-          city: address.city || address.town || address.village || '',
-          state: address.state || '',
-          pincode: address.postcode || '',
-          landmark: address.amenity || address.shop || ''
+        reverseGeocode(newPos.lat, newPos.lng).then(address => {
+          if (address) {
+            onAddressChange(address);
+          }
         });
       }
-    } catch (error) {
-      console.error('Reverse geocoding failed:', error);
-    }
+    },
   };
 
   useEffect(() => {
@@ -74,32 +79,13 @@ const MapClickHandler = ({ onPositionChange, onAddressChange }: any) => {
   useMapEvents({
     click(e) {
       onPositionChange(e.latlng);
-      // Reverse geocode on click as well
-      reverseGeocode(e.latlng.lat, e.latlng.lng);
+      reverseGeocode(e.latlng.lat, e.latlng.lng).then(address => {
+        if (address) {
+          onAddressChange(address);
+        }
+      });
     },
   });
-
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-      );
-      const data = await response.json();
-      
-      if (data && data.address) {
-        const address = data.address;
-        onAddressChange({
-          street: `${address.house_number || ''} ${address.road || address.pedestrian || ''}`.trim(),
-          city: address.city || address.town || address.village || '',
-          state: address.state || '',
-          pincode: address.postcode || '',
-          landmark: address.amenity || address.shop || ''
-        });
-      }
-    } catch (error) {
-      console.error('Reverse geocoding failed:', error);
-    }
-  };
 
   return null;
 };
