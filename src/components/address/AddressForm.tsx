@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import AddressLabelSelector from './AddressLabelSelector';
 import SimpleMap from './SimpleMap';
 import { AddressFormData, Address } from '@/types/address';
-
 const addressSchema = z.object({
   doorNo: z.string().min(1, 'Door/Flat number is required'),
   street: z.string().min(1, 'Street/Area is required'),
@@ -22,21 +20,26 @@ const addressSchema = z.object({
   name: z.string().optional(),
   label: z.enum(['home', 'work', 'other'])
 });
-
 interface AddressFormProps {
   onSubmit: (data: AddressFormData) => void;
   onCancel: () => void;
   initialData?: Address;
   isLoading?: boolean;
 }
-
-const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressFormProps) => {
+const AddressForm = ({
+  onSubmit,
+  onCancel,
+  initialData,
+  isLoading
+}: AddressFormProps) => {
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors }
+    formState: {
+      errors
+    }
   } = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: initialData || {
@@ -51,9 +54,7 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
       label: 'home'
     }
   });
-
   const selectedLabel = watch('label');
-
   const handleMapAddressSelect = (addressData: any) => {
     if (addressData.street) setValue('street', addressData.street);
     if (addressData.city) setValue('city', addressData.city);
@@ -61,9 +62,7 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
     if (addressData.pincode) setValue('pincode', addressData.pincode);
     if (addressData.landmark) setValue('landmark', addressData.landmark);
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Interactive Map */}
       <SimpleMap onAddressSelect={handleMapAddressSelect} />
 
@@ -72,139 +71,69 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
         {/* Door/Flat Number */}
         <div className="space-y-2">
           <Label htmlFor="doorNo" className="text-white">Door/Flat Number *</Label>
-          <Input
-            id="doorNo"
-            {...register('doorNo')}
-            placeholder="e.g., 101, A-23"
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          />
-          {errors.doorNo && (
-            <p className="text-red-400 text-sm">{errors.doorNo.message}</p>
-          )}
+          <Input id="doorNo" {...register('doorNo')} placeholder="e.g., 101, A-23" className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
+          {errors.doorNo && <p className="text-red-400 text-sm">{errors.doorNo.message}</p>}
         </div>
 
         {/* Street/Area */}
         <div className="space-y-2">
           <Label htmlFor="street" className="text-white">Street/Area *</Label>
-          <Textarea
-            id="street"
-            {...register('street')}
-            placeholder="Complete street address"
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60 resize-none"
-            rows={2}
-          />
-          {errors.street && (
-            <p className="text-red-400 text-sm">{errors.street.message}</p>
-          )}
+          <Textarea id="street" {...register('street')} placeholder="Complete street address" className="bg-white/10 border-white/20 text-white placeholder:text-white/60 resize-none" rows={2} />
+          {errors.street && <p className="text-red-400 text-sm">{errors.street.message}</p>}
         </div>
 
         {/* Landmark */}
         <div className="space-y-2">
           <Label htmlFor="landmark" className="text-white">Landmark (Optional)</Label>
-          <Input
-            id="landmark"
-            {...register('landmark')}
-            placeholder="e.g., Near Metro Station"
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          />
+          <Input id="landmark" {...register('landmark')} placeholder="e.g., Near Metro Station" className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
         </div>
 
         {/* City, State, Pincode */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label htmlFor="city" className="text-white">City *</Label>
-            <Input
-              id="city"
-              {...register('city')}
-              placeholder="City"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-            />
-            {errors.city && (
-              <p className="text-red-400 text-sm">{errors.city.message}</p>
-            )}
+            <Input id="city" {...register('city')} placeholder="City" className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
+            {errors.city && <p className="text-red-400 text-sm">{errors.city.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="state" className="text-white">State *</Label>
-            <Input
-              id="state"
-              {...register('state')}
-              placeholder="State"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-            />
-            {errors.state && (
-              <p className="text-red-400 text-sm">{errors.state.message}</p>
-            )}
+            <Input id="state" {...register('state')} placeholder="State" className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
+            {errors.state && <p className="text-red-400 text-sm">{errors.state.message}</p>}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="pincode" className="text-white">Pincode *</Label>
-          <Input
-            id="pincode"
-            {...register('pincode')}
-            placeholder="530012"
-            maxLength={6}
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          />
-          {errors.pincode && (
-            <p className="text-red-400 text-sm">{errors.pincode.message}</p>
-          )}
+          <Input id="pincode" {...register('pincode')} placeholder="530012" maxLength={6} className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
+          {errors.pincode && <p className="text-red-400 text-sm">{errors.pincode.message}</p>}
         </div>
 
         {/* Phone Number */}
         <div className="space-y-2">
           <Label htmlFor="phone" className="text-white">Phone Number *</Label>
-          <Input
-            id="phone"
-            {...register('phone')}
-            placeholder="9876543210"
-            maxLength={10}
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          />
-          {errors.phone && (
-            <p className="text-red-400 text-sm">{errors.phone.message}</p>
-          )}
+          <Input id="phone" {...register('phone')} placeholder="9876543210" maxLength={10} className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
+          {errors.phone && <p className="text-red-400 text-sm">{errors.phone.message}</p>}
         </div>
 
         {/* Name */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-white">Contact Name (Optional)</Label>
-          <Input
-            id="name"
-            {...register('name')}
-            placeholder="John Doe"
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-          />
+          <Input id="name" {...register('name')} placeholder="John Doe" className="bg-white/10 border-white/20 text-white placeholder:text-white/60" />
         </div>
 
         {/* Address Label */}
-        <AddressLabelSelector
-          selectedLabel={selectedLabel}
-          onLabelChange={(label) => setValue('label', label)}
-        />
+        <AddressLabelSelector selectedLabel={selectedLabel} onLabelChange={label => setValue('label', label)} />
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="flex-1 border-white/20 text-white hover:bg-white/10"
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading} className="flex-1 border-white/20 hover:bg-white/10 text-zinc-950">
             Cancel
           </Button>
-          <Button
-            type="submit"
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-            disabled={isLoading}
-          >
+          <Button type="submit" className="flex-1 bg-green-500 hover:bg-green-600 text-white" disabled={isLoading}>
             {isLoading ? 'Saving...' : initialData ? 'Update Address' : 'Save Address'}
           </Button>
         </div>
       </form>
-    </div>
-  );
+    </div>;
 };
-
 export default AddressForm;
