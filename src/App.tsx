@@ -14,6 +14,13 @@ const OrdersPage = lazy(() => import("./pages/Orders"));
 const ProfilePage = lazy(() => import("./pages/Profile"));
 const PickupDetailsPage = lazy(() => import("./pages/PickupDetails"));
 const AddressManagementPage = lazy(() => import("./pages/AddressManagement"));
+const PersonalInformationPage = lazy(() => import("./pages/PersonalInformation"));
+const SettingsPage = lazy(() => import("./pages/Settings"));
+const PaymentMethodsPage = lazy(() => import("./pages/PaymentMethods"));
+const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfServicePage = lazy(() => import("./pages/TermsOfService"));
+const RateAppPage = lazy(() => import("./pages/RateApp"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
 // Optimize query client for mobile
@@ -69,6 +76,13 @@ const App = () => (
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/profile/addresses" element={<AddressManagementPage />} />
+              <Route path="/profile/personal" element={<PersonalInformationPage />} />
+              <Route path="/profile/settings" element={<SettingsPage />} />
+              <Route path="/profile/payments" element={<PaymentMethodsPage />} />
+              <Route path="/profile/notifications" element={<NotificationSettingsPage />} />
+              <Route path="/profile/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/profile/terms" element={<TermsOfServicePage />} />
+              <Route path="/profile/rate" element={<RateAppPage />} />
               <Route path="/pickup-details" element={<PickupDetailsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

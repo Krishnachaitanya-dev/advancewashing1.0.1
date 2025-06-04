@@ -2,22 +2,42 @@
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { User, Settings, MapPin, CreditCard, Bell, Shield, FileText, Star, LogOut, ChevronRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear any user data/tokens here
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Show success message
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
+    
+    // Navigate to login page
+    navigate('/login');
+  };
+
   const profileSections = [{
     title: 'Account',
     items: [{
       id: 'personal',
       name: 'Personal Information',
       icon: <User className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/personal'
     }, {
       id: 'settings',
       name: 'Settings',
       icon: <Settings className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/settings'
     }]
   }, {
     title: 'Preferences',
@@ -31,20 +51,35 @@ const ProfilePage = () => {
       id: 'payment',
       name: 'Payment Methods',
       icon: <CreditCard className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/payments'
     }, {
       id: 'notifications',
       name: 'Notification Settings',
       icon: <Bell className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/notifications'
     }]
   }, {
-    title: 'Support',
+    title: 'Support & Legal',
     items: [{
-      id: 'help',
-      name: 'Help & Support',
-      icon: <HelpCircle className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      id: 'privacy',
+      name: 'Privacy Policy',
+      icon: <Shield className="w-5 h-5" />,
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/privacy'
+    }, {
+      id: 'terms',
+      name: 'Terms of Service',
+      icon: <FileText className="w-5 h-5" />,
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/terms'
+    }, {
+      id: 'rate',
+      name: 'Rate Our App',
+      icon: <Star className="w-5 h-5" />,
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/rate'
     }]
   }];
 
@@ -76,14 +111,10 @@ const ProfilePage = () => {
                   </div>
                 );
 
-                return item.href ? (
+                return (
                   <Link key={item.id} to={item.href}>
                     {content}
                   </Link>
-                ) : (
-                  <div key={item.id}>
-                    {content}
-                  </div>
                 );
               })}
             </div>
@@ -92,7 +123,11 @@ const ProfilePage = () => {
 
       {/* Logout Button */}
       <div className="mt-8">
-        <Button variant="outline" className="w-full border-white/20 flex items-center justify-center gap-2 text-zinc-950">
+        <Button 
+          variant="outline" 
+          onClick={handleLogout}
+          className="w-full border-white/20 flex items-center justify-center gap-2 text-zinc-950 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400"
+        >
           <LogOut className="w-5 h-5" />
           <span>Log Out</span>
         </Button>
