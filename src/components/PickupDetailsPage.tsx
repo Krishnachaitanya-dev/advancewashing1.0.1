@@ -89,7 +89,7 @@ const PickupDetailsPage = () => {
                   Minimum Order Information
                 </h3>
                 <p className="text-sm text-yellow-200">
-                  Our recommended minimum order value is ₹500. Your current order is ₹{total}. 
+                  Our recommended minimum order value is ₹500. 
                   You can still proceed with your order.
                 </p>
               </div>
