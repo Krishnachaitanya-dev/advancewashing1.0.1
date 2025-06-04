@@ -70,7 +70,7 @@ const PickupDetailsPage = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-            className="text-white mr-3"
+            className="text-white mr-3 hover:bg-white/10"
           >
             <ArrowLeft size={20} />
           </Button>
@@ -78,32 +78,31 @@ const PickupDetailsPage = () => {
         </div>
 
         {/* Pickup Date */}
-        <div className="glass-card p-4">
-          <h3 className="text-base font-medium text-white mb-3">Select Pickup Date</h3>
-          <div className="bg-white rounded-lg p-2">
+        <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <h3 className="text-base font-medium text-white mb-3">📅 Select Pickup Date</h3>
+          <div className="bg-white rounded-xl p-3 shadow-lg">
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={setSelectedDate}
               disabled={(date) => date < new Date() || date > new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000)}
-              className="rounded-md border-0"
+              className="rounded-md border-0 w-full"
             />
           </div>
         </div>
 
         {/* Time Slots */}
-        <div className="glass-card p-4">
-          <h3 className="text-base font-medium text-white mb-3">Select Time Slot</h3>
-          <div className="grid grid-cols-1 gap-2">
+        <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <h3 className="text-base font-medium text-white mb-3">⏰ Select Time Slot</h3>
+          <div className="grid grid-cols-1 gap-3">
             {timeSlots.map((slot) => (
               <Button
                 key={slot}
                 type="button"
-                variant={selectedSlot === slot ? 'default' : 'outline'}
-                className={`text-sm py-3 ${
+                className={`text-sm py-3 rounded-xl transition-all duration-200 ${
                   selectedSlot === slot 
-                    ? 'bg-blue-600 text-white border-blue-600' 
-                    : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transform scale-105' 
+                    : 'bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:scale-102'
                 }`}
                 onClick={() => setSelectedSlot(slot)}
               >
@@ -114,30 +113,30 @@ const PickupDetailsPage = () => {
         </div>
 
         {/* Special Instructions */}
-        <div className="glass-card p-4">
-          <h3 className="text-base font-medium text-white mb-3">Special Instructions (Optional)</h3>
+        <div className="bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <h3 className="text-base font-medium text-white mb-3">📝 Special Instructions (Optional)</h3>
           <Textarea
-            placeholder="Any specific instructions for pickup?"
+            placeholder="Any specific instructions for pickup? (e.g., Gate number, specific timing, etc.)"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
-            className="resize-none bg-white/10 border-white/20 text-white placeholder:text-white/60"
+            className="resize-none bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-xl min-h-[100px] focus:bg-white/20 transition-all duration-200"
           />
         </div>
 
         {/* Order Summary */}
-        <div className="glass-card p-4">
-          <h3 className="text-base font-medium text-white mb-3">Order Summary</h3>
-          <div className="space-y-2">
+        <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <h3 className="text-base font-medium text-white mb-3">📋 Order Summary</h3>
+          <div className="space-y-3">
             {selectedServices.map((service: Service) => (
-              <div key={service.id} className="flex justify-between text-sm">
-                <span className="text-white/80">{service.name}</span>
+              <div key={service.id} className="flex justify-between text-sm bg-white/10 rounded-lg p-3">
+                <span className="text-white/90">{service.name}</span>
                 <span className="text-white font-medium">{service.price}</span>
               </div>
             ))}
-            <div className="border-t border-white/20 my-2 pt-2"></div>
-            <div className="flex justify-between font-semibold">
-              <span className="text-white">Total</span>
-              <span className="text-blue-300 text-lg">₹{total}</span>
+            <div className="border-t border-white/20 my-3 pt-3"></div>
+            <div className="flex justify-between font-semibold bg-white/10 rounded-lg p-3">
+              <span className="text-white">Total Amount</span>
+              <span className="text-green-300 text-lg">₹{total}</span>
             </div>
           </div>
         </div>
@@ -146,9 +145,9 @@ const PickupDetailsPage = () => {
         <div className="pb-6">
           <Button 
             onClick={handlePlaceOrder} 
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-medium text-lg"
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg transform transition-all duration-200 hover:scale-105"
           >
-            Place Order
+            🛒 Place Order
           </Button>
         </div>
       </div>

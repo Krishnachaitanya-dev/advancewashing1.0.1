@@ -17,36 +17,42 @@ const ServicesPage = () => {
       id: 1,
       name: 'Normal Clothes - Wash & Fold',
       price: '₹100/kg',
+      color: 'from-purple-500 to-purple-600',
       icon: Shirt,
     },
     {
       id: 2,
       name: 'Normal Clothes - Wash & Steam Iron',
       price: '₹150/kg',
+      color: 'from-pink-500 to-pink-600',
       icon: Shirt,
     },
     {
       id: 3,
       name: 'Bedsheets - Wash & Fold',
       price: '₹130/kg',
+      color: 'from-orange-500 to-orange-600',
       icon: Shirt,
     },
     {
       id: 4,
       name: 'Quilts - Wash & Fold',
       price: '₹130/kg',
+      color: 'from-teal-500 to-teal-600',
       icon: Shirt,
     },
     {
       id: 5,
       name: 'Curtains - Wash & Fold',
       price: '₹140/kg',
+      color: 'from-indigo-500 to-indigo-600',
       icon: Shirt,
     },
     {
       id: 6,
       name: 'Shoes',
       price: '₹250/pair',
+      color: 'from-red-500 to-red-600',
       icon: Shirt,
     }
   ];
@@ -81,13 +87,15 @@ const ServicesPage = () => {
       description: `Total: ₹${total}. Minimum order value is ₹500. Proceeding to pickup details.`,
     });
 
-    // Navigate to pickup details page with selected services
-    navigate('/pickup-details', { 
-      state: { 
-        selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
-        total 
-      }
-    });
+    // Small delay to show the toast before navigation
+    setTimeout(() => {
+      navigate('/pickup-details', { 
+        state: { 
+          selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
+          total 
+        }
+      });
+    }, 1000);
   };
 
   return (
@@ -114,7 +122,7 @@ const ServicesPage = () => {
               className={`${
                 isSelected 
                   ? 'bg-gradient-to-br from-green-500 to-green-600' 
-                  : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                  : `bg-gradient-to-br ${service.color}`
               } p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
             >
               <div className="absolute top-3 right-3">
