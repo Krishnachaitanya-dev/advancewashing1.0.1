@@ -70,7 +70,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
   }, [initialPosition.lat, initialPosition.lng]);
 
   // Handle map click using ref instead of useMapEvents
-  const handleMapCreated = (map: L.Map) => {
+  const handleMapReady = (map: L.Map) => {
     mapRef.current = map;
     map.on('click', async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
@@ -87,7 +87,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
-          whenCreated={handleMapCreated}
+          whenReady={handleMapReady}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
