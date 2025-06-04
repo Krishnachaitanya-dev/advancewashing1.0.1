@@ -21,9 +21,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Optimize for mobile with smaller chunks
     target: 'es2015',
     minify: 'terser',
+    sourcemap: false, // Disable sourcemaps for mobile builds
     rollupOptions: {
       output: {
         manualChunks: {
@@ -41,14 +41,17 @@ export default defineConfig(({ mode }) => ({
         pure_funcs: mode === 'production' ? ['console.log'] : [],
       },
     },
-    // Optimize chunk sizes for mobile
     chunkSizeWarningLimit: 1000,
+    // Ensure assets are properly bundled for mobile
+    assetsDir: 'assets',
+    outDir: 'dist',
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
   },
-  // Add mobile-specific optimizations
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' }
   },
+  // Add base path configuration for mobile
+  base: './',
 }));

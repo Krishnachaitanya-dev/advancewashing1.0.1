@@ -1,3 +1,4 @@
+
 apply plugin: 'com.android.application'
 
 android {
@@ -13,8 +14,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
         aaptOptions {
-            // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-            // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
@@ -28,10 +27,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Ensure assets are properly included
+            shrinkResources false
         }
         debug {
             debuggable true
             minifyEnabled false
+            shrinkResources false
         }
     }
     
@@ -49,6 +51,12 @@ android {
     // Suppress unchecked operation warnings
     tasks.withType(JavaCompile) {
         options.compilerArgs += ['-Xlint:-unchecked']
+    }
+    
+    // Add asset optimization
+    aaptOptions {
+        noCompress 'tflite'
+        noCompress 'lite'
     }
 }
 

@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import("./pages/Home"));
@@ -16,15 +16,16 @@ const PickupDetailsPage = lazy(() => import("./pages/PickupDetails"));
 const AddressManagementPage = lazy(() => import("./pages/AddressManagement"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
-// Optimize query client for mobile with longer cache times
+// Optimize query client for mobile
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 60 * 1000, // 10 minutes - longer for mobile
-      gcTime: 30 * 60 * 1000, // 30 minutes - longer cache retention
-      retry: 2, // More retries for mobile network issues
-      refetchOnWindowFocus: false, // Disable for mobile
-      refetchOnReconnect: true, // Keep for mobile connectivity
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 15 * 60 * 1000, // 15 minutes
+      retry: 1, // Reduce retries for mobile
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      networkMode: 'offlineFirst', // Better offline handling
     },
   },
 });
@@ -36,25 +37,43 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Route Guard Component
+const RouteGuard = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    // Add mobile-specific initialization
+    if (typeof window !== 'undefined') {
+      // Prevent zoom on mobile
+      const viewport = document.querySelector('meta[name=viewport]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      }
+    }
+  }, []);
+
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/addresses" element={<AddressManagementPage />} />
-            <Route path="/pickup-details" element={<PickupDetailsPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+        <RouteGuard>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/addresses" element={<AddressManagementPage />} />
+              <Route path="/pickup-details" element={<PickupDetailsPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </RouteGuard>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
