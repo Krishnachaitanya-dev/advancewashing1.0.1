@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -41,36 +41,12 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-// Component that handles map events
-function MapEvents({ onPositionChange, onAddressChange }: {
-  onPositionChange: (position: { lat: number; lng: number }) => void;
-  onAddressChange: (address: any) => void;
-}) {
-  useMapEvents({
-    click: async (e) => {
-      const { lat, lng } = e.latlng;
-      console.log('Map clicked:', { lat, lng });
-      onPositionChange({ lat, lng });
-      
-      try {
-        const address = await reverseGeocode(lat, lng);
-        if (address) {
-          console.log('Address found:', address);
-          onAddressChange(address);
-        }
-      } catch (error) {
-        console.error('Error in reverse geocoding:', error);
-      }
-    },
-  });
-  return null;
-}
-
 const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
   const [markerPosition, setMarkerPosition] = useState<[number, number]>([
     initialPosition.lat, 
     initialPosition.lng
   ]);
+  const mapRef = useRef<L.Map | null>(null);
 
   const handlePositionChange = async (newPosition: { lat: number; lng: number }) => {
     console.log('Position changed:', newPosition);
@@ -93,6 +69,16 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
     setMarkerPosition([initialPosition.lat, initialPosition.lng]);
   }, [initialPosition.lat, initialPosition.lng]);
 
+  // Handle map click using ref instead of useMapEvents
+  const handleMapCreated = (map: L.Map) => {
+    mapRef.current = map;
+    map.on('click', async (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      console.log('Map clicked:', { lat, lng });
+      await handlePositionChange({ lat, lng });
+    });
+  };
+
   return (
     <div className="glass-card overflow-hidden">
       <div className="h-64 w-full">
@@ -101,16 +87,13 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
+          whenCreated={handleMapCreated}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={markerPosition} />
-          <MapEvents 
-            onPositionChange={handlePositionChange}
-            onAddressChange={onAddressChange}
-          />
         </MapContainer>
       </div>
       <div className="p-3 bg-white/5">
