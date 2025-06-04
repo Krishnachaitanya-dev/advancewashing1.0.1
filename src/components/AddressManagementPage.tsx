@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAddresses } from '@/hooks/useAddresses';
 import AddressCard from './address/AddressCard';

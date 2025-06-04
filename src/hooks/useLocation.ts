@@ -16,7 +16,7 @@ export const useLocation = () => {
     try {
       const permissions = await Geolocation.checkPermissions();
       setPermissionState({
-        status: permissions.location,
+        status: permissions.location as LocationPermissionState['status'],
         canRequest: permissions.location !== 'denied'
       });
       return permissions.location;
@@ -32,7 +32,7 @@ export const useLocation = () => {
       setIsLoading(true);
       const permissions = await Geolocation.requestPermissions();
       setPermissionState({
-        status: permissions.location,
+        status: permissions.location as LocationPermissionState['status'],
         canRequest: permissions.location !== 'denied'
       });
       return permissions.location === 'granted';

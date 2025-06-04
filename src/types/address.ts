@@ -34,7 +34,7 @@ export interface AddressFormData {
 }
 
 export interface LocationPermissionState {
-  status: 'granted' | 'denied' | 'prompt' | 'unknown';
+  status: 'granted' | 'denied' | 'prompt' | 'prompt-with-rationale' | 'unknown';
   canRequest: boolean;
 }
 
