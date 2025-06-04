@@ -69,9 +69,9 @@ const App = () => (
         <RouteGuard>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<LoginPage />} />
-              <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/profile" element={<ProfilePage />} />
