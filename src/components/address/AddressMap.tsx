@@ -20,6 +20,7 @@ interface AddressMapProps {
 
 const reverseGeocode = async (lat: number, lng: number) => {
   try {
+    console.log('Starting reverse geocoding for:', { lat, lng });
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
     );
@@ -50,7 +51,7 @@ const MapEvents = ({
   onAddressChange: (address: any) => void;
   setMarkerPosition: (position: [number, number]) => void;
 }) => {
-  useMapEvents({
+  const map = useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
       console.log('Map clicked:', { lat, lng });
