@@ -52,7 +52,7 @@ jobs:
 
       - name: Install npm dependencies
         run: |
-          npm ci --prefer-offline --no-audit
+          npm ci --legacy-peer-deps --prefer-offline --no-audit
           npm ls
 
       - name: Build web assets
