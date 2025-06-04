@@ -69,20 +69,26 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
     setMarkerPosition([initialPosition.lat, initialPosition.lng]);
   }, [initialPosition.lat, initialPosition.lng]);
 
-  // Handle map click using ref instead of useMapEvents
-  const handleMapReady = (map: L.Map) => {
-    mapRef.current = map;
-    map.on('click', async (e: L.LeafletMouseEvent) => {
-      const { lat, lng } = e.latlng;
-      console.log('Map clicked:', { lat, lng });
-      await handlePositionChange({ lat, lng });
-    });
+  // Handle map ready callback
+  const handleMapReady = () => {
+    // Use setTimeout to ensure the map is fully initialized
+    setTimeout(() => {
+      if (mapRef.current) {
+        console.log('Map ready, adding click listener');
+        mapRef.current.on('click', async (e: L.LeafletMouseEvent) => {
+          const { lat, lng } = e.latlng;
+          console.log('Map clicked:', { lat, lng });
+          await handlePositionChange({ lat, lng });
+        });
+      }
+    }, 100);
   };
 
   return (
     <div className="glass-card overflow-hidden">
       <div className="h-64 w-full">
         <MapContainer
+          ref={mapRef}
           center={markerPosition}
           zoom={16}
           style={{ height: '100%', width: '100%' }}
