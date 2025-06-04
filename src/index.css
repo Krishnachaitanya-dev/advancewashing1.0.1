@@ -1,5 +1,5 @@
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
@@ -70,8 +70,7 @@
     @apply bg-background text-foreground;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    font-family: "Poppins", "Inter", sans-serif;
-    font-weight: 400;
+    font-family: "Inter", sans-serif;
   }
 }
 
@@ -97,19 +96,4 @@
 .leaflet-control-attribution {
   font-size: 10px !important;
   background: rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Professional font styling */
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
-
-.font-display {
-  font-family: "Poppins", sans-serif;
-}
-
-.font-body {
-  font-family: "Inter", sans-serif;
 }
