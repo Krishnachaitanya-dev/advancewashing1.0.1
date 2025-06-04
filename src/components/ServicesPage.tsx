@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -80,10 +81,18 @@ const ServicesPage = () => {
 
     const total = calculateTotal();
 
-    // Navigate directly without showing toast notification
+    // Navigate with only serializable data (exclude icon property)
     navigate('/pickup-details', { 
       state: { 
-        selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
+        selectedServices: selectedServices.map(id => {
+          const service = services.find(s => s.id === id)!;
+          return {
+            id: service.id,
+            name: service.name,
+            price: service.price,
+            color: service.color
+          };
+        }),
         total 
       }
     });

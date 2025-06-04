@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,6 @@ interface Service {
   name: string;
   price: string;
   color: string;
-  icon: any;
 }
 
 const PickupDetailsPage = () => {
