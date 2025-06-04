@@ -1,74 +1,64 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, Check, Shirt } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import ServiceSelectionModal from './ServiceSelectionModal';
 
 const ServicesPage = () => {
-  const serviceCategories = [
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  const services = [
     {
-      id: "regular",
-      name: "Regular",
-      services: [
-        {
-          id: 1,
-          name: 'Regular Wash',
-          price: '$5.99',
-          description: 'Per kg, includes washing, drying, and folding',
-        },
-        {
-          id: 2,
-          name: 'Ironing Service',
-          price: '$3.99',
-          description: 'Per item, professional ironing service',
-        },
-        {
-          id: 3,
-          name: 'Wash & Iron',
-          price: '$8.99',
-          description: 'Per kg, complete wash and iron service',
-        }
-      ]
+      id: 1,
+      name: 'Normal Clothes - Wash & Fold',
+      price: '₹100/kg',
+      color: 'bg-gradient-to-br from-green-400 to-green-500',
+      icon: Shirt,
     },
     {
-      id: "premium",
-      name: "Premium",
-      services: [
-        {
-          id: 4,
-          name: 'Delicate Wash',
-          price: '$9.99',
-          description: 'For silk, wool and other delicate fabrics',
-        },
-        {
-          id: 5,
-          name: 'Dry Cleaning',
-          price: '$12.99',
-          description: 'Per item, professional dry cleaning',
-        }
-      ]
+      id: 2,
+      name: 'Normal Clothes - Wash & Steam Iron',
+      price: '₹150/kg',
+      color: 'bg-gradient-to-br from-pink-400 to-pink-500',
+      icon: Shirt,
     },
     {
-      id: "express",
-      name: "Express",
-      services: [
-        {
-          id: 6,
-          name: '3-Hour Express',
-          price: '$15.99',
-          description: 'Per kg, ready in 3 hours',
-        },
-        {
-          id: 7,
-          name: 'Same Day Delivery',
-          price: '$10.99',
-          description: 'Per kg, delivery on the same day',
-        }
-      ]
+      id: 3,
+      name: 'Bedsheets - Wash & Fold',
+      price: '₹130/kg',
+      color: 'bg-gradient-to-br from-yellow-400 to-yellow-500',
+      icon: Shirt,
+    },
+    {
+      id: 4,
+      name: 'Quilts - Wash & Fold',
+      price: '₹130/kg',
+      color: 'bg-gradient-to-br from-purple-400 to-purple-500',
+      icon: Shirt,
+    },
+    {
+      id: 5,
+      name: 'Curtains - Wash & Fold',
+      price: '₹140/kg',
+      color: 'bg-gradient-to-br from-green-400 to-green-500',
+      icon: Shirt,
+    },
+    {
+      id: 6,
+      name: 'Shoes',
+      price: '₹250/pair',
+      color: 'bg-gradient-to-br from-pink-400 to-pink-500',
+      icon: Shirt,
     }
   ];
+
+  const handleSchedulePickup = () => {
+    setIsModalOpen(true);
+  };
 
   return (
     <AppLayout>
@@ -81,39 +71,40 @@ const ServicesPage = () => {
         />
       </div>
 
-      {/* Services Tabs */}
-      <Tabs defaultValue="regular" className="mb-6">
-        <TabsList className="bg-white/10 backdrop-blur-sm w-full flex justify-between mb-6">
-          {serviceCategories.map(category => (
-            <TabsTrigger 
-              key={category.id}
-              value={category.id}
-              className="flex-1 data-[state=active]:bg-blue-900/60 text-white"
-            >
-              {category.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        
-        {serviceCategories.map(category => (
-          <TabsContent key={category.id} value={category.id}>
-            <div className="space-y-4">
-              {category.services.map(service => (
-                <div key={service.id} className="glass-card p-4">
-                  <div className="flex justify-between mb-2">
-                    <h3 className="text-lg font-medium text-white">{service.name}</h3>
-                    <span className="text-white font-bold">{service.price}</span>
-                  </div>
-                  <p className="text-white/70 text-sm mb-3">{service.description}</p>
-                  <Button className="bg-blue-900 hover:bg-blue-800 text-white w-full">
-                    Add to Order
-                  </Button>
+      {/* Services Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {services.map(service => {
+          const IconComponent = service.icon;
+          return (
+            <div key={service.id} className={`${service.color} p-4 rounded-2xl text-white relative shadow-lg`}>
+              <div className="absolute top-3 right-3">
+                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                  <Check size={14} className="text-white" />
                 </div>
-              ))}
+              </div>
+              <div className="mb-3">
+                <IconComponent size={32} className="text-white opacity-90" />
+              </div>
+              <h3 className="text-sm font-medium mb-2 leading-tight">{service.name}</h3>
+              <p className="text-lg font-bold">{service.price}</p>
             </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+          );
+        })}
+      </div>
+
+      {/* Schedule Pickup Button */}
+      <Button 
+        onClick={handleSchedulePickup}
+        className="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-medium"
+      >
+        Schedule Pickup
+      </Button>
+
+      <ServiceSelectionModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        services={services}
+      />
     </AppLayout>
   );
 };
