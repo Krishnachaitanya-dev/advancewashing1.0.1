@@ -41,14 +41,22 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-const MapClickHandler = ({ onPositionChange, onAddressChange }: {
+const MapClickHandler = ({ 
+  onPositionChange, 
+  onAddressChange,
+  onMarkerUpdate 
+}: {
   onPositionChange: (position: { lat: number; lng: number }) => void;
   onAddressChange: (address: any) => void;
+  onMarkerUpdate: (position: [number, number]) => void;
 }) => {
   useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
       console.log('Map clicked:', { lat, lng });
+      
+      // Update marker position immediately
+      onMarkerUpdate([lat, lng]);
       onPositionChange({ lat, lng });
       
       try {
@@ -94,6 +102,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           <MapClickHandler 
             onPositionChange={onPositionChange}
             onAddressChange={onAddressChange}
+            onMarkerUpdate={setMarkerPosition}
           />
         </MapContainer>
       </div>
