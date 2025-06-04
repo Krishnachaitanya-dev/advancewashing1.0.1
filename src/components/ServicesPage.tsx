@@ -17,42 +17,42 @@ const ServicesPage = () => {
       id: 1,
       name: 'Normal Clothes - Wash & Fold',
       price: '₹100/kg',
-      color: 'from-purple-500 to-purple-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     },
     {
       id: 2,
       name: 'Normal Clothes - Wash & Steam Iron',
       price: '₹150/kg',
-      color: 'from-pink-500 to-pink-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     },
     {
       id: 3,
       name: 'Bedsheets - Wash & Fold',
       price: '₹130/kg',
-      color: 'from-orange-500 to-orange-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     },
     {
       id: 4,
       name: 'Quilts - Wash & Fold',
       price: '₹130/kg',
-      color: 'from-teal-500 to-teal-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     },
     {
       id: 5,
       name: 'Curtains - Wash & Fold',
       price: '₹140/kg',
-      color: 'from-indigo-500 to-indigo-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     },
     {
       id: 6,
       name: 'Shoes',
       price: '₹250/pair',
-      color: 'from-red-500 to-red-600',
+      color: 'from-blue-500 to-blue-600',
       icon: Shirt,
     }
   ];
@@ -81,13 +81,11 @@ const ServicesPage = () => {
 
     const total = calculateTotal();
 
-    // Always show notification and proceed
     toast({
       title: "Services Selected!",
       description: `Proceeding to pickup details with ${selectedServices.length} services.`,
     });
 
-    // Navigate immediately without delay
     navigate('/pickup-details', { 
       state: { 
         selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
@@ -119,13 +117,13 @@ const ServicesPage = () => {
               onClick={() => handleServiceToggle(service.id)}
               className={`${
                 isSelected 
-                  ? 'bg-gradient-to-br from-green-500 to-green-600' 
+                  ? 'bg-gradient-to-br from-blue-700 to-blue-800 ring-2 ring-blue-300' 
                   : `bg-gradient-to-br ${service.color}`
               } p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
             >
               <div className="absolute top-3 right-3">
                 <div className={`w-6 h-6 ${isSelected ? 'bg-white' : 'bg-white/20'} rounded-full flex items-center justify-center transition-colors`}>
-                  <Check size={14} className={isSelected ? 'text-green-600' : 'text-white'} />
+                  <Check size={14} className={isSelected ? 'text-blue-600' : 'text-white'} />
                 </div>
               </div>
               <div className="mb-3">
