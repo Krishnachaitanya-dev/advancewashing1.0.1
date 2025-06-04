@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { Search, Check, Shirt, Zap, Bed, Shield, Curtains, Footprints } from 'lucide-react';
+import { Search, Check, Shirt, Zap, Bed, Shield, Package, Footprints } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +46,7 @@ const ServicesPage = () => {
       name: 'Curtains - Wash & Fold',
       price: '₹140/kg',
       color: 'from-blue-500 to-blue-600',
-      icon: Curtains
+      icon: Package
     },
     {
       id: 6,
