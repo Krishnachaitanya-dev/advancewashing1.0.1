@@ -45,14 +45,20 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
   const [mapPosition, setMapPosition] = useState(initialPosition);
   const markerRef = useRef<any>(null);
 
-  const handlePositionChange = (newPosition: { lat: number; lng: number }) => {
+  const handlePositionChange = async (newPosition: { lat: number; lng: number }) => {
+    console.log('Position changed:', newPosition);
     setMapPosition(newPosition);
     onPositionChange(newPosition);
-    reverseGeocode(newPosition.lat, newPosition.lng).then(address => {
+    
+    try {
+      const address = await reverseGeocode(newPosition.lat, newPosition.lng);
       if (address) {
+        console.log('Address found:', address);
         onAddressChange(address);
       }
-    });
+    } catch (error) {
+      console.error('Error in reverse geocoding:', error);
+    }
   };
 
   const eventHandlers = {
@@ -66,6 +72,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
   };
 
   useEffect(() => {
+    console.log('Map position updated:', initialPosition);
     setMapPosition(initialPosition);
   }, [initialPosition]);
 
@@ -77,6 +84,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
+          key={`${mapPosition.lat}-${mapPosition.lng}`}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -85,7 +93,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           <Marker
             draggable={true}
             eventHandlers={eventHandlers}
-            position={mapPosition}
+            position={[mapPosition.lat, mapPosition.lng]}
             ref={markerRef}
           />
         </MapContainer>
