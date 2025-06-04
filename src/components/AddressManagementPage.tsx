@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -8,15 +7,19 @@ import { useAddresses } from '@/hooks/useAddresses';
 import AddressCard from './address/AddressCard';
 import AddressForm from './address/AddressForm';
 import { Address, AddressFormData } from '@/types/address';
-
 type ViewMode = 'list' | 'add' | 'edit';
-
 const AddressManagementPage = () => {
-  const { addresses, isLoading, addAddress, updateAddress, deleteAddress, setDefaultAddress } = useAddresses();
+  const {
+    addresses,
+    isLoading,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress
+  } = useAddresses();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-
   const handleAddAddress = async (formData: AddressFormData) => {
     setFormLoading(true);
     try {
@@ -26,10 +29,8 @@ const AddressManagementPage = () => {
       setFormLoading(false);
     }
   };
-
   const handleUpdateAddress = async (formData: AddressFormData) => {
     if (!editingAddress) return;
-    
     setFormLoading(true);
     try {
       await updateAddress(editingAddress.id, formData);
@@ -39,147 +40,89 @@ const AddressManagementPage = () => {
       setFormLoading(false);
     }
   };
-
   const handleEdit = (address: Address) => {
     setEditingAddress(address);
     setViewMode('edit');
   };
-
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this address?')) {
       await deleteAddress(id);
     }
   };
-
   const handleCancel = () => {
     setViewMode('list');
     setEditingAddress(null);
   };
-
   if (viewMode === 'add') {
-    return (
-      <AppLayout>
+    return <AppLayout>
         <div className="space-y-6">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode('list')}
-              className="text-white mr-3 hover:bg-white/10"
-            >
+            <Button variant="ghost" size="icon" onClick={() => setViewMode('list')} className="text-white mr-3 hover:bg-white/10">
               <ArrowLeft size={20} />
             </Button>
             <h1 className="text-xl font-semibold text-white">Add New Address</h1>
           </div>
 
           <div className="glass-card p-6">
-            <AddressForm
-              onSubmit={handleAddAddress}
-              onCancel={handleCancel}
-              isLoading={formLoading}
-            />
+            <AddressForm onSubmit={handleAddAddress} onCancel={handleCancel} isLoading={formLoading} />
           </div>
         </div>
-      </AppLayout>
-    );
+      </AppLayout>;
   }
-
   if (viewMode === 'edit' && editingAddress) {
-    return (
-      <AppLayout>
+    return <AppLayout>
         <div className="space-y-6">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode('list')}
-              className="text-white mr-3 hover:bg-white/10"
-            >
+            <Button variant="ghost" size="icon" onClick={() => setViewMode('list')} className="text-white mr-3 hover:bg-white/10">
               <ArrowLeft size={20} />
             </Button>
             <h1 className="text-xl font-semibold text-white">Edit Address</h1>
           </div>
 
           <div className="glass-card p-6">
-            <AddressForm
-              onSubmit={handleUpdateAddress}
-              onCancel={handleCancel}
-              initialData={editingAddress}
-              isLoading={formLoading}
-            />
+            <AddressForm onSubmit={handleUpdateAddress} onCancel={handleCancel} initialData={editingAddress} isLoading={formLoading} />
           </div>
         </div>
-      </AppLayout>
-    );
+      </AppLayout>;
   }
-
-  return (
-    <AppLayout>
+  return <AppLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link to="/profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white mr-3 hover:bg-white/10"
-              >
+              <Button variant="ghost" size="icon" className="text-white mr-3 hover:bg-white/10">
                 <ArrowLeft size={20} />
               </Button>
             </Link>
             <h1 className="text-xl font-semibold text-white">My Addresses</h1>
           </div>
           
-          <Button
-            onClick={() => setViewMode('add')}
-            className="bg-green-500 hover:bg-green-600 text-white"
-          >
+          <Button onClick={() => setViewMode('add')} className="bg-green-500 hover:bg-green-600 text-white mx-0 my-0 py-0 px-[15px]">
             <Plus size={16} className="mr-2" />
             Add Address
           </Button>
         </div>
 
         {/* Address List */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="glass-card p-4 animate-pulse">
+        {isLoading ? <div className="space-y-4">
+            {[1, 2, 3].map(i => <div key={i} className="glass-card p-4 animate-pulse">
                 <div className="h-4 bg-white/20 rounded mb-2"></div>
                 <div className="h-3 bg-white/10 rounded mb-1"></div>
                 <div className="h-3 bg-white/10 rounded w-2/3"></div>
-              </div>
-            ))}
-          </div>
-        ) : addresses.length === 0 ? (
-          <div className="glass-card p-8 text-center">
+              </div>)}
+          </div> : addresses.length === 0 ? <div className="glass-card p-8 text-center">
             <MapPin size={48} className="mx-auto text-white/40 mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">No addresses added yet</h3>
             <p className="text-white/70 mb-4">Add your first address to get started</p>
-            <Button
-              onClick={() => setViewMode('add')}
-              className="bg-green-500 hover:bg-green-600 text-white"
-            >
+            <Button onClick={() => setViewMode('add')} className="bg-green-500 hover:bg-green-600 text-white">
               <Plus size={16} className="mr-2" />
               Add Your First Address
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {addresses.map((address) => (
-              <AddressCard
-                key={address.id}
-                address={address}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onSetDefault={setDefaultAddress}
-              />
-            ))}
-          </div>
-        )}
+          </div> : <div className="space-y-4">
+            {addresses.map(address => <AddressCard key={address.id} address={address} onEdit={handleEdit} onDelete={handleDelete} onSetDefault={setDefaultAddress} />)}
+          </div>}
       </div>
-    </AppLayout>
-  );
+    </AppLayout>;
 };
-
 export default AddressManagementPage;
