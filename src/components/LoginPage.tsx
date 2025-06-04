@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,14 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Check if user is already logged in (for mobile app persistence)
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (isLoggedIn === 'true') {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -19,13 +27,15 @@ const LoginPage = () => {
     // Simulate login process
     setTimeout(() => {
       setIsLoading(false);
+      // Store login state for mobile app
+      localStorage.setItem('isLoggedIn', 'true');
       // Navigate to home page after successful login
-      navigate('/home');
-    }, 1500);
+      navigate('/home', { replace: true });
+    }, 1000); // Reduced delay for better mobile UX
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex flex-col items-center justify-center p-6 relative">
+    <div className="min-h-screen bg-blue-600 flex flex-col items-center justify-center p-6 relative">
       {/* Logo and Brand Section */}
       <div className="text-center mb-16">
         {/* Logo */}
@@ -53,7 +63,7 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email or phone"
-              className="h-14 bg-white/90 backdrop-blur-xl border-0 rounded-full px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
+              className="h-14 bg-white/90 border-0 rounded-full px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
               required
             />
           </div>
@@ -65,7 +75,7 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="h-14 bg-white/90 backdrop-blur-xl border-0 rounded-full px-6 pr-14 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
+              className="h-14 bg-white/90 border-0 rounded-full px-6 pr-14 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
               required
             />
             <button

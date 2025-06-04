@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
 // Lazy load pages for better performance
@@ -16,20 +16,22 @@ const PickupDetailsPage = lazy(() => import("./pages/PickupDetails"));
 const AddressManagementPage = lazy(() => import("./pages/AddressManagement"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
-// Optimize query client for mobile
+// Optimize query client for mobile with longer cache times
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: 1,
+      staleTime: 10 * 60 * 1000, // 10 minutes - longer for mobile
+      gcTime: 30 * 60 * 1000, // 30 minutes - longer cache retention
+      retry: 2, // More retries for mobile network issues
+      refetchOnWindowFocus: false, // Disable for mobile
+      refetchOnReconnect: true, // Keep for mobile connectivity
     },
   },
 });
 
-// Loading component for suspense
+// Optimized loading component for mobile
 const LoadingSpinner = () => (
-  <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 flex items-center justify-center">
+  <div className="min-h-screen bg-blue-600 flex items-center justify-center">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
   </div>
 );
@@ -42,9 +44,9 @@ const App = () => (
       <BrowserRouter>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/home" element={<HomePage />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/profile" element={<ProfilePage />} />

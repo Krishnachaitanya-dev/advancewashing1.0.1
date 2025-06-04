@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Optimize for mobile
+    // Optimize for mobile with smaller chunks
     target: 'es2015',
     minify: 'terser',
     rollupOptions: {
@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => ({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast'],
+          icons: ['lucide-react'],
         },
       },
     },
@@ -37,10 +38,17 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
+        pure_funcs: mode === 'production' ? ['console.log'] : [],
       },
     },
+    // Optimize chunk sizes for mobile
+    chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
+  },
+  // Add mobile-specific optimizations
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   },
 }));
