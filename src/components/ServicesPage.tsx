@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Search, Check, Shirt } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import ServiceSelectionModal from './ServiceSelectionModal';
+import { useNavigate } from 'react-router-dom';
 
 const ServicesPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const services = [
     {
@@ -56,8 +57,51 @@ const ServicesPage = () => {
     }
   ];
 
+  const handleServiceToggle = (serviceId: number) => {
+    setSelectedServices(prev => 
+      prev.includes(serviceId) 
+        ? prev.filter(id => id !== serviceId)
+        : [...prev, serviceId]
+    );
+  };
+
+  const calculateTotal = () => {
+    return selectedServices.length * 100; // Assuming average ₹100 per service
+  };
+
   const handleSchedulePickup = () => {
-    setIsModalOpen(true);
+    const total = calculateTotal();
+    
+    if (selectedServices.length === 0) {
+      toast({
+        title: "No services selected",
+        description: "Please select at least one service to proceed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (total < 500) {
+      toast({
+        title: "Minimum Order Value",
+        description: "Minimum order value should be ₹500. Please add more services.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Services Selected!",
+      description: `Total: ₹${total}. Proceeding to pickup details.`,
+    });
+
+    // Navigate to pickup details page with selected services
+    navigate('/pickup-details', { 
+      state: { 
+        selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
+        total 
+      }
+    });
   };
 
   return (
@@ -72,14 +116,20 @@ const ServicesPage = () => {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {services.map(service => {
           const IconComponent = service.icon;
+          const isSelected = selectedServices.includes(service.id);
+          
           return (
-            <div key={service.id} className={`${service.color} p-4 rounded-2xl text-white relative shadow-lg`}>
+            <div 
+              key={service.id} 
+              onClick={() => handleServiceToggle(service.id)}
+              className={`${isSelected ? 'bg-blue-600' : service.color} p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
+            >
               <div className="absolute top-3 right-3">
-                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                  <Check size={14} className="text-white" />
+                <div className={`w-6 h-6 ${isSelected ? 'bg-white' : 'bg-white/20'} rounded-full flex items-center justify-center transition-colors`}>
+                  <Check size={14} className={isSelected ? 'text-blue-600' : 'text-white'} />
                 </div>
               </div>
               <div className="mb-3">
@@ -92,6 +142,16 @@ const ServicesPage = () => {
         })}
       </div>
 
+      {/* Selected Services Summary */}
+      {selectedServices.length > 0 && (
+        <div className="glass-card p-4 mb-4">
+          <div className="flex justify-between items-center text-white">
+            <span className="font-medium">{selectedServices.length} services selected</span>
+            <span className="font-bold text-lg">₹{calculateTotal()}</span>
+          </div>
+        </div>
+      )}
+
       {/* Schedule Pickup Button */}
       <Button 
         onClick={handleSchedulePickup}
@@ -99,12 +159,6 @@ const ServicesPage = () => {
       >
         Schedule Pickup
       </Button>
-
-      <ServiceSelectionModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        services={services}
-      />
     </AppLayout>
   );
 };

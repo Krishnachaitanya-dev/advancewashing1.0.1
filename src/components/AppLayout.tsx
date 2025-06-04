@@ -30,46 +30,46 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <img 
               src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" 
               alt="AW Logo" 
-              className="w-12 h-12 mr-3"
+              className="w-10 h-10 sm:w-12 sm:h-12 mr-2 sm:mr-3"
             />
-            <h1 className="text-white text-xl font-semibold">Advance Washing</h1>
+            <h1 className="text-white text-lg sm:text-xl font-semibold">Advance Washing</h1>
           </div>
         </header>
 
         {/* Main content */}
-        <main className="flex-1 p-4">
+        <main className="flex-1 p-4 pb-20">
           {children}
         </main>
 
         {/* Bottom Navigation */}
-        <nav className="bg-blue-900/60 backdrop-blur-md border-t border-white/10">
-          <div className="flex justify-around">
+        <nav className="fixed bottom-0 left-0 right-0 bg-blue-900/80 backdrop-blur-md border-t border-white/10">
+          <div className="flex justify-around max-w-md mx-auto">
             <Link 
               to="/" 
-              className={`p-4 flex flex-col items-center ${isActive('/') ? 'text-white' : 'text-white/70'}`}
+              className={`p-3 sm:p-4 flex flex-col items-center ${isActive('/') ? 'text-white' : 'text-white/70'} transition-colors`}
             >
-              <Home size={24} />
+              <Home size={20} className="sm:w-6 sm:h-6" />
               <span className="text-xs mt-1">Home</span>
             </Link>
             <Link 
               to="/services" 
-              className={`p-4 flex flex-col items-center ${isActive('/services') ? 'text-white' : 'text-white/70'}`}
+              className={`p-3 sm:p-4 flex flex-col items-center ${isActive('/services') ? 'text-white' : 'text-white/70'} transition-colors`}
             >
-              <ShoppingBag size={24} />
+              <ShoppingBag size={20} className="sm:w-6 sm:h-6" />
               <span className="text-xs mt-1">Services</span>
             </Link>
             <Link 
               to="/orders" 
-              className={`p-4 flex flex-col items-center ${isActive('/orders') ? 'text-white' : 'text-white/70'}`}
+              className={`p-3 sm:p-4 flex flex-col items-center ${isActive('/orders') ? 'text-white' : 'text-white/70'} transition-colors`}
             >
-              <Package size={24} />
+              <Package size={20} className="sm:w-6 sm:h-6" />
               <span className="text-xs mt-1">Orders</span>
             </Link>
             <Link 
               to="/profile" 
-              className={`p-4 flex flex-col items-center ${isActive('/profile') ? 'text-white' : 'text-white/70'}`}
+              className={`p-3 sm:p-4 flex flex-col items-center ${isActive('/profile') ? 'text-white' : 'text-white/70'} transition-colors`}
             >
-              <User size={24} />
+              <User size={20} className="sm:w-6 sm:h-6" />
               <span className="text-xs mt-1">Profile</span>
             </Link>
           </div>
