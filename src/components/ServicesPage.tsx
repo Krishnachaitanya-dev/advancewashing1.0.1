@@ -17,42 +17,36 @@ const ServicesPage = () => {
       id: 1,
       name: 'Normal Clothes - Wash & Fold',
       price: '₹100/kg',
-      color: 'bg-gradient-to-br from-green-400 to-green-500',
       icon: Shirt,
     },
     {
       id: 2,
       name: 'Normal Clothes - Wash & Steam Iron',
       price: '₹150/kg',
-      color: 'bg-gradient-to-br from-pink-400 to-pink-500',
       icon: Shirt,
     },
     {
       id: 3,
       name: 'Bedsheets - Wash & Fold',
       price: '₹130/kg',
-      color: 'bg-gradient-to-br from-yellow-400 to-yellow-500',
       icon: Shirt,
     },
     {
       id: 4,
       name: 'Quilts - Wash & Fold',
       price: '₹130/kg',
-      color: 'bg-gradient-to-br from-purple-400 to-purple-500',
       icon: Shirt,
     },
     {
       id: 5,
       name: 'Curtains - Wash & Fold',
       price: '₹140/kg',
-      color: 'bg-gradient-to-br from-green-400 to-green-500',
       icon: Shirt,
     },
     {
       id: 6,
       name: 'Shoes',
       price: '₹250/pair',
-      color: 'bg-gradient-to-br from-pink-400 to-pink-500',
       icon: Shirt,
     }
   ];
@@ -70,8 +64,6 @@ const ServicesPage = () => {
   };
 
   const handleSchedulePickup = () => {
-    const total = calculateTotal();
-    
     if (selectedServices.length === 0) {
       toast({
         title: "No services selected",
@@ -81,18 +73,12 @@ const ServicesPage = () => {
       return;
     }
 
-    if (total < 500) {
-      toast({
-        title: "Minimum Order Value",
-        description: "Minimum order value should be ₹500. Please add more services.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const total = calculateTotal();
 
+    // Always show notification and proceed
     toast({
       title: "Services Selected!",
-      description: `Total: ₹${total}. Proceeding to pickup details.`,
+      description: `Total: ₹${total}. Minimum order value is ₹500. Proceeding to pickup details.`,
     });
 
     // Navigate to pickup details page with selected services
@@ -125,11 +111,15 @@ const ServicesPage = () => {
             <div 
               key={service.id} 
               onClick={() => handleServiceToggle(service.id)}
-              className={`${isSelected ? 'bg-blue-600' : service.color} p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
+              className={`${
+                isSelected 
+                  ? 'bg-gradient-to-br from-green-500 to-green-600' 
+                  : 'bg-gradient-to-br from-blue-500 to-blue-600'
+              } p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
             >
               <div className="absolute top-3 right-3">
                 <div className={`w-6 h-6 ${isSelected ? 'bg-white' : 'bg-white/20'} rounded-full flex items-center justify-center transition-colors`}>
-                  <Check size={14} className={isSelected ? 'text-blue-600' : 'text-white'} />
+                  <Check size={14} className={isSelected ? 'text-green-600' : 'text-white'} />
                 </div>
               </div>
               <div className="mb-3">
