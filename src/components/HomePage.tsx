@@ -72,7 +72,7 @@ const HomePage = () => {
           </div>
         </div>
         <Link to="/orders">
-          <Button variant="outline" className="w-full border-white/20 text-sm text-zinc-800 bg-purple-400 hover:bg-purple-300">
+          <Button variant="outline" className="w-full border-white/20 text-sm text-zinc-800 bg-sky-500 hover:bg-sky-400">
             Track Order
           </Button>
         </Link>
