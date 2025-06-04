@@ -68,26 +68,70 @@ const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
       setIsLoading(true);
       console.log('Reverse geocoding for:', { lat, lng });
       
-      // Use multiple geocoding services for better accuracy
-      const nominatimResponse = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`
-      );
-      const nominatimData = await nominatimResponse.json();
+      // Use multiple geocoding attempts for better pincode accuracy
+      const promises = [
+        // High zoom level for precise location
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`),
+        // Lower zoom for better administrative data
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1&accept-language=en`),
+        // Even lower zoom for postal code
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=12&addressdetails=1&accept-language=en`)
+      ];
+
+      const responses = await Promise.all(promises);
+      const dataPromises = responses.map(response => response.json());
+      const [highZoom, mediumZoom, lowZoom] = await Promise.all(dataPromises);
       
-      if (nominatimData && nominatimData.address) {
-        const addr = nominatimData.address;
-        
-        // Try to get more accurate pincode from higher zoom level
-        const detailedResponse = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=20&addressdetails=1&accept-language=en`
-        );
-        const detailedData = await detailedResponse.json();
+      // Try to get the most accurate pincode from different zoom levels
+      let bestPincode = '';
+      let bestAddress = null;
+      
+      for (const data of [highZoom, mediumZoom, lowZoom]) {
+        if (data && data.address && data.address.postcode) {
+          // Validate pincode format (6 digits)
+          const pincode = data.address.postcode.replace(/\D/g, ''); // Remove non-digits
+          if (pincode.length === 6) {
+            bestPincode = pincode;
+            bestAddress = data;
+            break;
+          }
+        }
+      }
+      
+      // If no good pincode found, try a nearby search
+      if (!bestPincode) {
+        try {
+          const nearbyResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&lat=${lat}&lon=${lng}&limit=5&addressdetails=1&accept-language=en`
+          );
+          const nearbyData = await nearbyResponse.json();
+          
+          for (const item of nearbyData) {
+            if (item.address && item.address.postcode) {
+              const pincode = item.address.postcode.replace(/\D/g, '');
+              if (pincode.length === 6) {
+                bestPincode = pincode;
+                bestAddress = item;
+                break;
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Nearby search failed:', error);
+        }
+      }
+      
+      // Use the best available data
+      const addressData = bestAddress || highZoom;
+      
+      if (addressData && addressData.address) {
+        const addr = addressData.address;
         
         const address = {
           street: `${addr.house_number || ''} ${addr.road || addr.pedestrian || addr.suburb || ''}`.trim(),
           city: addr.city || addr.town || addr.village || addr.county || '',
           state: addr.state || '',
-          pincode: detailedData?.address?.postcode || addr.postcode || '',
+          pincode: bestPincode || addr.postcode || '',
           landmark: addr.amenity || addr.shop || addr.tourism || ''
         };
         
@@ -138,7 +182,7 @@ const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
       <div className="p-3 bg-white/5 border-b border-white/10">
         <div className="flex items-center justify-between">
           <p className="text-sm text-white/70">
-            📍 Click on map or use current location
+            📍 Click on map to set location
           </p>
           <Button
             type="button"

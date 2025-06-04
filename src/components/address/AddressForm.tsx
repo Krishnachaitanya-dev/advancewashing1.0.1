@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import AddressLabelSelector from './AddressLabelSelector';
 import SimpleMap from './SimpleMap';
 import { AddressFormData, Address } from '@/types/address';
-import { MapPin, Loader2 } from 'lucide-react';
 
 const addressSchema = z.object({
   doorNo: z.string().min(1, 'Door/Flat number is required'),
@@ -32,8 +31,6 @@ interface AddressFormProps {
 }
 
 const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressFormProps) => {
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
-  
   const {
     register,
     handleSubmit,
@@ -57,51 +54,6 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
 
   const selectedLabel = watch('label');
 
-  const handleQuickLocation = async () => {
-    setIsGettingLocation(true);
-    try {
-      if (!navigator.geolocation) {
-        throw new Error('Geolocation is not supported by this browser');
-      }
-
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 60000
-          }
-        );
-      });
-
-      const { latitude: lat, longitude: lng } = position.coords;
-      
-      // Use multiple geocoding attempts for better accuracy
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=20&addressdetails=1&accept-language=en`
-      );
-      const data = await response.json();
-      
-      if (data && data.address) {
-        const address = data.address;
-        
-        setValue('street', `${address.house_number || ''} ${address.road || address.pedestrian || address.suburb || ''}`.trim());
-        setValue('city', address.city || address.town || address.village || address.county || '');
-        setValue('state', address.state || '');
-        setValue('pincode', address.postcode || '');
-        if (address.amenity || address.shop || address.tourism) {
-          setValue('landmark', address.amenity || address.shop || address.tourism);
-        }
-      }
-    } catch (error) {
-      console.error('Error getting location:', error);
-    } finally {
-      setIsGettingLocation(false);
-    }
-  };
-
   const handleMapAddressSelect = (addressData: any) => {
     if (addressData.street) setValue('street', addressData.street);
     if (addressData.city) setValue('city', addressData.city);
@@ -112,33 +64,6 @@ const AddressForm = ({ onSubmit, onCancel, initialData, isLoading }: AddressForm
 
   return (
     <div className="space-y-6">
-      {/* Quick Location Section */}
-      <div className="glass-card p-4 text-center">
-        <MapPin className="mx-auto text-green-400 mb-3" size={32} />
-        <h3 className="text-base font-medium text-white mb-2">Quick Auto-fill</h3>
-        <p className="text-white/70 text-sm mb-3">
-          Use your current location to quickly fill address details
-        </p>
-        <Button
-          type="button"
-          onClick={handleQuickLocation}
-          disabled={isGettingLocation}
-          className="bg-green-500 hover:bg-green-600 text-white"
-        >
-          {isGettingLocation ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Getting Location...
-            </>
-          ) : (
-            <>
-              <MapPin className="mr-2 h-4 w-4" />
-              Use My Location
-            </>
-          )}
-        </Button>
-      </div>
-
       {/* Interactive Map */}
       <SimpleMap onAddressSelect={handleMapAddressSelect} />
 
