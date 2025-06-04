@@ -84,18 +84,16 @@ const ServicesPage = () => {
     // Always show notification and proceed
     toast({
       title: "Services Selected!",
-      description: `Total: ₹${total}. Minimum order value is ₹500. Proceeding to pickup details.`,
+      description: `Proceeding to pickup details with ${selectedServices.length} services.`,
     });
 
-    // Small delay to show the toast before navigation
-    setTimeout(() => {
-      navigate('/pickup-details', { 
-        state: { 
-          selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
-          total 
-        }
-      });
-    }, 1000);
+    // Navigate immediately without delay
+    navigate('/pickup-details', { 
+      state: { 
+        selectedServices: selectedServices.map(id => services.find(s => s.id === id)!),
+        total 
+      }
+    });
   };
 
   return (

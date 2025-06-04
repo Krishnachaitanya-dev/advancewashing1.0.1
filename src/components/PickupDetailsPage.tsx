@@ -77,6 +77,26 @@ const PickupDetailsPage = () => {
           <h1 className="text-xl font-semibold text-white">Pickup Details</h1>
         </div>
 
+        {/* Minimum Order Information Box */}
+        {total < 500 && (
+          <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-4 border border-yellow-400/30">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                <span className="text-yellow-900 text-sm font-bold">!</span>
+              </div>
+              <div>
+                <h3 className="text-base font-medium text-yellow-100 mb-1">
+                  Minimum Order Information
+                </h3>
+                <p className="text-sm text-yellow-200">
+                  Our recommended minimum order value is ₹500. Your current order is ₹{total}. 
+                  You can still proceed with your order.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Pickup Date */}
         <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
           <h3 className="text-base font-medium text-white mb-3">📅 Select Pickup Date</h3>
