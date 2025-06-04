@@ -1,40 +1,31 @@
-
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
 import { Shirt, Clock, Award, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 const HomePage = () => {
-  const services = [
-    {
-      id: 1,
-      name: 'Regular Wash',
-      icon: <Shirt className="w-6 h-6" />,
-      description: 'Standard washing service for your clothes'
-    },
-    {
-      id: 2,
-      name: 'Express Service',
-      icon: <Clock className="w-6 h-6" />,
-      description: 'Get your clothes cleaned in just 3 hours'
-    },
-    {
-      id: 3,
-      name: 'Premium Care',
-      icon: <Award className="w-6 h-6" />,
-      description: 'Special care for your delicate fabrics'
-    },
-    {
-      id: 4,
-      name: 'Dry Cleaning',
-      icon: <Sparkles className="w-6 h-6" />,
-      description: 'Professional dry cleaning service'
-    }
-  ];
-
-  return (
-    <AppLayout>
+  const services = [{
+    id: 1,
+    name: 'Regular Wash',
+    icon: <Shirt className="w-6 h-6" />,
+    description: 'Standard washing service for your clothes'
+  }, {
+    id: 2,
+    name: 'Express Service',
+    icon: <Clock className="w-6 h-6" />,
+    description: 'Get your clothes cleaned in just 3 hours'
+  }, {
+    id: 3,
+    name: 'Premium Care',
+    icon: <Award className="w-6 h-6" />,
+    description: 'Special care for your delicate fabrics'
+  }, {
+    id: 4,
+    name: 'Dry Cleaning',
+    icon: <Sparkles className="w-6 h-6" />,
+    description: 'Professional dry cleaning service'
+  }];
+  return <AppLayout>
       {/* Hero Section */}
       <div className="glass-card p-4 sm:p-6 mb-6">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Welcome to Advance Washing</h2>
@@ -58,15 +49,13 @@ const HomePage = () => {
         </div>
         
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {services.map((service) => (
-            <div key={service.id} className="glass-card p-3 sm:p-4 flex flex-col items-center">
+          {services.map(service => <div key={service.id} className="glass-card p-3 sm:p-4 flex flex-col items-center">
               <div className="bg-blue-900/60 rounded-full p-2 sm:p-3 mb-2">
                 {service.icon}
               </div>
               <h4 className="text-white font-medium text-sm sm:text-base text-center">{service.name}</h4>
               <p className="text-white/70 text-xs text-center mt-1">{service.description}</p>
-            </div>
-          ))}
+            </div>)}
         </div>
       </div>
 
@@ -83,13 +72,11 @@ const HomePage = () => {
           </div>
         </div>
         <Link to="/orders">
-          <Button variant="outline" className="w-full border-white/20 text-white text-sm">
+          <Button variant="outline" className="w-full border-white/20 text-sm text-zinc-800 bg-purple-400 hover:bg-purple-300">
             Track Order
           </Button>
         </Link>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>;
 };
-
 export default HomePage;
