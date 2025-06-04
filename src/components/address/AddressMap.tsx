@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -41,61 +41,28 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-const DraggableMarker = ({ position, onPositionChange, onAddressChange }: any) => {
-  const [markerPosition, setMarkerPosition] = useState(position);
+const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
+  const [mapPosition, setMapPosition] = useState(initialPosition);
   const markerRef = useRef<any>(null);
+
+  const handlePositionChange = (newPosition: { lat: number; lng: number }) => {
+    setMapPosition(newPosition);
+    onPositionChange(newPosition);
+    reverseGeocode(newPosition.lat, newPosition.lng).then(address => {
+      if (address) {
+        onAddressChange(address);
+      }
+    });
+  };
 
   const eventHandlers = {
     dragend() {
       const marker = markerRef.current;
       if (marker != null) {
         const newPos = marker.getLatLng();
-        setMarkerPosition(newPos);
-        onPositionChange(newPos);
-        reverseGeocode(newPos.lat, newPos.lng).then(address => {
-          if (address) {
-            onAddressChange(address);
-          }
-        });
+        handlePositionChange(newPos);
       }
     },
-  };
-
-  useEffect(() => {
-    setMarkerPosition(position);
-  }, [position]);
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      position={markerPosition}
-      ref={markerRef}
-    />
-  );
-};
-
-const MapClickHandler = ({ onPositionChange, onAddressChange }: any) => {
-  useMapEvents({
-    click(e) {
-      onPositionChange(e.latlng);
-      reverseGeocode(e.latlng.lat, e.latlng.lng).then(address => {
-        if (address) {
-          onAddressChange(address);
-        }
-      });
-    },
-  });
-
-  return null;
-};
-
-const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
-  const [mapPosition, setMapPosition] = useState(initialPosition);
-
-  const handlePositionChange = (newPosition: { lat: number; lng: number }) => {
-    setMapPosition(newPosition);
-    onPositionChange(newPosition);
   };
 
   useEffect(() => {
@@ -115,20 +82,17 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <DraggableMarker
+          <Marker
+            draggable={true}
+            eventHandlers={eventHandlers}
             position={mapPosition}
-            onPositionChange={handlePositionChange}
-            onAddressChange={onAddressChange}
-          />
-          <MapClickHandler
-            onPositionChange={handlePositionChange}
-            onAddressChange={onAddressChange}
+            ref={markerRef}
           />
         </MapContainer>
       </div>
       <div className="p-3 bg-white/5">
         <p className="text-xs text-white/70 text-center">
-          📍 Drag the pin or tap on the map to adjust your location
+          📍 Drag the pin to adjust your location
         </p>
       </div>
     </div>
