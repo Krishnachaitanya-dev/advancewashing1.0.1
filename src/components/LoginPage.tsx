@@ -3,18 +3,25 @@ import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     // Simulate login process
-    setTimeout(() => setIsLoading(false), 1500);
+    setTimeout(() => {
+      setIsLoading(false);
+      // Navigate to home page after successful login
+      navigate('/home');
+    }, 1500);
   };
 
   return (
