@@ -60,17 +60,29 @@ jobs:
           npm run build
           ls -la dist/
 
-      - name: Sync Capacitor
+      - name: Sync Capacitor (without build)
         run: |
-          npx cap sync android --no-build
+          npx cap sync android
           ls -la android/
+
+      - name: Verify Android project structure
+        working-directory: android
+        run: |
+          echo "Checking Android project structure..."
+          ls -la
+          ls -la app/
+          if [ ! -f "gradlew" ]; then
+            echo "Error: gradlew not found"
+            exit 1
+          fi
+          chmod +x gradlew
 
       - name: Validate Android project
         working-directory: android
         run: |
           ./gradlew --version
           ./gradlew projects
-          ./gradlew dependencies --configuration implementation | head -20
+          ./gradlew tasks --group="android" | head -20
 
       - name: Clean Android project
         working-directory: android
@@ -83,12 +95,18 @@ jobs:
         run: |
           ./gradlew assembleDebug --stacktrace --info --no-daemon
         env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -Dorg.gradle.daemon=false"
 
       - name: Verify APK creation
         run: |
-          ls -la android/app/build/outputs/apk/debug/
-          file android/app/build/outputs/apk/debug/app-debug.apk
+          if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            ls -la android/app/build/outputs/apk/debug/
+            file android/app/build/outputs/apk/debug/app-debug.apk
+          else
+            echo "APK not found, listing build directory structure..."
+            find android/app/build -name "*.apk" -o -name "*.aab" 2>/dev/null || echo "No APK/AAB files found"
+            exit 1
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -105,4 +123,6 @@ jobs:
           path: |
             android/app/build/reports/
             android/build/reports/
+            android/app/build/tmp/
           retention-days: 7
+          if-no-files-found: ignore
