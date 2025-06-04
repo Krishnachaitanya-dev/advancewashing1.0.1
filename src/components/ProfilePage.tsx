@@ -1,7 +1,10 @@
+
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
 import { User, Settings, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 const ProfilePage = () => {
   const profileSections = [{
     title: 'Account',
@@ -22,7 +25,8 @@ const ProfilePage = () => {
       id: 'address',
       name: 'My Addresses',
       icon: <MapPin className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />
+      action: <ChevronRight className="w-5 h-5" />,
+      href: '/profile/addresses'
     }, {
       id: 'payment',
       name: 'Payment Methods',
@@ -43,6 +47,7 @@ const ProfilePage = () => {
       action: <ChevronRight className="w-5 h-5" />
     }]
   }];
+
   return <AppLayout>
       {/* Profile Header */}
       <div className="glass-card p-6 mb-6 flex items-center">
@@ -60,13 +65,27 @@ const ProfilePage = () => {
         {profileSections.map(section => <div key={section.title}>
             <h3 className="text-white text-lg font-medium mb-3">{section.title}</h3>
             <div className="glass-card overflow-hidden">
-              {section.items.map((item, index) => <div key={item.id} className={`flex items-center justify-between p-4 text-white hover:bg-white/10 cursor-pointer ${index !== section.items.length - 1 ? 'border-b border-white/10' : ''}`}>
-                  <div className="flex items-center">
-                    <span className="mr-3 text-white/80">{item.icon}</span>
-                    <span>{item.name}</span>
+              {section.items.map((item, index) => {
+                const content = (
+                  <div className={`flex items-center justify-between p-4 text-white hover:bg-white/10 cursor-pointer ${index !== section.items.length - 1 ? 'border-b border-white/10' : ''}`}>
+                    <div className="flex items-center">
+                      <span className="mr-3 text-white/80">{item.icon}</span>
+                      <span>{item.name}</span>
+                    </div>
+                    <span className="text-white/60">{item.action}</span>
                   </div>
-                  <span className="text-white/60">{item.action}</span>
-                </div>)}
+                );
+
+                return item.href ? (
+                  <Link key={item.id} to={item.href}>
+                    {content}
+                  </Link>
+                ) : (
+                  <div key={item.id}>
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </div>)}
       </div>
@@ -80,4 +99,5 @@ const ProfilePage = () => {
       </div>
     </AppLayout>;
 };
+
 export default ProfilePage;

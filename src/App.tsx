@@ -13,6 +13,7 @@ const ServicesPage = lazy(() => import("./pages/Services"));
 const OrdersPage = lazy(() => import("./pages/Orders"));
 const ProfilePage = lazy(() => import("./pages/Profile"));
 const PickupDetailsPage = lazy(() => import("./pages/PickupDetails"));
+const AddressManagementPage = lazy(() => import("./pages/AddressManagement"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
 // Optimize query client for mobile
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/addresses" element={<AddressManagementPage />} />
             <Route path="/pickup-details" element={<PickupDetailsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
