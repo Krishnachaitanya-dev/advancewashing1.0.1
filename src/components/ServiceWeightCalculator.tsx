@@ -10,6 +10,7 @@ interface ServiceWeightCalculatorProps {
   currentFinalWeight?: number;
   currentFinalPrice?: number;
   onSave: (weight: number, price: number) => Promise<boolean>;
+  onStatusSave: () => Promise<void>;
   isUpdating: boolean;
 }
 
@@ -19,6 +20,7 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
   currentFinalWeight,
   currentFinalPrice,
   onSave,
+  onStatusSave,
   isUpdating
 }) => {
   const [itemWeights, setItemWeights] = useState<Record<string, number>>({});
@@ -101,11 +103,13 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
     }));
   };
 
-  const handleSave = async () => {
+  const handleSaveAll = async () => {
+    // First save the weight and price
     const success = await onSave(calculatedWeight, calculatedPrice);
     if (success) {
-      // Optionally update individual item weights in the database
-      console.log('Weights saved successfully:', itemWeights);
+      // Then save the status
+      await onStatusSave();
+      console.log('All changes saved successfully:', itemWeights);
     }
   };
 
@@ -115,8 +119,10 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
   };
 
   const getCleanServiceName = (serviceName: string) => {
-    // Extract the main service name before any dash or parentheses
-    return serviceName.split(' - ')[0].trim();
+    // Remove duplicate parts and clean the service name
+    const parts = serviceName.split(' - ');
+    const uniqueParts = [...new Set(parts)];
+    return uniqueParts.join(' - ');
   };
 
   return (
@@ -170,12 +176,12 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
             <p className="font-medium">Total Price: ₹{calculatedPrice.toFixed(2)}</p>
           </div>
           <Button
-            onClick={handleSave}
+            onClick={handleSaveAll}
             disabled={isUpdating}
             className="bg-green-600 hover:bg-green-700 flex items-center space-x-2"
           >
             <Save className="w-4 h-4" />
-            <span>Save</span>
+            <span>Save All Changes</span>
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import { useOrderUpdate } from '@/hooks/useOrderUpdate';
 import OrderStatusFilter from './OrderStatusFilter';
 import ServiceWeightCalculator from './ServiceWeightCalculator';
 import type { Order } from '@/hooks/useOrders';
+
 const AdminOrderManagement = () => {
   const {
     orders,
@@ -39,6 +41,7 @@ const AdminOrderManagement = () => {
     });
     return counts;
   }, [orders]);
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -55,6 +58,7 @@ const AdminOrderManagement = () => {
         return <Clock className="w-4 h-4" />;
     }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -71,6 +75,7 @@ const AdminOrderManagement = () => {
         return 'bg-gray-600 text-gray-100';
     }
   };
+
   const statusOptions = [{
     value: 'confirmed',
     label: 'Confirmed'
@@ -87,12 +92,14 @@ const AdminOrderManagement = () => {
     value: 'delivered',
     label: 'Delivered'
   }];
+
   const handleEdit = (order: Order) => {
     setEditingOrder(order.id);
     setEditData({
       status: order.status
     });
   };
+
   const handleSave = async (orderId: string) => {
     const updateData: any = {
       status: editData.status
@@ -103,22 +110,26 @@ const AdminOrderManagement = () => {
       refetch();
     }
   };
+
   const handleServiceWeightSave = async (orderId: string, weight: number, price: number) => {
     const success = await updateOrder(orderId, {
       final_weight: weight,
       final_price: price
     });
     if (success) {
+      setEditingOrder(null);
       refetch();
     }
     return success;
   };
+
   const handleCancel = () => {
     setEditingOrder(null);
     setEditData({
       status: ''
     });
   };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -128,11 +139,21 @@ const AdminOrderManagement = () => {
       minute: '2-digit'
     });
   };
+
+  // Helper function to clean service names and remove duplicates
+  const getCleanServiceName = (serviceName: string) => {
+    // Split by " - " and take unique parts
+    const parts = serviceName.split(' - ');
+    const uniqueParts = [...new Set(parts)];
+    return uniqueParts.join(' - ');
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-white text-lg">Loading orders...</div>
       </div>;
   }
+
   return <div className="space-y-4 md:space-y-6 p-4 md:p-0">
       <OrderStatusFilter selectedStatus={selectedStatus} onStatusChange={setSelectedStatus} orderCounts={orderCounts} />
 
@@ -153,10 +174,6 @@ const AdminOrderManagement = () => {
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                 {editingOrder === order.id ? <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                    <Button size="sm" onClick={() => handleSave(order.id)} disabled={isUpdating} className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-                      <Save className="w-4 h-4 mr-1" />
-                      Save
-                    </Button>
                     <Button size="sm" variant="outline" onClick={handleCancel} className="border-gray-500 text-gray-300 w-full sm:w-auto">
                       <X className="w-4 h-4 mr-1" />
                       Cancel
@@ -191,14 +208,14 @@ const AdminOrderManagement = () => {
                   </Select>
                 </div>
 
-                <ServiceWeightCalculator orderId={order.id} orderItems={order.order_items || []} currentFinalWeight={order.final_weight || undefined} currentFinalPrice={order.final_price || undefined} onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} isUpdating={isUpdating} />
+                <ServiceWeightCalculator orderId={order.id} orderItems={order.order_items || []} currentFinalWeight={order.final_weight || undefined} currentFinalPrice={order.final_price || undefined} onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} onStatusSave={() => handleSave(order.id)} isUpdating={isUpdating} />
               </div> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="text-white/80 text-sm">
                   <strong>Items:</strong> {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} pieces
                 </div>
                 
                 <div className="text-white/80 text-sm">
-                  <strong>Est. Weight:</strong> {order.estimated_weight} kg
+                  <strong>Actual Weight:</strong> {order.final_weight || order.estimated_weight} kg
                 </div>
 
                 <div className="text-white/80 text-sm">
@@ -211,10 +228,10 @@ const AdminOrderManagement = () => {
               <div className="space-y-2">
                 {order.order_items?.map(item => <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between text-white/80 text-sm space-y-1 sm:space-y-0">
                     <span className="break-words">
-                      {item.services?.name} {item.item_name && `- ${item.item_name}`}
+                      {getCleanServiceName(item.services?.name || 'Service')} {item.item_name && `- ${item.item_name}`}
                     </span>
                     <span className="text-xs sm:text-sm whitespace-nowrap">
-                      Qty: {item.quantity} | Est. Weight: {item.estimated_weight}kg
+                      Qty: {item.quantity} | Weight: {item.final_weight || item.estimated_weight}kg
                     </span>
                   </div>)}
               </div>
@@ -235,4 +252,5 @@ const AdminOrderManagement = () => {
       </div>
     </div>;
 };
+
 export default AdminOrderManagement;
