@@ -1,13 +1,26 @@
-
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
 import { Clock, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useOrders } from '@/hooks/useOrders';
+import OrderDetailsModal from './OrderDetailsModal';
+import type { Order } from '@/hooks/useOrders';
 
 const OrdersPage = memo(() => {
   const { orders, loading } = useOrders();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOrderClick = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedOrder(null);
+    setIsModalOpen(false);
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -96,7 +109,11 @@ const OrdersPage = memo(() => {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => (
-              <div key={order.id} className="glass-card p-4">
+              <div 
+                key={order.id} 
+                className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-colors"
+                onClick={() => handleOrderClick(order)}
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="text-white font-semibold text-lg">
@@ -156,6 +173,10 @@ const OrdersPage = memo(() => {
                       variant="outline" 
                       size="sm"
                       className="border-red-500/50 text-red-300 hover:bg-red-500/20"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle cancel order
+                      }}
                     >
                       Cancel Order
                     </Button>
@@ -165,6 +186,12 @@ const OrdersPage = memo(() => {
             ))}
           </div>
         )}
+
+        <OrderDetailsModal 
+          order={selectedOrder}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
       </div>
     </AppLayout>
   );
