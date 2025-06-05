@@ -87,7 +87,7 @@ const PickupDetailsPage = () => {
       return;
     }
 
-    // Prepare order data with proper service_id
+    // Prepare order data with proper service_id handling
     const orderData = {
       pickup_date: selectedDate.toISOString().split('T')[0],
       pickup_time: selectedSlot,
@@ -95,7 +95,7 @@ const PickupDetailsPage = () => {
       address_id: selectedAddress.id,
       estimated_total: total,
       items: selectedServices.map((service: Service) => ({
-        service_id: service.id?.toString() || '1', // Ensure we have a valid service_id
+        service_id: service.id?.toString() || '1', // Ensure we have a valid string service_id, default to '1'
         item_name: service.name,
         quantity: 1,
         estimated_weight: 1

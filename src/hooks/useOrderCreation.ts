@@ -25,17 +25,28 @@ export const useOrderCreation = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Helper function to convert time slot to a proper time
+  // Helper function to convert time slot to 24-hour format
   const convertTimeSlotToTime = (timeSlot: string) => {
-    // Extract start time from slot like "11:00 AM - 1:00 PM"
     const startTime = timeSlot.split(' - ')[0];
-    return startTime;
+    
+    // Convert to 24-hour format
+    const [time, period] = startTime.split(' ');
+    const [hours, minutes] = time.split(':');
+    let hour24 = parseInt(hours);
+    
+    if (period === 'PM' && hour24 !== 12) {
+      hour24 += 12;
+    } else if (period === 'AM' && hour24 === 12) {
+      hour24 = 0;
+    }
+    
+    return `${hour24.toString().padStart(2, '0')}:${minutes}:00`;
   };
 
-  // Helper function to create proper timestamp
+  // Helper function to create proper timestamp for database
   const createPickupTimestamp = (date: string, timeSlot: string) => {
     const time = convertTimeSlotToTime(timeSlot);
-    return `${date} ${time}`;
+    return `${date}T${time}`;
   };
 
   const createOrder = async (orderData: CreateOrderData) => {
@@ -75,13 +86,13 @@ export const useOrderCreation = () => {
       const pickupTimestamp = createPickupTimestamp(orderData.pickup_date, orderData.pickup_time);
       console.log('Pickup timestamp:', pickupTimestamp);
 
-      // Create booking first
+      // Create booking with correct status value
       const bookingData = {
         user_id: user.id,
         address_id: orderData.address_id,
         pickup_time: pickupTimestamp,
         special_note: orderData.special_instructions || null,
-        status: 'pending'
+        status: 'confirmed' // Using 'confirmed' instead of 'pending'
       };
 
       console.log('Creating booking with data:', bookingData);
@@ -107,12 +118,12 @@ export const useOrderCreation = () => {
       // Generate order number
       const orderNumber = `AW${Date.now()}`;
 
-      // Create order
+      // Create order with correct status
       const orderDataToInsert = {
         user_id: user.id,
         booking_id: booking.id,
         order_number: orderNumber,
-        status: 'pending',
+        status: 'confirmed', // Using 'confirmed' instead of 'pending'
         estimated_price: orderData.estimated_total,
         estimated_weight: orderData.items.reduce((sum, item) => sum + item.estimated_weight, 0)
       };
@@ -137,14 +148,22 @@ export const useOrderCreation = () => {
 
       console.log('Order created successfully:', order);
 
-      // Create order items with proper service_id
-      const orderItems = orderData.items.map(item => ({
-        order_id: order.id,
-        service_id: item.service_id && item.service_id !== 'NaN' ? item.service_id : null,
-        item_name: item.item_name,
-        quantity: item.quantity,
-        estimated_weight: item.estimated_weight
-      }));
+      // Create order items with proper service_id validation
+      const orderItems = orderData.items.map(item => {
+        // Ensure service_id is valid - if invalid, use a default service id of '1'
+        let validServiceId = item.service_id;
+        if (!validServiceId || validServiceId === 'NaN' || validServiceId === 'undefined') {
+          validServiceId = '1'; // Default service id
+        }
+
+        return {
+          order_id: order.id,
+          service_id: validServiceId,
+          item_name: item.item_name,
+          quantity: item.quantity,
+          estimated_weight: item.estimated_weight
+        };
+      });
 
       console.log('Creating order items:', orderItems);
 
