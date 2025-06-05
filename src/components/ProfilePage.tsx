@@ -136,7 +136,7 @@ const ProfilePage = memo(() => {
 
         {/* Sign Out */}
         <div className="glass-card p-4">
-          <Button onClick={handleSignOut} variant="outline" className="w-full border-red-500/50 hover:bg-red-500/20 flex items-center justify-center space-x-2 text-zinc-50">
+          <Button onClick={handleSignOut} variant="outline" className="w-full border-red-500/50 flex items-center justify-center space-x-2 text-zinc-50 bg-[#4469ef]/20">
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </Button>
