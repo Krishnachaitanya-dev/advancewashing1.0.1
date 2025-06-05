@@ -21,7 +21,7 @@ const AppLayout = memo(({
       {/* Content container */}
       <div className="relative min-h-screen flex flex-col">
         {/* Header - optimized for mobile touch */}
-        <header className="p-4 flex items-center justify-between bg-blue-900/30 backdrop-blur-sm border-b border-white/10 safe-area-top px-[70px] py-[5px]">
+        <header className="p-4 flex items-center justify-between bg-blue-900/30 backdrop-blur-sm border-b border-white/10 safe-area-top px-[70px] py-[8px]">
           <div className="flex items-center">
             <img src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" alt="AW Logo" className="w-10 h-10 sm:w-12 sm:h-12 mr-2 sm:mr-3" loading="lazy" />
             <h1 className="text-white text-lg sm:text-xl font-semibold">Advance Washing</h1>
