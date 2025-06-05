@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
+import { toast } from 'sonner';
 
 interface PersonalInfo {
   firstName: string;
@@ -22,7 +22,6 @@ export const usePersonalInformation = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const fetchPersonalInfo = async () => {
@@ -60,7 +59,7 @@ export const usePersonalInformation = () => {
         lastName,
         email: user.email || '',
         phone: profile?.phone || user.user_metadata?.phone || '',
-        dateOfBirth: profile?.date_of_birth || ''
+        dateOfBirth: '' // Remove reference to non-existent date_of_birth field
       });
 
       console.log('Set personal info:', {
@@ -74,10 +73,9 @@ export const usePersonalInformation = () => {
 
     } catch (error: any) {
       console.error('Error fetching personal info:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load personal information",
-        variant: "destructive"
+      toast.error('Failed to load personal information', {
+        description: 'Please try refreshing the page',
+        duration: 4000,
       });
     } finally {
       setIsLoading(false);
@@ -85,17 +83,31 @@ export const usePersonalInformation = () => {
   };
 
   const updatePersonalInfo = async (updatedInfo: PersonalInfo) => {
-    if (!user) return;
+    if (!user) {
+      toast.error('Authentication required', {
+        description: 'Please log in to update your information',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Validate required fields
+    if (!updatedInfo.firstName.trim()) {
+      toast.error('First name is required', {
+        description: 'Please enter your first name',
+        duration: 4000,
+      });
+      return;
+    }
 
     setIsSaving(true);
     try {
-      const fullName = `${updatedInfo.firstName} ${updatedInfo.lastName}`.trim();
+      const fullName = `${updatedInfo.firstName.trim()} ${updatedInfo.lastName.trim()}`.trim();
       
       console.log('Updating profile with:', {
         id: user.id,
         name: fullName,
-        phone: updatedInfo.phone,
-        date_of_birth: updatedInfo.dateOfBirth || null
+        phone: updatedInfo.phone.trim()
       });
       
       const { data, error } = await supabase
@@ -104,8 +116,7 @@ export const usePersonalInformation = () => {
           id: user.id,
           email: user.email || '',
           name: fullName,
-          phone: updatedInfo.phone,
-          date_of_birth: updatedInfo.dateOfBirth || null,
+          phone: updatedInfo.phone.trim(),
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id'
@@ -115,21 +126,26 @@ export const usePersonalInformation = () => {
 
       if (error) {
         console.error('Error updating profile:', error);
-        toast({
-          title: "Error",
-          description: `Failed to update personal information: ${error.message}`,
-          variant: "destructive"
+        toast.error('Update failed', {
+          description: `${error.message}`,
+          duration: 5000,
         });
         throw error;
       }
 
       setPersonalInfo(updatedInfo);
-      toast({
-        title: "Success",
-        description: "Personal information updated successfully",
+      toast.success('Profile updated successfully! 🎉', {
+        description: 'Your personal information has been saved',
+        duration: 3000,
       });
+      
+      return true;
     } catch (error: any) {
       console.error('Error updating personal info:', error);
+      toast.error('Something went wrong', {
+        description: 'Please check your connection and try again',
+        duration: 5000,
+      });
       throw error;
     } finally {
       setIsSaving(false);
