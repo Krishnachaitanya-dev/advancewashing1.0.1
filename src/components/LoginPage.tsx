@@ -58,21 +58,17 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_30%,rgba(59,130,246,0.05)_32%,transparent_34%)] bg-[size:40px_40px] animate-pulse"></div>
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      
-      <div className="w-full max-w-md relative z-10">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Content container */}
+      <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
         {/* Logo and Brand Section */}
         <div className="text-center mb-12">
           <div className="mb-8">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-4 shadow-2xl">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-2 shadow-2xl">
               <img 
-                src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" 
+                src="/lovable-uploads/6032e746-b4da-4840-9d68-2afbfb5e432d.png" 
                 alt="AW Logo" 
-                className="w-full h-full object-contain filter brightness-0 invert"
+                className="w-full h-full object-contain"
               />
             </div>
             <h1 className="text-white text-3xl font-bold tracking-tight mb-2">Advance Washing</h1>
@@ -81,7 +77,7 @@ const LoginPage = () => {
         </div>
 
         {/* Auth Card */}
-        <div className="backdrop-blur-xl bg-white/[0.08] border border-white/20 rounded-3xl p-8 shadow-2xl">
+        <div className="w-full max-w-md glass-card p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-white mb-2">
