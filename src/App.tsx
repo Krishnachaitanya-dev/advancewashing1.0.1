@@ -1,95 +1,65 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import AuthWrapper from "@/components/AuthWrapper";
+import Index from "./pages/Index";
+import Home from "./pages/Home";
+import Services from "./pages/Services";
+import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import NotificationSettings from "./pages/NotificationSettings";
+import PaymentMethods from "./pages/PaymentMethods";
+import PersonalInformation from "./pages/PersonalInformation";
+import AddressManagement from "./pages/AddressManagement";
+import RateApp from "./pages/RateApp";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import PickupDetails from "./pages/PickupDetails";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 
-// Lazy load pages for better performance
-const HomePage = lazy(() => import("./pages/Home"));
-const LoginPage = lazy(() => import("./pages/Login"));
-const ServicesPage = lazy(() => import("./pages/Services"));
-const OrdersPage = lazy(() => import("./pages/Orders"));
-const ProfilePage = lazy(() => import("./pages/Profile"));
-const PickupDetailsPage = lazy(() => import("./pages/PickupDetails"));
-const AddressManagementPage = lazy(() => import("./pages/AddressManagement"));
-const PersonalInformationPage = lazy(() => import("./pages/PersonalInformation"));
-const SettingsPage = lazy(() => import("./pages/Settings"));
-const PaymentMethodsPage = lazy(() => import("./pages/PaymentMethods"));
-const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
-const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicy"));
-const TermsOfServicePage = lazy(() => import("./pages/TermsOfService"));
-const RateAppPage = lazy(() => import("./pages/RateApp"));
-const NotFoundPage = lazy(() => import("./pages/NotFound"));
-
-// Optimize query client for mobile
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 15 * 60 * 1000, // 15 minutes
-      retry: 1, // Reduce retries for mobile
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: true,
-      networkMode: 'offlineFirst', // Better offline handling
-    },
-  },
-});
-
-// Optimized loading component for mobile
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-blue-600 flex items-center justify-center">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-  </div>
-);
-
-// Route Guard Component
-const RouteGuard = ({ children }: { children: React.ReactNode }) => {
-  useEffect(() => {
-    // Add mobile-specific initialization
-    if (typeof window !== 'undefined') {
-      // Prevent zoom on mobile
-      const viewport = document.querySelector('meta[name=viewport]');
-      if (viewport) {
-        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-      }
-    }
-  }, []);
-
-  return <>{children}</>;
-};
+const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <RouteGuard>
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/addresses" element={<AddressManagementPage />} />
-              <Route path="/profile/personal" element={<PersonalInformationPage />} />
-              <Route path="/profile/settings" element={<SettingsPage />} />
-              <Route path="/profile/payments" element={<PaymentMethodsPage />} />
-              <Route path="/profile/notifications" element={<NotificationSettingsPage />} />
-              <Route path="/profile/privacy" element={<PrivacyPolicyPage />} />
-              <Route path="/profile/terms" element={<TermsOfServicePage />} />
-              <Route path="/profile/rate" element={<RateAppPage />} />
-              <Route path="/pickup-details" element={<PickupDetailsPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </RouteGuard>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/*"
+              element={
+                <AuthWrapper>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/notification-settings" element={<NotificationSettings />} />
+                    <Route path="/payment-methods" element={<PaymentMethods />} />
+                    <Route path="/personal-information" element={<PersonalInformation />} />
+                    <Route path="/address-management" element={<AddressManagement />} />
+                    <Route path="/rate-app" element={<RateApp />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/pickup-details" element={<PickupDetails />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AuthWrapper>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

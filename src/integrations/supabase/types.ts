@@ -9,13 +9,338 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      addresses: {
+        Row: {
+          city: string
+          coordinates: Json | null
+          created_at: string
+          door_no: string
+          id: string
+          is_default: boolean
+          label: string
+          landmark: string | null
+          name: string | null
+          phone: string
+          pincode: string
+          state: string
+          street: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          coordinates?: Json | null
+          created_at?: string
+          door_no: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          landmark?: string | null
+          name?: string | null
+          phone: string
+          pincode: string
+          state: string
+          street: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          coordinates?: Json | null
+          created_at?: string
+          door_no?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          landmark?: string | null
+          name?: string | null
+          phone?: string
+          pincode?: string
+          state?: string
+          street?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addresses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          details: Json | null
+          id: string
+          order_id: string | null
+          timestamp: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          details?: Json | null
+          id?: string
+          order_id?: string | null
+          timestamp?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          details?: Json | null
+          id?: string
+          order_id?: string | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          address_id: string
+          created_at: string
+          id: string
+          pickup_time: string
+          special_note: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_id: string
+          created_at?: string
+          id?: string
+          pickup_time: string
+          special_note?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_id?: string
+          created_at?: string
+          id?: string
+          pickup_time?: string
+          special_note?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          estimated_weight: number | null
+          final_weight: number | null
+          id: string
+          item_name: string | null
+          order_id: string
+          price: number | null
+          quantity: number
+          service_id: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_weight?: number | null
+          final_weight?: number | null
+          id?: string
+          item_name?: string | null
+          order_id: string
+          price?: number | null
+          quantity?: number
+          service_id: string
+        }
+        Update: {
+          created_at?: string
+          estimated_weight?: number | null
+          final_weight?: number | null
+          id?: string
+          item_name?: string | null
+          order_id?: string
+          price?: number | null
+          quantity?: number
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          booking_id: string
+          created_at: string
+          estimated_price: number | null
+          estimated_weight: number | null
+          final_price: number | null
+          final_weight: number | null
+          id: string
+          order_number: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          estimated_price?: number | null
+          estimated_weight?: number | null
+          final_price?: number | null
+          final_weight?: number | null
+          id?: string
+          order_number: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          estimated_price?: number | null
+          estimated_weight?: number | null
+          final_price?: number | null
+          final_weight?: number | null
+          id?: string
+          order_number?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          base_price_per_kg: number
+          created_at: string
+          description: string | null
+          icon_name: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          base_price_per_kg: number
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          base_price_per_kg?: number
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

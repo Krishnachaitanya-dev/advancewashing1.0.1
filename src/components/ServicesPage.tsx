@@ -1,163 +1,83 @@
 
-import React, { useState } from 'react';
+import React, { memo } from 'react';
 import AppLayout from './AppLayout';
-import { Button } from '@/components/ui/button';
-import { Search, Check, Shirt, Zap, Bed, Shield, Package, Footprints } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useServices } from '@/hooks/useServices';
+import { 
+  Shirt, 
+  Clock, 
+  Award, 
+  Sparkles, 
+  Zap,
+  Bed,
+  Shield,
+  Package,
+  Footprints
+} from 'lucide-react';
 
-const ServicesPage = () => {
-  const [selectedServices, setSelectedServices] = useState<number[]>([]);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+const iconMap: { [key: string]: React.ComponentType<any> } = {
+  'Shirt': Shirt,
+  'Clock': Clock,
+  'Award': Award,
+  'Sparkles': Sparkles,
+  'Zap': Zap,
+  'Bed': Bed,
+  'Shield': Shield,
+  'Package': Package,
+  'Footprints': Footprints
+};
 
-  const services = [
-    {
-      id: 1,
-      name: 'Normal Clothes - Wash & Fold',
-      price: '₹100/kg',
-      color: 'from-blue-500 to-blue-600',
-      icon: Shirt
-    },
-    {
-      id: 2,
-      name: 'Normal Clothes - Wash & Steam Iron',
-      price: '₹150/kg',
-      color: 'from-blue-500 to-blue-600',
-      icon: Zap
-    },
-    {
-      id: 3,
-      name: 'Bedsheets - Wash & Fold',
-      price: '₹130/kg',
-      color: 'from-blue-500 to-blue-600',
-      icon: Bed
-    },
-    {
-      id: 4,
-      name: 'Quilts - Wash & Fold',
-      price: '₹130/kg',
-      color: 'from-blue-500 to-blue-600',
-      icon: Shield
-    },
-    {
-      id: 5,
-      name: 'Curtains - Wash & Fold',
-      price: '₹140/kg',
-      color: 'from-blue-500 to-blue-600',
-      icon: Package
-    },
-    {
-      id: 6,
-      name: 'Shoes',
-      price: '₹250/pair',
-      color: 'from-blue-500 to-blue-600',
-      icon: Footprints
-    }
-  ];
+const ServicesPage = memo(() => {
+  const { services, loading } = useServices();
 
-  const handleServiceToggle = (serviceId: number) => {
-    setSelectedServices(prev =>
-      prev.includes(serviceId)
-        ? prev.filter(id => id !== serviceId)
-        : [...prev, serviceId]
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="text-white text-lg">Loading services...</div>
+        </div>
+      </AppLayout>
     );
-  };
-
-  const calculateTotal = () => {
-    return selectedServices.length * 100; // Assuming average ₹100 per service
-  };
-
-  const handleSchedulePickup = () => {
-    if (selectedServices.length === 0) {
-      toast({
-        title: "No services selected",
-        description: "Please select at least one service to proceed.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const total = calculateTotal();
-
-    // Navigate with only serializable data (exclude icon property)
-    navigate('/pickup-details', {
-      state: {
-        selectedServices: selectedServices.map(id => {
-          const service = services.find(s => s.id === id)!;
-          return {
-            id: service.id,
-            name: service.name,
-            price: service.price,
-            color: service.color
-          };
-        }),
-        total
-      }
-    });
-  };
+  }
 
   return (
     <AppLayout>
-      {/* Search Bar */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-3 text-white/60" size={20} />
-        <Input
-          placeholder="Search services"
-          className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60 backdrop-blur-sm rounded-xl"
-        />
-      </div>
+      <div className="space-y-6">
+        <div className="glass-card p-6">
+          <h2 className="text-2xl font-bold text-white mb-2">Our Services</h2>
+          <p className="text-white/80">Choose from our range of professional laundry services</p>
+        </div>
 
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        {services.map(service => {
-          const IconComponent = service.icon;
-          const isSelected = selectedServices.includes(service.id);
-          
-          return (
-            <div
-              key={service.id}
-              onClick={() => handleServiceToggle(service.id)}
-              className={`${
-                isSelected
-                  ? 'bg-gradient-to-br from-blue-700 to-blue-800 ring-2 ring-blue-300'
-                  : `bg-gradient-to-br ${service.color}`
-              } p-4 rounded-2xl text-white relative shadow-lg cursor-pointer transition-all duration-200 active:scale-95`}
-            >
-              <div className="absolute top-3 right-3">
-                <div className={`w-6 h-6 ${isSelected ? 'bg-white' : 'bg-white/20'} rounded-full flex items-center justify-center transition-colors`}>
-                  <Check size={14} className={isSelected ? 'text-blue-600' : 'text-white'} />
+        <div className="grid gap-4">
+          {services.map((service) => {
+            const IconComponent = iconMap[service.icon_name || 'Shirt'] || Shirt;
+            
+            return (
+              <div key={service.id} className="glass-card p-4">
+                <div className="flex items-start space-x-4">
+                  <div className="rounded-full p-3 bg-blue-900/60">
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold text-lg">{service.name}</h3>
+                    <p className="text-white/80 text-sm mb-2">{service.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/90 font-medium">
+                        ₹{service.base_price_per_kg}/kg
+                      </span>
+                      <button className="bg-blue-900/60 hover:bg-blue-800/60 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Select
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="mb-3">
-                <IconComponent size={32} className="text-white opacity-90" />
-              </div>
-              <h3 className="text-sm font-medium mb-2 leading-tight">{service.name}</h3>
-              <p className="text-lg font-bold">{service.price}</p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Selected Services Summary */}
-      {selectedServices.length > 0 && (
-        <div className="glass-card p-4 mb-4">
-          <div className="flex justify-between items-center text-white">
-            <span className="font-medium">{selectedServices.length} services selected</span>
-          </div>
+            );
+          })}
         </div>
-      )}
-
-      {/* Schedule Pickup Button */}
-      <Button
-        onClick={handleSchedulePickup}
-        className="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-medium"
-      >
-        Schedule Pickup
-      </Button>
+      </div>
     </AppLayout>
   );
-};
+});
 
+ServicesPage.displayName = 'ServicesPage';
 export default ServicesPage;

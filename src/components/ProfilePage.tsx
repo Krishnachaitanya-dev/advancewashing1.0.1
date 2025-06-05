@@ -1,132 +1,155 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, Bell, Shield, FileText, Star, LogOut, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { User, Settings, MapPin, CreditCard, Bell, Star, Shield, FileText, LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
-const ProfilePage = () => {
-  const navigate = useNavigate();
+const ProfilePage = memo(() => {
+  const { user, signOut, isAdmin } = useAuth();
 
-  const handleLogout = () => {
-    // Clear any user data/tokens here
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Show success message
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account.",
-    });
-    
-    // Navigate to login page
-    navigate('/login');
+  const handleSignOut = async () => {
+    await signOut();
   };
 
-  const profileSections = [{
-    title: 'Account',
-    items: [{
-      id: 'personal',
-      name: 'Personal Information',
+  const menuItems = [
+    {
       icon: <User className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/personal'
-    }, {
-      id: 'settings',
-      name: 'Settings',
-      icon: <Settings className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/settings'
-    }]
-  }, {
-    title: 'Preferences',
-    items: [{
-      id: 'address',
-      name: 'My Addresses',
+      label: 'Personal Information',
+      path: '/personal-information',
+      description: 'Update your profile details'
+    },
+    {
       icon: <MapPin className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/addresses'
-    }, {
-      id: 'notifications',
-      name: 'Notification Settings',
+      label: 'Address Management',
+      path: '/address-management',
+      description: 'Manage your delivery addresses'
+    },
+    {
+      icon: <CreditCard className="w-5 h-5" />,
+      label: 'Payment Methods',
+      path: '/payment-methods',
+      description: 'Manage payment options'
+    },
+    {
       icon: <Bell className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/notifications'
-    }]
-  }, {
-    title: 'Support & Legal',
-    items: [{
-      id: 'privacy',
-      name: 'Privacy Policy',
-      icon: <Shield className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/privacy'
-    }, {
-      id: 'terms',
-      name: 'Terms of Service',
-      icon: <FileText className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/terms'
-    }, {
-      id: 'rate',
-      name: 'Rate Our App',
+      label: 'Notification Settings',
+      path: '/notification-settings',
+      description: 'Control your notifications'
+    },
+    {
+      icon: <Settings className="w-5 h-5" />,
+      label: 'Settings',
+      path: '/settings',
+      description: 'App preferences and settings'
+    }
+  ];
+
+  const supportItems = [
+    {
       icon: <Star className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/rate'
-    }]
-  }];
+      label: 'Rate Our App',
+      path: '/rate-app',
+      description: 'Share your feedback'
+    },
+    {
+      icon: <Shield className="w-5 h-5" />,
+      label: 'Privacy Policy',
+      path: '/privacy-policy',
+      description: 'How we protect your data'
+    },
+    {
+      icon: <FileText className="w-5 h-5" />,
+      label: 'Terms of Service',
+      path: '/terms-of-service',
+      description: 'App terms and conditions'
+    }
+  ];
 
-  return <AppLayout>
-      {/* Profile Header */}
-      <div className="glass-card p-6 mb-6 flex items-center">
-        <div className="w-16 h-16 rounded-full bg-blue-900/60 flex items-center justify-center mr-4">
-          <User className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-white">John Doe</h2>
-          <p className="text-white/70">john.doe@example.com</p>
-        </div>
-      </div>
-
-      {/* Profile Sections */}
+  return (
+    <AppLayout>
       <div className="space-y-6">
-        {profileSections.map(section => <div key={section.title}>
-            <h3 className="text-white text-lg font-medium mb-3">{section.title}</h3>
-            <div className="glass-card overflow-hidden">
-              {section.items.map((item, index) => {
-                const content = (
-                  <div className={`flex items-center justify-between p-4 text-white hover:bg-white/10 cursor-pointer ${index !== section.items.length - 1 ? 'border-b border-white/10' : ''}`}>
-                    <div className="flex items-center">
-                      <span className="mr-3 text-white/80">{item.icon}</span>
-                      <span>{item.name}</span>
-                    </div>
-                    <span className="text-white/60">{item.action}</span>
-                  </div>
-                );
-
-                return (
-                  <Link key={item.id} to={item.href}>
-                    {content}
-                  </Link>
-                );
-              })}
+        {/* Profile Header */}
+        <div className="glass-card p-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-blue-900/60 rounded-full flex items-center justify-center">
+              <User className="w-8 h-8 text-white" />
             </div>
-          </div>)}
-      </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-white">
+                {user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
+              </h2>
+              <p className="text-white/80 text-sm">{user?.email}</p>
+              {isAdmin && (
+                <span className="inline-block mt-1 px-2 py-1 bg-yellow-600/60 text-yellow-100 text-xs font-medium rounded">
+                  Admin
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
 
-      {/* Logout Button */}
-      <div className="mt-8">
-        <Button 
-          variant="outline" 
-          onClick={handleLogout}
-          className="w-full border-white/20 flex items-center justify-center gap-2 text-zinc-950 hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400"
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Log Out</span>
-        </Button>
-      </div>
-    </AppLayout>;
-};
+        {/* Account Section */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
+          <div className="space-y-3">
+            {menuItems.map((item, index) => (
+              <Link key={index} to={item.path}>
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                  <div className="text-white/80">
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-medium text-sm">{item.label}</p>
+                    <p className="text-white/60 text-xs">{item.description}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
 
+        {/* Support Section */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+          <div className="space-y-3">
+            {supportItems.map((item, index) => (
+              <Link key={index} to={item.path}>
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                  <div className="text-white/80">
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-medium text-sm">{item.label}</p>
+                    <p className="text-white/60 text-xs">{item.description}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Sign Out */}
+        <div className="glass-card p-6">
+          <Button 
+            onClick={handleSignOut}
+            variant="outline" 
+            className="w-full border-red-500/50 text-red-300 hover:bg-red-500/20 flex items-center justify-center space-x-2"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </Button>
+        </div>
+
+        {/* App Version */}
+        <div className="text-center text-white/60 text-xs">
+          Advance Washing v1.0.0
+        </div>
+      </div>
+    </AppLayout>
+  );
+});
+
+ProfilePage.displayName = 'ProfilePage';
 export default ProfilePage;
