@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -117,10 +116,11 @@ const AdminOrderManagement = () => {
     }
   };
 
-  const handleServiceWeightSave = async (orderId: string, weight: number, price: number) => {
+  const handleServiceWeightSave = async (orderId: string, weight: number, price: number, itemWeights: Record<string, number>) => {
     const success = await updateOrder(orderId, {
       final_weight: weight,
-      final_price: price
+      final_price: price,
+      order_items_weights: itemWeights
     });
     if (success) {
       setEditingOrder(null);
@@ -152,11 +152,13 @@ const AdminOrderManagement = () => {
       </div>;
   }
 
-  return <div className="space-y-4 md:space-y-6 p-4 md:p-0">
+  return (
+    <div className="space-y-4 md:space-y-6 p-4 md:p-0">
       <OrderStatusFilter selectedStatus={selectedStatus} onStatusChange={setSelectedStatus} orderCounts={orderCounts} />
 
       <div className="space-y-4">
-        {filteredOrders.map(order => <div key={order.id} className="glass-card p-4 md:p-6">
+        {filteredOrders.map(order => (
+          <div key={order.id} className="glass-card p-4 md:p-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 space-y-3 md:space-y-0">
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-lg break-all">
@@ -212,7 +214,7 @@ const AdminOrderManagement = () => {
                     orderItems={order.order_items || []} 
                     currentFinalWeight={order.final_weight || undefined} 
                     currentFinalPrice={order.final_price || undefined} 
-                    onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} 
+                    onSave={(weight, price, itemWeights) => handleServiceWeightSave(order.id, weight, price, itemWeights)} 
                     onStatusSave={() => handleSave(order.id)} 
                     isUpdating={isUpdating} 
                   />
@@ -284,13 +286,15 @@ const AdminOrderManagement = () => {
             {order.bookings?.special_note && <div className="mt-2 text-white/80 text-sm break-words">
                 <strong>Special Instructions:</strong> {order.bookings.special_note}
               </div>}
-          </div>)}
+          </div>
+        ))}
 
         {filteredOrders.length === 0 && <div className="glass-card p-8 text-center">
             <p className="text-white/70">No orders found for the selected status.</p>
           </div>}
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default AdminOrderManagement;

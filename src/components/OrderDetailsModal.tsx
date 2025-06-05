@@ -111,10 +111,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-white rounded-lg">
-        <DialogHeader className="flex flex-row items-center justify-between">
+      <DialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-2xl">
+        <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
           <div>
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+            <DialogTitle className="text-xl font-bold text-gray-900">
               Order Details
             </DialogTitle>
           </div>
@@ -122,30 +122,31 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-6 w-6 rounded-full"
+            className="h-8 w-8 rounded-full hover:bg-gray-100"
           >
             <X className="h-4 w-4" />
           </Button>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 py-4">
           {/* Order Header */}
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900">
                 {order.order_number}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-500 mt-1">
                 {formatDate(order.created_at)}
               </p>
             </div>
-            <Badge className={`${getStatusColor(order.status)} border-0`}>
+            <Badge className={`${getStatusColor(order.status)} border-0 px-3 py-1 font-medium`}>
               {order.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </Badge>
           </div>
 
           {/* Status Timeline */}
           <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-sm">Order Progress</h4>
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = index <= currentStepIndex;
@@ -153,9 +154,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               
               return (
                 <div key={step.key} className="flex items-center space-x-3">
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                     isCompleted 
-                      ? 'bg-blue-500 text-white' 
+                      ? 'bg-blue-500 text-white shadow-lg' 
                       : 'bg-gray-200 text-gray-400'
                   }`}>
                     <Icon className="w-4 h-4" />
@@ -175,58 +176,69 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
 
           {/* Order Summary */}
           <div className="border-t pt-4">
-            <h4 className="font-medium text-gray-900 mb-3">Order Summary</h4>
-            <div className="space-y-2">
+            <h4 className="font-semibold text-gray-900 mb-4">Order Summary</h4>
+            <div className="space-y-3">
               {Object.values(groupedItems).map((item: any, index) => (
-                <div key={index} className="flex justify-between text-sm">
-                  <span className="text-gray-600">
-                    {item.name}
-                  </span>
-                  <span className="text-gray-900 font-medium">
-                    ₹{item.pricePerKg}/kg
-                  </span>
+                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <span className="text-gray-900 font-medium">
+                      {item.name}
+                    </span>
+                    <div className="text-sm text-gray-500 mt-1">
+                      Rate: ₹{item.pricePerKg}/kg
+                    </div>
+                  </div>
+                  {(item.finalWeight > 0 || item.estimatedWeight > 0) && (
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-gray-900">
+                        {(item.finalWeight || item.estimatedWeight).toFixed(1)} kg
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-            <div className="border-t mt-3 pt-2">
+            
+            <div className="border-t mt-4 pt-4 bg-blue-50 rounded-lg p-4">
               {showFinalPricing ? (
-                <>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-900">Total</span>
-                    <span className="font-bold text-blue-600 text-lg">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-900">Total Amount</span>
+                    <span className="font-bold text-blue-600 text-xl">
                       ₹{order.final_price}
                     </span>
                   </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-sm text-gray-600">Weight</span>
-                    <span className="text-sm text-gray-900 font-medium">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Total Weight</span>
+                    <span className="text-gray-900 font-medium">
                       {order.final_weight} kg
                     </span>
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="text-center py-2">
-                  <span className="text-sm text-gray-600">
-                    Final price will be calculated after weighing
-                  </span>
+                  <div className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-2">
+                    💡 Final price will be calculated after weighing
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Track Order Button for in-progress orders */}
-          {order.status !== 'delivered' && order.status !== 'cancelled' && (
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              Track Order
-            </Button>
-          )}
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            {order.status !== 'delivered' && order.status !== 'cancelled' && (
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 shadow-lg">
+                📍 Track Order
+              </Button>
+            )}
 
-          {/* Review Button for delivered orders */}
-          {order.status === 'delivered' && (
-            <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-              ⭐ Review
-            </Button>
-          )}
+            {order.status === 'delivered' && (
+              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 shadow-lg">
+                ⭐ Rate & Review
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

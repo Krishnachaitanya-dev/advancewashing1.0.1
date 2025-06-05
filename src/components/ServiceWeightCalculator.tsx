@@ -9,7 +9,7 @@ interface ServiceWeightCalculatorProps {
   orderItems: any[];
   currentFinalWeight?: number;
   currentFinalPrice?: number;
-  onSave: (weight: number, price: number) => Promise<boolean>;
+  onSave: (weight: number, price: number, itemWeights: Record<string, number>) => Promise<boolean>;
   onStatusSave: () => Promise<void>;
   isUpdating: boolean;
 }
@@ -104,8 +104,8 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
   };
 
   const handleSaveAll = async () => {
-    // First save the weight and price
-    const success = await onSave(calculatedWeight, calculatedPrice);
+    // Save the weight, price, and individual item weights
+    const success = await onSave(calculatedWeight, calculatedPrice, itemWeights);
     if (success) {
       // Then save the status
       await onStatusSave();

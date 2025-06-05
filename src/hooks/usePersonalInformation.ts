@@ -32,33 +32,46 @@ export const usePersonalInformation = () => {
     }
 
     try {
+      console.log('Fetching profile for user:', user.id);
+      
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error) {
+      console.log('Profile data:', profile, 'Error:', error);
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
         console.error('Error fetching profile:', error);
-        // Use auth data as fallback
-        setPersonalInfo({
-          firstName: user.user_metadata?.name?.split(' ')[0] || '',
-          lastName: user.user_metadata?.name?.split(' ').slice(1).join(' ') || '',
-          email: user.email || '',
-          phone: user.user_metadata?.phone || '',
-          dateOfBirth: ''
-        });
-      } else if (profile) {
-        // Split the name field since the profiles table only has 'name', not separate first/last names
-        const nameParts = profile.name?.split(' ') || [];
-        setPersonalInfo({
-          firstName: nameParts[0] || '',
-          lastName: nameParts.slice(1).join(' ') || '',
-          email: user.email || '',
-          phone: profile.phone || user.user_metadata?.phone || '',
-          dateOfBirth: '' // Not stored in profiles table
-        });
       }
+
+      // Always try to populate from available data
+      const authName = user.user_metadata?.name || user.user_metadata?.full_name || '';
+      const profileName = profile?.name || '';
+      const finalName = profileName || authName;
+      
+      const nameParts = finalName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      setPersonalInfo({
+        firstName,
+        lastName,
+        email: user.email || '',
+        phone: profile?.phone || user.user_metadata?.phone || '',
+        dateOfBirth: profile?.date_of_birth || ''
+      });
+
+      console.log('Set personal info:', {
+        firstName,
+        lastName,
+        email: user.email,
+        phone: profile?.phone || user.user_metadata?.phone,
+        profileName,
+        authName
+      });
+
     } catch (error: any) {
       console.error('Error fetching personal info:', error);
       toast({
@@ -76,24 +89,35 @@ export const usePersonalInformation = () => {
 
     setIsSaving(true);
     try {
-      // Combine first and last name since profiles table only has 'name' field
       const fullName = `${updatedInfo.firstName} ${updatedInfo.lastName}`.trim();
       
-      const { error } = await supabase
+      console.log('Updating profile with:', {
+        id: user.id,
+        name: fullName,
+        phone: updatedInfo.phone,
+        date_of_birth: updatedInfo.dateOfBirth || null
+      });
+      
+      const { data, error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
           email: user.email || '',
           name: fullName,
           phone: updatedInfo.phone,
+          date_of_birth: updatedInfo.dateOfBirth || null,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
         });
+
+      console.log('Update result:', data, 'Error:', error);
 
       if (error) {
         console.error('Error updating profile:', error);
         toast({
           title: "Error",
-          description: "Failed to update personal information",
+          description: `Failed to update personal information: ${error.message}`,
           variant: "destructive"
         });
         throw error;
