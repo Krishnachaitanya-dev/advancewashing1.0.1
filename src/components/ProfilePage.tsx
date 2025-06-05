@@ -2,7 +2,7 @@
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, CreditCard, Bell, Shield, FileText, Star, LogOut, ChevronRight } from 'lucide-react';
+import { User, Settings, MapPin, Bell, Shield, FileText, Star, LogOut, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
@@ -47,12 +47,6 @@ const ProfilePage = () => {
       icon: <MapPin className="w-5 h-5" />,
       action: <ChevronRight className="w-5 h-5" />,
       href: '/profile/addresses'
-    }, {
-      id: 'payment',
-      name: 'Payment Methods',
-      icon: <CreditCard className="w-5 h-5" />,
-      action: <ChevronRight className="w-5 h-5" />,
-      href: '/profile/payments'
     }, {
       id: 'notifications',
       name: 'Notification Settings',

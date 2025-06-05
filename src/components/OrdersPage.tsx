@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { CalendarClock, TrendingUp, Package, CheckCircle, Truck, Timer } from 'lucide-react';
+import { CalendarClock, TrendingUp, Package, CheckCircle, Truck, Timer, Star } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { toast } from '@/hooks/use-toast';
 
 const OrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -26,6 +27,13 @@ const OrdersPage = () => {
       default:
         return <div className="h-3 w-3 bg-gray-300 rounded-full"></div>;
     }
+  };
+
+  const handleReviewOrder = (orderId: string) => {
+    toast({
+      title: "Review Submitted",
+      description: "Thank you for reviewing your order!",
+    });
   };
 
   const orders = [{
@@ -149,9 +157,21 @@ const OrdersPage = () => {
               <span className="font-bold">{order.total}</span>
             </div>
 
-            <Button onClick={() => openTracking(order)} className="w-full bg-blue-900 hover:bg-blue-800 text-white">
-              Track Order
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => openTracking(order)} className="flex-1 bg-blue-900 hover:bg-blue-800 text-white">
+                Track Order
+              </Button>
+              {order.status === 'Delivered' && (
+                <Button 
+                  onClick={() => handleReviewOrder(order.id)}
+                  variant="outline" 
+                  className="border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  <Star size={16} className="mr-1" />
+                  Review
+                </Button>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -206,6 +226,22 @@ const OrdersPage = () => {
                   <span className="text-blue-600">{selectedOrder.total}</span>
                 </div>
               </div>
+
+              {/* Review Button for Delivered Orders */}
+              {selectedOrder.status === 'Delivered' && (
+                <div className="mt-4">
+                  <Button 
+                    onClick={() => {
+                      handleReviewOrder(selectedOrder.id);
+                      setTrackingOpen(false);
+                    }}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white flex items-center justify-center gap-2"
+                  >
+                    <Star size={16} />
+                    Review This Order
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </SheetContent>

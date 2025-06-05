@@ -2,16 +2,14 @@
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Bell, Mail, Smartphone, Package, Star } from 'lucide-react';
+import { ArrowLeft, Bell, Smartphone, Package, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NotificationSettingsPage = () => {
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
     promotions: false,
-    emailNotifications: true,
     pushNotifications: true,
-    smsNotifications: false,
     reviewReminders: true
   });
 
@@ -45,21 +43,9 @@ const NotificationSettingsPage = () => {
 
   const communicationMethods = [
     {
-      id: 'emailNotifications',
-      title: 'Email Notifications',
-      description: 'Receive notifications via email',
-      icon: <Mail className="w-5 h-5 text-white/70" />
-    },
-    {
       id: 'pushNotifications',
       title: 'Push Notifications',
       description: 'Get app notifications on your device',
-      icon: <Smartphone className="w-5 h-5 text-white/70" />
-    },
-    {
-      id: 'smsNotifications',
-      title: 'SMS Notifications',
-      description: 'Receive important updates via SMS',
       icon: <Smartphone className="w-5 h-5 text-white/70" />
     }
   ];
