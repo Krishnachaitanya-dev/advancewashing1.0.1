@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AddressLabelSelector from './AddressLabelSelector';
 import SimpleMap from './SimpleMap';
-import { AddressFormData, Address } from '@/types/address';
+import { AddressFormData } from '@/types/address';
+
 const addressSchema = z.object({
   doorNo: z.string().min(1, 'Door/Flat number is required'),
   street: z.string().min(1, 'Street/Area is required'),
@@ -20,12 +21,14 @@ const addressSchema = z.object({
   name: z.string().optional(),
   label: z.enum(['home', 'work', 'other'])
 });
+
 interface AddressFormProps {
   onSubmit: (data: AddressFormData) => void;
   onCancel: () => void;
-  initialData?: Address;
+  initialData?: AddressFormData;
   isLoading?: boolean;
 }
+
 const AddressForm = ({
   onSubmit,
   onCancel,
@@ -54,7 +57,9 @@ const AddressForm = ({
       label: 'home'
     }
   });
+
   const selectedLabel = watch('label');
+
   const handleMapAddressSelect = (addressData: any) => {
     if (addressData.street) setValue('street', addressData.street);
     if (addressData.city) setValue('city', addressData.city);
@@ -62,6 +67,7 @@ const AddressForm = ({
     if (addressData.pincode) setValue('pincode', addressData.pincode);
     if (addressData.landmark) setValue('landmark', addressData.landmark);
   };
+
   return <div className="space-y-6">
       {/* Interactive Map */}
       <SimpleMap onAddressSelect={handleMapAddressSelect} />
@@ -136,4 +142,5 @@ const AddressForm = ({
       </form>
     </div>;
 };
+
 export default AddressForm;
