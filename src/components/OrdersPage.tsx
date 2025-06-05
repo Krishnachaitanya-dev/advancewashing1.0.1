@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -158,17 +159,17 @@ const OrdersPage = () => {
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={() => openTracking(order)} className="flex-1 bg-blue-900 hover:bg-blue-800 text-white">
-                Track Order
-              </Button>
-              {order.status === 'Delivered' && (
+              {order.status === 'Delivered' ? (
                 <Button 
                   onClick={() => handleReviewOrder(order.id)}
-                  variant="outline" 
-                  className="border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10"
+                  className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center justify-center gap-2"
                 >
-                  <Star size={16} className="mr-1" />
+                  <Star size={16} />
                   Review
+                </Button>
+              ) : (
+                <Button onClick={() => openTracking(order)} className="flex-1 bg-blue-900 hover:bg-blue-800 text-white">
+                  Track Order
                 </Button>
               )}
             </div>
