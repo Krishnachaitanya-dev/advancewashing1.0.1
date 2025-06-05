@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 const OrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [trackingOpen, setTrackingOpen] = useState(false);
+  const [rating, setRating] = useState(0);
 
   // Function to get the appropriate icon for each tracking step
   const getStepIcon = (title: string, completed: boolean) => {
@@ -30,11 +30,23 @@ const OrdersPage = () => {
     }
   };
 
-  const handleReviewOrder = (orderId: string) => {
+  const handleReviewOrder = (order: any) => {
+    setSelectedOrder(order);
+    setRating(0); // Reset rating when opening review
+    setTrackingOpen(true);
+  };
+
+  const handleStarClick = (starRating: number) => {
+    setRating(starRating);
+  };
+
+  const submitReview = () => {
     toast({
       title: "Review Submitted",
-      description: "Thank you for reviewing your order!",
+      description: `Thank you for rating ${selectedOrder?.id} with ${rating} stars!`,
     });
+    setTrackingOpen(false);
+    setRating(0);
   };
 
   const orders = [{
@@ -161,7 +173,7 @@ const OrdersPage = () => {
             <div className="flex gap-2">
               {order.status === 'Delivered' ? (
                 <Button 
-                  onClick={() => handleReviewOrder(order.id)}
+                  onClick={() => handleReviewOrder(order)}
                   className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white flex items-center justify-center gap-2"
                 >
                   <Star size={16} />
@@ -181,7 +193,7 @@ const OrdersPage = () => {
       <Sheet open={trackingOpen} onOpenChange={setTrackingOpen}>
         <SheetContent className="w-full sm:max-w-md">
           <SheetHeader>
-            <SheetTitle>Order Tracking</SheetTitle>
+            <SheetTitle>Order Details</SheetTitle>
           </SheetHeader>
           
           {selectedOrder && (
@@ -228,19 +240,41 @@ const OrdersPage = () => {
                 </div>
               </div>
 
-              {/* Review Button for Delivered Orders */}
+              {/* Star Rating Section for Delivered Orders */}
               {selectedOrder.status === 'Delivered' && (
-                <div className="mt-4">
-                  <Button 
-                    onClick={() => {
-                      handleReviewOrder(selectedOrder.id);
-                      setTrackingOpen(false);
-                    }}
-                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white flex items-center justify-center gap-2"
-                  >
-                    <Star size={16} />
-                    Review This Order
-                  </Button>
+                <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <h4 className="font-medium mb-3 text-center">Rate Your Experience</h4>
+                  <div className="flex justify-center space-x-2 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => handleStarClick(star)}
+                        className="transition-colors"
+                      >
+                        <Star
+                          size={32}
+                          className={star <= rating ? 'text-yellow-500 fill-current' : 'text-gray-300'}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  {rating > 0 && (
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-3">
+                        {rating === 1 && "We're sorry to hear that. We'll work to improve."}
+                        {rating === 2 && "Thank you for the feedback. We'll do better."}
+                        {rating === 3 && "Thanks! We appreciate your honest feedback."}
+                        {rating === 4 && "Great! We're glad you liked our service."}
+                        {rating === 5 && "Excellent! Thank you for the amazing rating!"}
+                      </p>
+                      <Button 
+                        onClick={submitReview}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        Submit Review
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
