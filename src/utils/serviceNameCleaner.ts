@@ -70,3 +70,44 @@ export const getCleanServiceName = (serviceName: string): string => {
   console.log('Final result:', result);
   return result;
 };
+
+// New function to check if two names are essentially the same
+export const areNamesEquivalent = (name1: string, name2: string): boolean => {
+  if (!name1 || !name2) return false;
+  
+  const normalized1 = name1.toLowerCase().trim();
+  const normalized2 = name2.toLowerCase().trim();
+  
+  // Exact match
+  if (normalized1 === normalized2) return true;
+  
+  // One contains the other
+  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) return true;
+  
+  return false;
+};
+
+// New function to get the best display name from service name and item name
+export const getBestDisplayName = (serviceName: string, itemName: string | null): string => {
+  const cleanServiceName = getCleanServiceName(serviceName);
+  
+  if (!itemName) return cleanServiceName;
+  
+  // If they're equivalent, return the longer/more descriptive one
+  if (areNamesEquivalent(cleanServiceName, itemName)) {
+    return cleanServiceName.length >= itemName.length ? cleanServiceName : itemName;
+  }
+  
+  // If service name already contains item name, just return service name
+  if (cleanServiceName.toLowerCase().includes(itemName.toLowerCase())) {
+    return cleanServiceName;
+  }
+  
+  // If item name contains service name, return item name
+  if (itemName.toLowerCase().includes(cleanServiceName.toLowerCase())) {
+    return itemName;
+  }
+  
+  // If they're genuinely different, combine them
+  return `${itemName} - ${cleanServiceName}`;
+};

@@ -5,7 +5,7 @@ import { Clock, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useOrders } from '@/hooks/useOrders';
 import OrderDetailsModal from './OrderDetailsModal';
-import { getCleanServiceName } from '@/utils/serviceNameCleaner';
+import { getBestDisplayName } from '@/utils/serviceNameCleaner';
 import type { Order } from '@/hooks/useOrders';
 
 const OrdersPage = memo(() => {
@@ -163,24 +163,22 @@ const OrdersPage = memo(() => {
                   <div className="space-y-1">
                     {Object.entries(
                       order.order_items?.reduce((acc, item) => {
-                        const cleanName = getCleanServiceName(item.services?.name || 'Service');
-                        const key = `${cleanName}${item.item_name ? `-${item.item_name}` : ''}`;
+                        const displayName = getBestDisplayName(item.services?.name || 'Service', item.item_name);
                         
-                        if (!acc[key]) {
-                          acc[key] = {
-                            name: cleanName,
-                            itemName: item.item_name,
+                        if (!acc[displayName]) {
+                          acc[displayName] = {
+                            name: displayName,
                             quantity: 0,
                             pricePerKg: item.services?.base_price_per_kg || 0
                           };
                         }
-                        acc[key].quantity += item.quantity;
+                        acc[displayName].quantity += item.quantity;
                         return acc;
                       }, {} as Record<string, any>) || {}
                     ).map(([key, item]) => (
                       <div key={key} className="flex justify-between text-white/80 text-sm">
                         <span>
-                          {item.name} {item.itemName && `- ${item.itemName}`}
+                          {item.name}
                         </span>
                         <span>
                           Qty: {item.quantity} | ₹{item.pricePerKg}/kg

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Package, Truck, Clock, X } from 'lucide-react';
 import { Order } from '@/hooks/useOrders';
-import { getCleanServiceName } from '@/utils/serviceNameCleaner';
+import { getBestDisplayName } from '@/utils/serviceNameCleaner';
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -82,15 +82,13 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
     });
   };
 
-  // Group items by service name to avoid duplicates - more aggressive grouping
+  // Group items by display name to avoid duplicates - improved grouping logic
   const groupedItems = order.order_items?.reduce((acc, item) => {
-    const cleanName = getCleanServiceName(item.services?.name || 'Service');
-    const key = `${cleanName}${item.item_name ? `-${item.item_name}` : ''}`;
+    const displayName = getBestDisplayName(item.services?.name || 'Service', item.item_name);
     
-    if (!acc[key]) {
-      acc[key] = {
-        name: cleanName,
-        itemName: item.item_name,
+    if (!acc[displayName]) {
+      acc[displayName] = {
+        name: displayName,
         totalQuantity: 0,
         pricePerKg: item.services?.base_price_per_kg || 0,
         estimatedWeight: 0,
@@ -98,9 +96,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
       };
     }
     
-    acc[key].totalQuantity += item.quantity;
-    acc[key].estimatedWeight += item.estimated_weight || 0;
-    acc[key].finalWeight += item.final_weight || 0;
+    acc[displayName].totalQuantity += item.quantity;
+    acc[displayName].estimatedWeight += item.estimated_weight || 0;
+    acc[displayName].finalWeight += item.final_weight || 0;
     
     return acc;
   }, {} as Record<string, any>) || {};
@@ -182,7 +180,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               {Object.values(groupedItems).map((item: any, index) => (
                 <div key={index} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {item.name} {item.itemName && `- ${item.itemName}`}
+                    {item.name}
                   </span>
                   <span className="text-gray-900 font-medium">
                     ₹{item.pricePerKg}/kg
