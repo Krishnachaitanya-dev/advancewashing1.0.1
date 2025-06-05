@@ -87,7 +87,7 @@ const PickupDetailsPage = () => {
       return;
     }
 
-    // Prepare order data
+    // Prepare order data with proper service_id
     const orderData = {
       pickup_date: selectedDate.toISOString().split('T')[0],
       pickup_time: selectedSlot,
@@ -95,13 +95,15 @@ const PickupDetailsPage = () => {
       address_id: selectedAddress.id,
       estimated_total: total,
       items: selectedServices.map((service: Service) => ({
-        service_id: service.id.toString(),
+        service_id: service.id?.toString() || '1', // Ensure we have a valid service_id
         item_name: service.name,
         quantity: 1,
         estimated_weight: 1
       }))
     };
 
+    console.log('Submitting order data:', orderData);
+    
     const result = await createOrder(orderData);
     
     if (result.success) {

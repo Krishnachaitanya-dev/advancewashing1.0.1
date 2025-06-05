@@ -25,6 +25,19 @@ export const useOrderCreation = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // Helper function to convert time slot to a proper time
+  const convertTimeSlotToTime = (timeSlot: string) => {
+    // Extract start time from slot like "11:00 AM - 1:00 PM"
+    const startTime = timeSlot.split(' - ')[0];
+    return startTime;
+  };
+
+  // Helper function to create proper timestamp
+  const createPickupTimestamp = (date: string, timeSlot: string) => {
+    const time = convertTimeSlotToTime(timeSlot);
+    return `${date} ${time}`;
+  };
+
   const createOrder = async (orderData: CreateOrderData) => {
     if (!user) {
       toast({
@@ -58,11 +71,15 @@ export const useOrderCreation = () => {
         return { success: false };
       }
 
+      // Create proper pickup timestamp
+      const pickupTimestamp = createPickupTimestamp(orderData.pickup_date, orderData.pickup_time);
+      console.log('Pickup timestamp:', pickupTimestamp);
+
       // Create booking first
       const bookingData = {
         user_id: user.id,
         address_id: orderData.address_id,
-        pickup_time: `${orderData.pickup_date} ${orderData.pickup_time}`,
+        pickup_time: pickupTimestamp,
         special_note: orderData.special_instructions || null,
         status: 'pending'
       };
@@ -120,10 +137,10 @@ export const useOrderCreation = () => {
 
       console.log('Order created successfully:', order);
 
-      // Create order items
+      // Create order items with proper service_id
       const orderItems = orderData.items.map(item => ({
         order_id: order.id,
-        service_id: item.service_id,
+        service_id: item.service_id && item.service_id !== 'NaN' ? item.service_id : null,
         item_name: item.item_name,
         quantity: item.quantity,
         estimated_weight: item.estimated_weight
