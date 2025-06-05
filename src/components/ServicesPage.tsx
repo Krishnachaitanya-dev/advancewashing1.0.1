@@ -13,7 +13,7 @@ import {
   Shield,
   Package,
   ShoppingBag,
-  CheckCircle
+  CheckCircle2
 } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -25,23 +25,32 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
   'shoes': ShoppingBag
 };
 
-// Define color scheme for selected services
+// Define color scheme for selected services with stronger colors
 const serviceColors = [
-  'border-green-500',
-  'border-pink-500', 
-  'border-violet-500',
-  'border-orange-500',
-  'border-yellow-500',
-  'border-cyan-500'
+  'border-green-400',
+  'border-pink-400', 
+  'border-violet-400',
+  'border-orange-400',
+  'border-yellow-400',
+  'border-cyan-400'
 ];
 
 const serviceBgColors = [
-  'bg-green-500/20',
-  'bg-pink-500/20', 
-  'bg-violet-500/20',
-  'bg-orange-500/20',
-  'bg-yellow-500/20',
-  'bg-cyan-500/20'
+  'bg-green-400/30',
+  'bg-pink-400/30', 
+  'bg-violet-400/30',
+  'bg-orange-400/30',
+  'bg-yellow-400/30',
+  'bg-cyan-400/30'
+];
+
+const serviceCheckColors = [
+  'text-green-400',
+  'text-pink-400', 
+  'text-violet-400',
+  'text-orange-400',
+  'text-yellow-400',
+  'text-cyan-400'
 ];
 
 interface SelectedService {
@@ -95,9 +104,18 @@ const ServicesPage = memo(() => {
       const borderClass = serviceColors[colorIndex];
       const bgClass = serviceBgColors[colorIndex];
       console.log(`Service ${serviceId} at index ${selectedIndex} gets border ${borderClass}`);
-      return `glass-card p-4 cursor-pointer transition-all duration-200 border-2 ${borderClass} ${bgClass} relative`;
+      return `glass-card p-4 cursor-pointer transition-all duration-300 border-4 ${borderClass} ${bgClass} relative shadow-lg transform scale-105`;
     }
-    return 'glass-card p-4 cursor-pointer transition-all duration-200 hover:bg-white/10 border-2 border-transparent';
+    return 'glass-card p-4 cursor-pointer transition-all duration-300 hover:bg-white/10 border-2 border-transparent hover:scale-102';
+  };
+
+  const getCheckmarkColor = (serviceId: string) => {
+    const selectedIndex = selectedServices.findIndex(s => s.id === serviceId);
+    if (selectedIndex !== -1) {
+      const colorIndex = selectedIndex % serviceCheckColors.length;
+      return serviceCheckColors[colorIndex];
+    }
+    return 'text-white';
   };
 
   const isServiceSelected = (serviceId: string) => {
@@ -175,24 +193,28 @@ const ServicesPage = memo(() => {
               >
                 {/* Selection Indicator */}
                 {isSelected && (
-                  <div className="absolute top-2 right-2">
-                    <CheckCircle className="w-6 h-6 text-white fill-current" />
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-white rounded-full p-1 shadow-lg">
+                      <CheckCircle2 
+                        className={`w-6 h-6 ${getCheckmarkColor(service.id)} fill-current`} 
+                      />
+                    </div>
                   </div>
                 )}
                 
                 <div className="flex flex-col items-center text-center space-y-3">
                   {/* Service Icon */}
-                  <div className="rounded-full p-3 bg-white/20">
+                  <div className={`rounded-full p-3 ${isSelected ? 'bg-white/40' : 'bg-white/20'} transition-all duration-300`}>
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
                   
                   {/* Service Name */}
-                  <h3 className="text-white font-semibold text-sm leading-tight">
+                  <h3 className={`font-semibold text-sm leading-tight transition-all duration-300 ${isSelected ? 'text-white' : 'text-white/90'}`}>
                     {service.name}
                   </h3>
                   
                   {/* Service Price */}
-                  <div className="text-white/90 font-medium text-lg">
+                  <div className={`font-medium text-lg transition-all duration-300 ${isSelected ? 'text-white' : 'text-white/90'}`}>
                     ₹{service.base_price_per_kg}/kg
                   </div>
                 </div>
