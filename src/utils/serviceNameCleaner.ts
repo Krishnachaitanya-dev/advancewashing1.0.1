@@ -37,11 +37,11 @@ export const getCleanServiceName = (serviceName: string): string => {
     
     // Keep only truly unique normalized parts
     const reallyUnique = [];
-    const seenNormalized = new Set();
+    const seenNormalized = new Set<string>();
     
     for (const item of normalized) {
       // Check if this normalized version is already seen or similar to existing ones
-      const isSimilar = Array.from(seenNormalized).some(existing => {
+      const isSimilar = Array.from(seenNormalized).some((existing: string) => {
         const longer = existing.length > item.normalized.length ? existing : item.normalized;
         const shorter = existing.length > item.normalized.length ? item.normalized : existing;
         return longer.includes(shorter) && shorter.length > 2; // Only consider similar if meaningful length
