@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, CreditCard, Bell, Star, Shield, FileText, LogOut } from 'lucide-react';
+import { User, Settings, MapPin, CreditCard, Bell, Star, Shield, FileText, LogOut, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -43,10 +43,7 @@ const ProfilePage = memo(() => {
       label: 'Settings',
       path: '/settings',
       description: 'App preferences and settings'
-    }
-  ];
-
-  const supportItems = [
+    },
     {
       icon: <Star className="w-5 h-5" />,
       label: 'Rate Our App',
@@ -90,48 +87,30 @@ const ProfilePage = memo(() => {
           </div>
         </div>
 
-        {/* Account Section */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
-          <div className="space-y-3">
-            {menuItems.map((item, index) => (
-              <Link key={index} to={item.path}>
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                  <div className="text-white/80">
-                    {item.icon}
+        {/* Menu Items - Clean Vertical List */}
+        <div className="space-y-3">
+          {menuItems.map((item, index) => (
+            <Link key={index} to={item.path}>
+              <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-102">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-white/80">
+                      {item.icon}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium text-sm">{item.label}</p>
+                      <p className="text-white/60 text-xs">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-white font-medium text-sm">{item.label}</p>
-                    <p className="text-white/60 text-xs">{item.description}</p>
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/60" />
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Support Section */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
-          <div className="space-y-3">
-            {supportItems.map((item, index) => (
-              <Link key={index} to={item.path}>
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                  <div className="text-white/80">
-                    {item.icon}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white font-medium text-sm">{item.label}</p>
-                    <p className="text-white/60 text-xs">{item.description}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+              </div>
+            </Link>
+          ))}
         </div>
 
         {/* Sign Out */}
-        <div className="glass-card p-6">
+        <div className="glass-card p-4">
           <Button 
             onClick={handleSignOut}
             variant="outline" 

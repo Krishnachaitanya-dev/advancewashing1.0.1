@@ -223,27 +223,6 @@ const ServicesPage = memo(() => {
           })}
         </div>
 
-        {/* Selected Services Summary */}
-        {selectedServices.length > 0 && (
-          <div className="glass-card p-4">
-            <h3 className="text-white font-semibold mb-3">Selected Services</h3>
-            <div className="space-y-2 mb-4">
-              {selectedServices.map((service) => (
-                <div key={service.id} className="flex justify-between items-center text-sm">
-                  <span className="text-white/90">{service.name}</span>
-                  <span className="text-white font-medium">₹{service.price}/kg</span>
-                </div>
-              ))}
-            </div>
-            <div className="border-t border-white/20 pt-3 mb-4">
-              <div className="flex justify-between items-center">
-                <span className="text-white font-semibold">Estimated Total:</span>
-                <span className="text-white font-bold text-lg">₹{calculateTotal()}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Schedule Pickup Button */}
         <div className="pb-6">
           <Button
