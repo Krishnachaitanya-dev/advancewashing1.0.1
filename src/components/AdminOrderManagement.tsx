@@ -9,7 +9,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { useOrderUpdate } from '@/hooks/useOrderUpdate';
 import OrderStatusFilter from './OrderStatusFilter';
 import ServiceWeightCalculator from './ServiceWeightCalculator';
-import { getCleanServiceName } from '@/utils/serviceNameCleaner';
+import { getBestDisplayName } from '@/utils/serviceNameCleaner';
 import type { Order } from '@/hooks/useOrders';
 
 const AdminOrderManagement = () => {
@@ -93,41 +93,6 @@ const AdminOrderManagement = () => {
     value: 'delivered',
     label: 'Delivered'
   }];
-
-  // Helper function to clean service names and remove duplicates more aggressively
-  const getCleanServiceName = (serviceName: string) => {
-    if (!serviceName) return 'Service';
-    
-    // Split by various separators and clean
-    const parts = serviceName.split(/\s*[-–—]\s*|\s*\|\s*|\s*,\s*/);
-    
-    // Remove duplicates and empty strings, then clean whitespace
-    const uniqueParts = [...new Set(parts)]
-      .map(part => part.trim())
-      .filter(part => part.length > 0);
-    
-    // If we have duplicates, just take the first unique part
-    if (uniqueParts.length > 1) {
-      // Check if parts are very similar (like "Bedsheets" and "Bedsheet")
-      const normalized = uniqueParts.map(part => part.toLowerCase().replace(/s$/, ''));
-      const reallyUnique = [];
-      
-      for (let i = 0; i < uniqueParts.length; i++) {
-        const current = normalized[i];
-        if (!reallyUnique.some(existing => 
-          existing.toLowerCase().replace(/s$/, '') === current ||
-          current.includes(existing.toLowerCase().replace(/s$/, '')) ||
-          existing.toLowerCase().replace(/s$/, '').includes(current)
-        )) {
-          reallyUnique.push(uniqueParts[i]);
-        }
-      }
-      
-      return reallyUnique.join(' - ');
-    }
-    
-    return uniqueParts[0] || 'Service';
-  };
 
   // Check if weight can be edited (only confirmed and picked_up statuses)
   const canEditWeight = (status: string) => {
@@ -286,14 +251,29 @@ const AdminOrderManagement = () => {
             <div className="border-t border-white/20 pt-4">
               <h4 className="text-white font-medium text-sm mb-2">Order Items:</h4>
               <div className="space-y-2">
-                {order.order_items?.map(item => <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between text-white/80 text-sm space-y-1 sm:space-y-0">
+                {Object.entries(
+                  order.order_items?.reduce((acc, item) => {
+                    const displayName = getBestDisplayName(item.services?.name || 'Service', item.item_name);
+                    
+                    if (!acc[displayName]) {
+                      acc[displayName] = {
+                        name: displayName,
+                        totalWeight: 0
+                      };
+                    }
+                    acc[displayName].totalWeight += item.final_weight || item.estimated_weight || 0;
+                    return acc;
+                  }, {} as Record<string, any>) || {}
+                ).map(([key, item]) => (
+                  <div key={key} className="flex flex-col sm:flex-row sm:justify-between text-white/80 text-sm space-y-1 sm:space-y-0">
                     <span className="break-words">
-                      {getCleanServiceName(item.services?.name || 'Service')} {item.item_name && `- ${item.item_name}`}
+                      {item.name}
                     </span>
                     <span className="text-xs sm:text-sm whitespace-nowrap">
-                      Qty: {item.quantity} | Weight: {item.final_weight || item.estimated_weight}kg
+                      Weight: {item.totalWeight}kg
                     </span>
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
 
