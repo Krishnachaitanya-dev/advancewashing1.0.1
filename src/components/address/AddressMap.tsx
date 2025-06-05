@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import React, { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -42,19 +42,23 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-interface MapEventsHandlerProps {
+interface MapControllerProps {
   onPositionChange: (position: { lat: number; lng: number }) => void;
   onAddressChange: (address: any) => void;
   setMarkerPosition: (position: [number, number]) => void;
 }
 
-const MapEventsHandler: React.FC<MapEventsHandlerProps> = ({ 
+const MapController: React.FC<MapControllerProps> = ({ 
   onPositionChange, 
   onAddressChange, 
   setMarkerPosition 
 }) => {
-  useMapEvents({
-    click: async (e) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    const handleMapClick = async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       console.log('Map clicked:', { lat, lng });
       
@@ -71,8 +75,14 @@ const MapEventsHandler: React.FC<MapEventsHandlerProps> = ({
       } catch (error) {
         console.error('Error in reverse geocoding:', error);
       }
-    }
-  });
+    };
+
+    map.on('click', handleMapClick);
+
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, onPositionChange, onAddressChange, setMarkerPosition]);
 
   return null;
 };
@@ -102,7 +112,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={markerPosition} />
-          <MapEventsHandler 
+          <MapController 
             onPositionChange={onPositionChange}
             onAddressChange={onAddressChange}
             setMarkerPosition={setMarkerPosition}
