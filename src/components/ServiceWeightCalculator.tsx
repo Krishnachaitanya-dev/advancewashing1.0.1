@@ -116,9 +116,7 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
                 <div className="flex-1">
                   <p className="text-white font-medium text-sm">{serviceName}</p>
                   {item.item_name}
-                  <p className="text-white/60 text-xs">
-                    Quantity: {item.quantity} | Guideline: {guidelines.min}-{guidelines.max}kg {guidelines.unit}
-                  </p>
+                  
                 </div>
                 <div className="ml-3">
                   <Input type="number" step="0.1" value={itemWeights[item.id] || ''} onChange={e => handleWeightChange(item.id, e.target.value)} placeholder="Weight (kg)" className="w-24 bg-white/10 border-white/20 text-white text-sm" />
@@ -138,7 +136,7 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
             <p className="font-medium">Total Price: ₹{calculatedPrice.toFixed(2)}</p>
           </div>
           <Button onClick={handleSave} disabled={isUpdating} className="bg-green-600 hover:bg-green-700 flex items-center space-x-2">
-            <Save className="w-4 h-4" />
+            
             <span>Save</span>
           </Button>
         </div>
