@@ -10,6 +10,7 @@ import { ArrowLeft, MapPin, ChevronDown } from 'lucide-react';
 import { useSupabaseAddresses } from '@/hooks/useSupabaseAddresses';
 import { useOrderCreation } from '@/hooks/useOrderCreation';
 import AddressCard from './address/AddressCard';
+import { Address } from '@/types/address';
 
 interface Service {
   id: number;
@@ -17,6 +18,26 @@ interface Service {
   price: string;
   color: string;
 }
+
+// Helper function to convert SupabaseAddress to Address
+const convertSupabaseAddressToAddress = (supabaseAddr: any): Address => {
+  return {
+    id: supabaseAddr.id,
+    doorNo: supabaseAddr.door_no,
+    street: supabaseAddr.street,
+    landmark: supabaseAddr.landmark,
+    city: supabaseAddr.city,
+    state: supabaseAddr.state,
+    pincode: supabaseAddr.pincode,
+    phone: supabaseAddr.phone,
+    name: supabaseAddr.name,
+    label: supabaseAddr.label,
+    coordinates: supabaseAddr.coordinates,
+    isDefault: supabaseAddr.is_default,
+    createdAt: new Date(supabaseAddr.created_at),
+    updatedAt: new Date(supabaseAddr.updated_at)
+  };
+};
 
 const PickupDetailsPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -32,8 +53,9 @@ const PickupDetailsPage = () => {
 
   const { selectedServices, total } = location.state || { selectedServices: [], total: 0 };
 
-  // Get default address
-  const selectedAddress = addresses.find(addr => addr.is_default) || addresses[0];
+  // Get default address and convert to Address type
+  const selectedSupabaseAddress = addresses.find(addr => addr.is_default) || addresses[0];
+  const selectedAddress = selectedSupabaseAddress ? convertSupabaseAddressToAddress(selectedSupabaseAddress) : null;
 
   const timeSlots = ['9:00 AM - 11:00 AM', '11:00 AM - 1:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 5:00 PM', '5:00 PM - 7:00 PM'];
 
@@ -156,11 +178,11 @@ const PickupDetailsPage = () => {
             <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
               <p className="text-sm text-white/70 mb-2">Select a different address:</p>
               {addresses
-                .filter(addr => addr.id !== selectedAddress?.id)
+                .filter(addr => addr.id !== selectedSupabaseAddress?.id)
                 .map(address => (
                   <div key={address.id} className="cursor-pointer">
                     <AddressCard 
-                      address={address} 
+                      address={convertSupabaseAddressToAddress(address)} 
                       onEdit={() => {}} 
                       onDelete={() => {}} 
                       onSetDefault={() => {}}

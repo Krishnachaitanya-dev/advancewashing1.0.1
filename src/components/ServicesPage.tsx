@@ -1,4 +1,3 @@
-
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -12,7 +11,7 @@ import {
   Bed,
   Shield,
   Package,
-  shoes
+  ShoppingBag
 } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -21,7 +20,7 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
   'Bed': Bed,
   'Shield': Shield,
   'Package': Package,
-  'shoes': shoes
+  'shoes': ShoppingBag
 };
 
 interface SelectedService {
