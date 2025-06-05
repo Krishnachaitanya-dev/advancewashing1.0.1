@@ -1,3 +1,4 @@
+
 import React, { ReactNode, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, User, Package } from 'lucide-react';
@@ -11,7 +12,9 @@ const AppLayout = memo(({
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-  return <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 relative overflow-hidden">
+  return <div className="min-h-screen relative overflow-hidden" style={{
+      background: 'linear-gradient(135deg, #ffffff 0%, #e0f2fe 25%, #87ceeb 50%, #4682b4 75%, #1e3a8a 100%)'
+    }}>
       {/* Background water effect - optimized for mobile */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="water-wave"></div>
@@ -21,7 +24,7 @@ const AppLayout = memo(({
       {/* Content container */}
       <div className="relative min-h-screen flex flex-col">
         {/* Header - optimized for mobile touch */}
-        <header className="p-4 flex items-center justify-between bg-blue-900/30 backdrop-blur-sm border-b border-white/10 safe-area-top py-[8px] px-[60px]">
+        <header className="p-4 flex items-center justify-between bg-white/20 backdrop-blur-sm border-b border-white/10 safe-area-top py-[8px] px-[60px]">
           <div className="flex items-center">
             <img src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" alt="AW Logo" className="w-10 h-10 sm:w-12 sm:h-12 mr-2 sm:mr-3" loading="lazy" />
             <h1 className="text-white text-lg sm:text-xl font-semibold">Advance Washing</h1>

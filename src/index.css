@@ -68,7 +68,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 25%, #87ceeb 50%, #4682b4 75%, #1e3a8a 100%);
     min-height: 100vh;
     font-family: "Inter", sans-serif;
   }
