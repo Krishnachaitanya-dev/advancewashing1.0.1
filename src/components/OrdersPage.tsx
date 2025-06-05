@@ -7,6 +7,7 @@ import { useOrders } from '@/hooks/useOrders';
 import OrderDetailsModal from './OrderDetailsModal';
 import { getBestDisplayName } from '@/utils/serviceNameCleaner';
 import type { Order } from '@/hooks/useOrders';
+
 const OrdersPage = memo(() => {
   const {
     orders,
@@ -14,14 +15,17 @@ const OrdersPage = memo(() => {
   } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleOrderClick = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
+
   const handleCloseModal = () => {
     setSelectedOrder(null);
     setIsModalOpen(false);
   };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -40,6 +44,7 @@ const OrdersPage = memo(() => {
         return <Clock className="w-5 h-5" />;
     }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
@@ -60,6 +65,7 @@ const OrdersPage = memo(() => {
         return 'bg-gray-600/60 text-gray-100';
     }
   };
+
   const formatStatus = (status: string) => {
     switch (status) {
       case 'pending':
@@ -80,6 +86,7 @@ const OrdersPage = memo(() => {
         return status;
     }
   };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -104,13 +111,17 @@ const OrdersPage = memo(() => {
   };
 
   if (loading) {
-    return <AppLayout>
+    return (
+      <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
           <div className="text-white text-lg">Loading orders...</div>
         </div>
-      </AppLayout>;
+      </AppLayout>
+    );
   }
-  return <AppLayout>
+
+  return (
+    <AppLayout>
       <div className="space-y-6">
         {orders.length === 0 ? <div className="glass-card p-8 text-center">
             <Package className="w-16 h-16 text-white/60 mx-auto mb-4" />
@@ -221,7 +232,8 @@ const OrdersPage = memo(() => {
 
         <OrderDetailsModal order={selectedOrder} isOpen={isModalOpen} onClose={handleCloseModal} />
       </div>
-    </AppLayout>;
+    </AppLayout>
+  );
 });
 
 OrdersPage.displayName = 'OrdersPage';
