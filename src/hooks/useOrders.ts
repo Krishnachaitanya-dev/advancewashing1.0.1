@@ -73,6 +73,7 @@ export const useOrders = () => {
             item_name,
             quantity,
             estimated_weight,
+            final_weight,
             services!inner(
               name,
               base_price_per_kg
