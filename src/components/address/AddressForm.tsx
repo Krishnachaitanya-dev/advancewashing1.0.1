@@ -86,6 +86,7 @@ const AddressForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submitting form with coordinates:', selectedCoordinates);
+    // Pass the selected coordinates to the submit handler
     await onSubmit(formData, selectedCoordinates || undefined);
   };
 
@@ -108,13 +109,6 @@ const AddressForm = ({
           />
         </CardContent>
       </Card>
-
-      {/* Coordinates Display */}
-      {selectedCoordinates && (
-        <div className="text-sm text-white/70 bg-white/5 p-2 rounded">
-          📍 Location: {selectedCoordinates.lat.toFixed(6)}, {selectedCoordinates.lng.toFixed(6)}
-        </div>
-      )}
 
       {/* Form Section */}
       <form onSubmit={handleSubmit} className="space-y-4">
