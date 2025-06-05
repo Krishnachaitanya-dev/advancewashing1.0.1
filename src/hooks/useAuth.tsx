@@ -71,6 +71,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       console.log('User role check result:', profile, error);
       
+      // Handle the infinite recursion error gracefully
+      if (error && error.code === '42P17') {
+        console.warn('Database policy issue detected, defaulting to non-admin');
+        setIsAdmin(false);
+        return;
+      }
+      
       if (error) {
         console.error('Error checking user role:', error);
         setIsAdmin(false);

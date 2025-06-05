@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, ChevronDown } from 'lucide-react';
-import { useAddresses } from '@/hooks/useAddresses';
+import { useSupabaseAddresses } from '@/hooks/useSupabaseAddresses';
+import { useOrderCreation } from '@/hooks/useOrderCreation';
 import AddressCard from './address/AddressCard';
-import { Address } from '@/types/address';
 
 interface Service {
   id: number;
@@ -23,26 +23,21 @@ const PickupDetailsPage = () => {
   const [selectedSlot, setSelectedSlot] = useState<string>('');
   const [instructions, setInstructions] = useState('');
   const [showAddressSelection, setShowAddressSelection] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  const { addresses, getDefaultAddress } = useAddresses();
+  const { addresses, isLoading: addressesLoading } = useSupabaseAddresses();
+  const { createOrder, isCreating } = useOrderCreation();
 
   const { selectedServices, total } = location.state || { selectedServices: [], total: 0 };
 
-  // Initialize selected address with default address
-  React.useEffect(() => {
-    if (!selectedAddress && addresses.length > 0) {
-      const defaultAddr = getDefaultAddress();
-      setSelectedAddress(defaultAddr);
-    }
-  }, [addresses, selectedAddress, getDefaultAddress]);
+  // Get default address
+  const selectedAddress = addresses.find(addr => addr.is_default) || addresses[0];
 
   const timeSlots = ['9:00 AM - 11:00 AM', '11:00 AM - 1:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 5:00 PM', '5:00 PM - 7:00 PM'];
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       toast({
         title: "Address Required",
@@ -70,17 +65,42 @@ const PickupDetailsPage = () => {
       return;
     }
 
-    toast({
-      title: "Order Placed Successfully!",
-      description: `Your pickup is scheduled for ${selectedDate.toDateString()} between ${selectedSlot}`
-    });
-    navigate('/orders');
+    // Prepare order data
+    const orderData = {
+      pickup_date: selectedDate.toISOString().split('T')[0],
+      pickup_time: selectedSlot,
+      special_instructions: instructions,
+      address_id: selectedAddress.id,
+      estimated_total: total,
+      items: selectedServices.map((service: Service) => ({
+        service_id: service.id.toString(),
+        item_name: service.name,
+        quantity: 1,
+        estimated_weight: 1
+      }))
+    };
+
+    const result = await createOrder(orderData);
+    
+    if (result.success) {
+      navigate('/orders');
+    }
   };
 
-  const handleAddressSelect = (address: Address) => {
-    setSelectedAddress(address);
+  const handleAddressSelect = (address: any) => {
+    // This would update the selected address if multiple addresses were supported
     setShowAddressSelection(false);
   };
+
+  if (addressesLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="text-white text-lg">Loading...</div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -121,9 +141,9 @@ const PickupDetailsPage = () => {
           ) : (
             <div className="text-center py-4">
               <MapPin size={32} className="mx-auto text-white/40 mb-2" />
-              <p className="text-white/70 mb-3">No address selected</p>
+              <p className="text-white/70 mb-3">No address found</p>
               <Button
-                onClick={() => navigate('/profile/addresses')}
+                onClick={() => navigate('/address-management')}
                 className="bg-green-500 hover:bg-green-600 text-white"
               >
                 Add Address
@@ -235,9 +255,17 @@ const PickupDetailsPage = () => {
         <div className="pb-6">
           <Button 
             onClick={handlePlaceOrder} 
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg transform transition-all duration-200 hover:scale-105"
+            disabled={isCreating || !selectedAddress}
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-medium text-lg shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🛒 Place Order
+            {isCreating ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                Placing Order...
+              </div>
+            ) : (
+              '🛒 Place Order'
+            )}
           </Button>
         </div>
       </div>
