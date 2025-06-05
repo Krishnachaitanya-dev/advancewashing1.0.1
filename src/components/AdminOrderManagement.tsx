@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -7,17 +6,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CheckCircle, Package, Truck, Clock, Edit, Save, X } from 'lucide-react';
 import { useOrders } from '@/hooks/useOrders';
 import { useOrderUpdate } from '@/hooks/useOrderUpdate';
+import OrderStatusFilter from './OrderStatusFilter';
+import ServiceWeightCalculator from './ServiceWeightCalculator';
 import type { Order } from '@/hooks/useOrders';
 
 const AdminOrderManagement = () => {
   const { orders, loading, refetch } = useOrders();
   const { updateOrder, isUpdating } = useOrderUpdate();
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [editData, setEditData] = useState({
     status: '',
     final_weight: '',
     final_price: ''
   });
+
+  // Filter orders based on selected status
+  const filteredOrders = useMemo(() => {
+    if (!selectedStatus) return orders;
+    return orders.filter(order => order.status === selectedStatus);
+  }, [orders, selectedStatus]);
+
+  // Calculate order counts by status
+  const orderCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    orders.forEach(order => {
+      counts[order.status] = (counts[order.status] || 0) + 1;
+    });
+    return counts;
+  }, [orders]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -78,6 +95,17 @@ const AdminOrderManagement = () => {
     }
   };
 
+  const handleServiceWeightSave = async (orderId: string, weight: number, price: number) => {
+    const success = await updateOrder(orderId, {
+      final_weight: weight,
+      final_price: price
+    });
+    if (success) {
+      refetch();
+    }
+    return success;
+  };
+
   const handleCancel = () => {
     setEditingOrder(null);
     setEditData({ status: '', final_weight: '', final_price: '' });
@@ -108,8 +136,14 @@ const AdminOrderManagement = () => {
         <p className="text-white/80">Manage all customer orders and update their status</p>
       </div>
 
+      <OrderStatusFilter
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+        orderCounts={orderCounts}
+      />
+
       <div className="space-y-4">
-        {orders.map((order) => (
+        {filteredOrders.map((order) => (
           <div key={order.id} className="glass-card p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -165,46 +199,57 @@ const AdminOrderManagement = () => {
             </div>
 
             {editingOrder === order.id ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <label className="block text-white/80 text-sm mb-2">Status</label>
-                  <Select value={editData.status} onValueChange={(value) => setEditData(prev => ({ ...prev, status: value }))}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-white/80 text-sm mb-2">Status</label>
+                    <Select value={editData.status} onValueChange={(value) => setEditData(prev => ({ ...prev, status: value }))}>
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-white/80 text-sm mb-2">Final Weight (kg)</label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={editData.final_weight}
+                      onChange={(e) => setEditData(prev => ({ ...prev, final_weight: e.target.value }))}
+                      placeholder="Enter weight"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white/80 text-sm mb-2">Final Price (₹)</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={editData.final_price}
+                      onChange={(e) => setEditData(prev => ({ ...prev, final_price: e.target.value }))}
+                      placeholder="Enter price"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-white/80 text-sm mb-2">Final Weight (kg)</label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={editData.final_weight}
-                    onChange={(e) => setEditData(prev => ({ ...prev, final_weight: e.target.value }))}
-                    placeholder="Enter weight"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white/80 text-sm mb-2">Final Price (₹)</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={editData.final_price}
-                    onChange={(e) => setEditData(prev => ({ ...prev, final_price: e.target.value }))}
-                    placeholder="Enter price"
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  />
-                </div>
+                <ServiceWeightCalculator
+                  orderId={order.id}
+                  orderItems={order.order_items || []}
+                  currentFinalWeight={order.final_weight || undefined}
+                  currentFinalPrice={order.final_price || undefined}
+                  onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)}
+                  isUpdating={isUpdating}
+                />
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -253,6 +298,12 @@ const AdminOrderManagement = () => {
             )}
           </div>
         ))}
+
+        {filteredOrders.length === 0 && (
+          <div className="glass-card p-8 text-center">
+            <p className="text-white/70">No orders found for the selected status.</p>
+          </div>
+        )}
       </div>
     </div>
   );
