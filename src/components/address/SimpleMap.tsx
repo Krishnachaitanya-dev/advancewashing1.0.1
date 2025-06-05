@@ -4,15 +4,17 @@ import { MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SimpleMapProps {
-  onAddressSelect: (address: any) => void;
+  onAddressSelect: (address: any, coordinates?: { lat: number; lng: number }) => void;
   initialPosition?: { lat: number; lng: number };
+  onCoordinatesChange?: (coords: { lat: number; lng: number }) => void;
 }
 
-const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
+const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: SimpleMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [markerInstance, setMarkerInstance] = useState<any>(null);
+  const [currentCoordinates, setCurrentCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
   // Initialize map when component mounts
   useEffect(() => {
@@ -42,10 +44,16 @@ const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
       // Add marker
       const marker = L.marker([defaultPos.lat, defaultPos.lng]).addTo(map);
 
+      // Set initial coordinates
+      setCurrentCoordinates(defaultPos);
+      onCoordinatesChange?.(defaultPos);
+
       // Handle map clicks
       map.on('click', async (e: any) => {
         const { lat, lng } = e.latlng;
         marker.setLatLng([lat, lng]);
+        setCurrentCoordinates({ lat, lng });
+        onCoordinatesChange?.({ lat, lng });
         await reverseGeocode(lat, lng);
       });
 
@@ -135,8 +143,8 @@ const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
           landmark: addr.amenity || addr.shop || addr.tourism || ''
         };
         
-        console.log('Address found:', address);
-        onAddressSelect(address);
+        console.log('Address found:', address, 'Coordinates:', { lat, lng });
+        onAddressSelect(address, { lat, lng });
       }
     } catch (error) {
       console.error('Reverse geocoding failed:', error);
@@ -167,6 +175,10 @@ const SimpleMap = ({ onAddressSelect, initialPosition }: SimpleMapProps) => {
       // Update map view and marker
       mapInstance.setView([lat, lng], 16);
       markerInstance.setLatLng([lat, lng]);
+      
+      // Update coordinates
+      setCurrentCoordinates({ lat, lng });
+      onCoordinatesChange?.({ lat, lng });
       
       // Get address for this location
       await reverseGeocode(lat, lng);

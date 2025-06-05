@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -77,11 +76,12 @@ const AddressManagementPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
-  const handleAddAddress = async (formData: AddressFormData) => {
+  const handleAddAddress = async (formData: AddressFormData, coordinates?: { lat: number; lng: number }) => {
     setFormLoading(true);
     try {
       const supabaseFormData = convertToSupabaseFormData(formData);
-      await addAddress(supabaseFormData, selectedCoordinates || undefined);
+      console.log('Adding address with coordinates:', coordinates);
+      await addAddress(supabaseFormData, coordinates);
       setViewMode('list');
       setSelectedCoordinates(null);
     } finally {
@@ -89,12 +89,13 @@ const AddressManagementPage = () => {
     }
   };
 
-  const handleUpdateAddress = async (formData: AddressFormData) => {
+  const handleUpdateAddress = async (formData: AddressFormData, coordinates?: { lat: number; lng: number }) => {
     if (!editingAddress) return;
     setFormLoading(true);
     try {
       const supabaseFormData = convertToSupabaseFormData(formData);
-      await updateAddress(editingAddress.id, supabaseFormData, selectedCoordinates || undefined);
+      console.log('Updating address with coordinates:', coordinates);
+      await updateAddress(editingAddress.id, supabaseFormData, coordinates);
       setViewMode('list');
       setEditingAddress(null);
       setSelectedCoordinates(null);

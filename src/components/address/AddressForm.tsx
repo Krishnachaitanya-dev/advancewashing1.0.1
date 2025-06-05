@@ -10,7 +10,7 @@ import AddressLabelSelector from './AddressLabelSelector';
 import { AddressFormData } from '@/types/address';
 
 interface AddressFormProps {
-  onSubmit: (data: AddressFormData) => Promise<void> | void;
+  onSubmit: (data: AddressFormData, coordinates?: { lat: number; lng: number }) => Promise<void> | void;
   onCancel: () => void;
   initialData?: AddressFormData;
   isLoading?: boolean;
@@ -47,10 +47,15 @@ const AddressForm = ({
     return { lat: 17.6868, lng: 83.2185 };
   });
 
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{ lat: number; lng: number } | null>(
+    initialCoordinates || null
+  );
+
   // Update map position when initial coordinates change
   useEffect(() => {
     if (initialCoordinates) {
       setMapPosition(initialCoordinates);
+      setSelectedCoordinates(initialCoordinates);
     }
   }, [initialCoordinates]);
 
@@ -58,8 +63,8 @@ const AddressForm = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAddressSelect = (address: any) => {
-    console.log('Address selected from map:', address);
+  const handleAddressSelect = (address: any, coordinates?: { lat: number; lng: number }) => {
+    console.log('Address selected from map:', address, 'Coordinates:', coordinates);
     
     // Update form data with the selected address
     setFormData(prev => ({
@@ -70,15 +75,24 @@ const AddressForm = ({
       pincode: address.pincode || prev.pincode,
       landmark: address.landmark || prev.landmark
     }));
+
+    // Store coordinates if provided
+    if (coordinates) {
+      setSelectedCoordinates(coordinates);
+      onCoordinatesChange?.(coordinates);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    console.log('Submitting form with coordinates:', selectedCoordinates);
+    await onSubmit(formData, selectedCoordinates || undefined);
   };
 
   const handleCoordinatesUpdate = (coords: { lat: number; lng: number }) => {
+    console.log('Coordinates updated:', coords);
     setMapPosition(coords);
+    setSelectedCoordinates(coords);
     onCoordinatesChange?.(coords);
   };
 
@@ -90,9 +104,17 @@ const AddressForm = ({
           <SimpleMap 
             onAddressSelect={handleAddressSelect}
             initialPosition={mapPosition}
+            onCoordinatesChange={handleCoordinatesUpdate}
           />
         </CardContent>
       </Card>
+
+      {/* Coordinates Display */}
+      {selectedCoordinates && (
+        <div className="text-sm text-white/70 bg-white/5 p-2 rounded">
+          📍 Location: {selectedCoordinates.lat.toFixed(6)}, {selectedCoordinates.lng.toFixed(6)}
+        </div>
+      )}
 
       {/* Form Section */}
       <form onSubmit={handleSubmit} className="space-y-4">
