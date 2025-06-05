@@ -9,7 +9,6 @@ interface PersonalInfo {
   lastName: string;
   email: string;
   phone: string;
-  dateOfBirth: string;
 }
 
 export const usePersonalInformation = () => {
@@ -17,8 +16,7 @@ export const usePersonalInformation = () => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    dateOfBirth: ''
+    phone: ''
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -58,8 +56,7 @@ export const usePersonalInformation = () => {
         firstName,
         lastName,
         email: user.email || '',
-        phone: profile?.phone || user.user_metadata?.phone || '',
-        dateOfBirth: '' // Remove reference to non-existent date_of_birth field
+        phone: profile?.phone || user.user_metadata?.phone || ''
       });
 
       console.log('Set personal info:', {

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Mail, Phone, Calendar } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePersonalInformation } from '@/hooks/usePersonalInformation';
 
@@ -122,25 +122,6 @@ const PersonalInformationPage = () => {
                 />
               ) : (
                 <p className="text-white">{personalInfo.phone}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center p-4 bg-white/5 rounded-lg">
-            <Calendar className="w-5 h-5 text-white/70 mr-3" />
-            <div className="flex-1">
-              <label className="text-white/70 text-sm">Date of Birth</label>
-              {isEditing ? (
-                <input
-                  type="date"
-                  value={personalInfo.dateOfBirth}
-                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                  className="w-full bg-transparent text-white border-b border-white/20 focus:border-white outline-none"
-                />
-              ) : (
-                <p className="text-white">
-                  {personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString() : 'Not set'}
-                </p>
               )}
             </div>
           </div>
