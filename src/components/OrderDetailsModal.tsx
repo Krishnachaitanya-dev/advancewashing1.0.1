@@ -87,6 +87,28 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
     return serviceName.split(' - ')[0].trim();
   };
 
+  // Group items by service name to avoid duplicates
+  const groupedItems = order.order_items?.reduce((acc, item) => {
+    const cleanName = getCleanServiceName(item.services?.name || 'Service');
+    
+    if (!acc[cleanName]) {
+      acc[cleanName] = {
+        name: cleanName,
+        totalQuantity: 0,
+        totalPrice: 0,
+        pricePerKg: item.services?.base_price_per_kg || 0
+      };
+    }
+    
+    acc[cleanName].totalQuantity += item.quantity;
+    
+    // Use final weight if available, otherwise estimated weight
+    const itemWeight = item.final_weight || item.estimated_weight || 1;
+    acc[cleanName].totalPrice += itemWeight * (item.services?.base_price_per_kg || 0);
+    
+    return acc;
+  }, {} as Record<string, any>) || {};
+
   const steps = getStatusSteps();
   const currentStepIndex = getCurrentStepIndex();
 
@@ -158,13 +180,13 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
           <div className="border-t pt-4">
             <h4 className="font-medium text-gray-900 mb-3">Order Summary</h4>
             <div className="space-y-2">
-              {order.order_items?.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
+              {Object.values(groupedItems).map((item: any, index) => (
+                <div key={index} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {getCleanServiceName(item.services?.name || 'Service')}
+                    {item.name}
                   </span>
                   <span className="text-gray-900 font-medium">
-                    ₹{item.services?.base_price_per_kg ? (item.services.base_price_per_kg * (item.estimated_weight || 1)).toFixed(0) : '0'}
+                    ₹{item.totalPrice.toFixed(0)}
                   </span>
                 </div>
               ))}
@@ -176,6 +198,14 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
                   ₹{order.final_price || order.estimated_price || '0'}
                 </span>
               </div>
+              {order.final_weight && (
+                <div className="flex justify-between mt-1">
+                  <span className="text-sm text-gray-600">Weight</span>
+                  <span className="text-sm text-gray-900 font-medium">
+                    {order.final_weight} kg
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

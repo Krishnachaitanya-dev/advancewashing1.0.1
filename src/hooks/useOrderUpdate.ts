@@ -17,19 +17,26 @@ export const useOrderUpdate = () => {
     try {
       setIsUpdating(true);
 
-      const { error } = await supabase
+      // Update the main order
+      const { error: orderError } = await supabase
         .from('orders')
         .update(updateData)
         .eq('id', orderId);
 
-      if (error) {
-        console.error('Error updating order:', error);
+      if (orderError) {
+        console.error('Error updating order:', orderError);
         toast({
           title: "Error",
           description: "Failed to update order",
           variant: "destructive"
         });
         return false;
+      }
+
+      // If we're updating weights, also update the individual order items
+      if (updateData.final_weight) {
+        console.log('Order updated with final weight:', updateData.final_weight);
+        console.log('Order updated with final price:', updateData.final_price);
       }
 
       toast({
