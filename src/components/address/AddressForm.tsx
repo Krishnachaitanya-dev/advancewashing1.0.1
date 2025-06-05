@@ -205,10 +205,9 @@ const AddressForm: React.FC<AddressFormProps> = ({
 
       {/* Address Label */}
       <div>
-        <Label className="text-white mb-2 block">Address Label</Label>
         <AddressLabelSelector
-          value={formData.label}
-          onChange={(label) => handleInputChange('label', label)}
+          selectedLabel={formData.label}
+          onLabelChange={(label) => handleInputChange('label', label)}
         />
       </div>
 
