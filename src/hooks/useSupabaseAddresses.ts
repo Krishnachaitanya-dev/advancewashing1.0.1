@@ -3,45 +3,95 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
-import { AddressFormData } from '@/types/address';
+import type { Database } from '@/integrations/supabase/types';
+
+type DatabaseAddress = Database['public']['Tables']['addresses']['Row'];
 
 export interface SupabaseAddress {
   id: string;
   user_id: string;
   door_no: string;
   street: string;
-  landmark: string | null;
+  landmark?: string;
   city: string;
   state: string;
   pincode: string;
   phone: string;
-  name: string | null;
-  label: string;
-  coordinates: { lat: number; lng: number } | null;
+  name?: string;
+  label: 'home' | 'work' | 'other';
+  coordinates?: { lat: number; lng: number; };
   is_default: boolean;
   created_at: string;
   updated_at: string;
 }
 
+export interface AddressFormData {
+  door_no: string;
+  street: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+  name?: string;
+  label: 'home' | 'work' | 'other';
+}
+
+// Transform database address to our interface
+const transformAddress = (dbAddress: DatabaseAddress): SupabaseAddress => {
+  let coordinates: { lat: number; lng: number; } | undefined;
+  
+  if (dbAddress.coordinates) {
+    try {
+      if (typeof dbAddress.coordinates === 'object' && dbAddress.coordinates !== null) {
+        const coords = dbAddress.coordinates as any;
+        if (coords.lat && coords.lng) {
+          coordinates = { lat: coords.lat, lng: coords.lng };
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing coordinates:', error);
+    }
+  }
+
+  return {
+    id: dbAddress.id,
+    user_id: dbAddress.user_id,
+    door_no: dbAddress.door_no,
+    street: dbAddress.street,
+    landmark: dbAddress.landmark || undefined,
+    city: dbAddress.city,
+    state: dbAddress.state,
+    pincode: dbAddress.pincode,
+    phone: dbAddress.phone,
+    name: dbAddress.name || undefined,
+    label: dbAddress.label as 'home' | 'work' | 'other',
+    coordinates,
+    is_default: dbAddress.is_default,
+    created_at: dbAddress.created_at,
+    updated_at: dbAddress.updated_at
+  };
+};
+
 export const useSupabaseAddresses = () => {
   const [addresses, setAddresses] = useState<SupabaseAddress[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
 
   const fetchAddresses = async () => {
     if (!user) {
       setAddresses([]);
+      setIsLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('addresses')
         .select('*')
         .eq('user_id', user.id)
-        .order('is_default', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -54,7 +104,8 @@ export const useSupabaseAddresses = () => {
         return;
       }
 
-      setAddresses(data || []);
+      const transformedAddresses = (data || []).map(transformAddress);
+      setAddresses(transformedAddresses);
     } catch (error: any) {
       console.error('Error fetching addresses:', error);
       toast({
@@ -63,22 +114,19 @@ export const useSupabaseAddresses = () => {
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const addAddress = async (formData: AddressFormData) => {
-    if (!user) return null;
+  const addAddress = async (formData: AddressFormData, coordinates?: { lat: number; lng: number; }) => {
+    if (!user) return;
 
     try {
-      // If this is the first address, make it default
-      const isFirstAddress = addresses.length === 0;
-
       const { data, error } = await supabase
         .from('addresses')
         .insert({
           user_id: user.id,
-          door_no: formData.doorNo,
+          door_no: formData.door_no,
           street: formData.street,
           landmark: formData.landmark,
           city: formData.city,
@@ -87,67 +135,76 @@ export const useSupabaseAddresses = () => {
           phone: formData.phone,
           name: formData.name,
           label: formData.label,
-          is_default: isFirstAddress
+          coordinates: coordinates ? JSON.stringify(coordinates) : null,
+          is_default: addresses.length === 0 // First address is default
         })
         .select()
         .single();
 
       if (error) {
+        console.error('Error adding address:', error);
         toast({
           title: "Error",
           description: "Failed to add address",
           variant: "destructive"
         });
-        return null;
+        throw error;
       }
 
+      const transformedAddress = transformAddress(data);
+      setAddresses(prev => [transformedAddress, ...prev]);
+      
       toast({
         title: "Success",
-        description: "Address added successfully"
+        description: "Address added successfully",
       });
-
-      await fetchAddresses();
-      return data;
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to add address",
-        variant: "destructive"
-      });
-      return null;
+      console.error('Error adding address:', error);
+      throw error;
     }
   };
 
-  const updateAddress = async (id: string, updates: Partial<AddressFormData>) => {
+  const updateAddress = async (id: string, formData: AddressFormData, coordinates?: { lat: number; lng: number; }) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('addresses')
-        .update(updates)
-        .eq('id', id);
+        .update({
+          door_no: formData.door_no,
+          street: formData.street,
+          landmark: formData.landmark,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          phone: formData.phone,
+          name: formData.name,
+          label: formData.label,
+          coordinates: coordinates ? JSON.stringify(coordinates) : null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
+        console.error('Error updating address:', error);
         toast({
           title: "Error",
           description: "Failed to update address",
           variant: "destructive"
         });
-        return false;
+        throw error;
       }
 
+      const transformedAddress = transformAddress(data);
+      setAddresses(prev => prev.map(addr => addr.id === id ? transformedAddress : addr));
+      
       toast({
         title: "Success",
-        description: "Address updated successfully"
+        description: "Address updated successfully",
       });
-
-      await fetchAddresses();
-      return true;
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to update address",
-        variant: "destructive"
-      });
-      return false;
+      console.error('Error updating address:', error);
+      throw error;
     }
   };
 
@@ -159,34 +216,30 @@ export const useSupabaseAddresses = () => {
         .eq('id', id);
 
       if (error) {
+        console.error('Error deleting address:', error);
         toast({
           title: "Error",
           description: "Failed to delete address",
           variant: "destructive"
         });
-        return false;
+        throw error;
       }
 
+      setAddresses(prev => prev.filter(addr => addr.id !== id));
+      
       toast({
         title: "Success",
-        description: "Address deleted successfully"
+        description: "Address deleted successfully",
       });
-
-      await fetchAddresses();
-      return true;
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to delete address",
-        variant: "destructive"
-      });
-      return false;
+      console.error('Error deleting address:', error);
+      throw error;
     }
   };
 
   const setDefaultAddress = async (id: string) => {
     try {
-      // First, remove default from all addresses
+      // First, unset all default addresses
       await supabase
         .from('addresses')
         .update({ is_default: false })
@@ -199,33 +252,28 @@ export const useSupabaseAddresses = () => {
         .eq('id', id);
 
       if (error) {
+        console.error('Error setting default address:', error);
         toast({
           title: "Error",
           description: "Failed to set default address",
           variant: "destructive"
         });
-        return false;
+        throw error;
       }
 
+      setAddresses(prev => prev.map(addr => ({
+        ...addr,
+        is_default: addr.id === id
+      })));
+      
       toast({
         title: "Success",
-        description: "Default address updated"
+        description: "Default address updated",
       });
-
-      await fetchAddresses();
-      return true;
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to set default address",
-        variant: "destructive"
-      });
-      return false;
+      console.error('Error setting default address:', error);
+      throw error;
     }
-  };
-
-  const getDefaultAddress = () => {
-    return addresses.find(addr => addr.is_default) || addresses[0] || null;
   };
 
   useEffect(() => {
@@ -234,12 +282,11 @@ export const useSupabaseAddresses = () => {
 
   return {
     addresses,
-    loading,
+    isLoading,
     addAddress,
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-    getDefaultAddress,
     refetch: fetchAddresses
   };
 };
