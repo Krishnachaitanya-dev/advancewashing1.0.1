@@ -1,4 +1,5 @@
 
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "leaflet/dist/leaflet.css";
 @tailwind base;
@@ -68,7 +69,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1e3a8a 100%);
+    background: linear-gradient(135deg, #87ceeb 0%, #4682b4 50%, #1e90ff 100%);
     min-height: 100vh;
     font-family: "Inter", sans-serif;
     position: relative;
@@ -83,9 +84,9 @@
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(30, 64, 175, 0.4) 0%, transparent 50%),
-      radial-gradient(circle at 40% 80%, rgba(30, 58, 138, 0.3) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(135, 206, 235, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(70, 130, 180, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(30, 144, 255, 0.2) 0%, transparent 50%);
     animation: water-flow 20s ease-in-out infinite;
     pointer-events: none;
     z-index: -1;
@@ -95,19 +96,19 @@
 @keyframes water-flow {
   0%, 100% {
     transform: translate(0, 0) scale(1);
-    opacity: 0.8;
+    opacity: 0.6;
   }
   25% {
     transform: translate(-10px, -15px) scale(1.1);
-    opacity: 0.6;
+    opacity: 0.4;
   }
   50% {
     transform: translate(10px, -10px) scale(0.9);
-    opacity: 0.9;
+    opacity: 0.7;
   }
   75% {
     transform: translate(-5px, 10px) scale(1.05);
-    opacity: 0.7;
+    opacity: 0.5;
   }
 }
 
@@ -134,3 +135,4 @@
   font-size: 10px !important;
   background: rgba(255, 255, 255, 0.8) !important;
 }
+
