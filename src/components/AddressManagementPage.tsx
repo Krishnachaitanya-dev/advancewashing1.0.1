@@ -135,6 +135,8 @@ const AddressManagementPage = () => {
   }
 
   if (viewMode === 'edit' && editingAddress) {
+    const initialFormData = convertAddressToFormData(editingAddress);
+    
     return (
       <AppLayout>
         <div className="space-y-6">
@@ -149,7 +151,7 @@ const AddressManagementPage = () => {
             <AddressForm 
               onSubmit={handleUpdateAddress} 
               onCancel={handleCancel} 
-              initialData={convertAddressToFormData(editingAddress)} 
+              initialData={initialFormData} 
               isLoading={formLoading} 
             />
           </div>

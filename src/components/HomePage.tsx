@@ -2,7 +2,7 @@
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { Shirt, Clock, Award, Sparkles, ChevronRight } from 'lucide-react';
+import { Shirt, Clock, Award, Sparkles, ChevronRight, Package, Bed, Star, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useServices } from '@/hooks/useServices';
 import { useOrders } from '@/hooks/useOrders';
@@ -13,11 +13,42 @@ const HomePage = () => {
   const { orders, loading: ordersLoading } = useOrders();
   const { user } = useAuth();
 
+  // Function to get appropriate icon for each service
+  const getServiceIcon = (serviceName: string, index: number) => {
+    const iconMap: { [key: string]: JSX.Element } = {
+      'normal': <Shirt className="w-6 h-6" />,
+      'wash': <Shirt className="w-6 h-6" />,
+      'bedsheet': <Bed className="w-6 h-6" />,
+      'quilt': <Layers className="w-6 h-6" />,
+      'premium': <Star className="w-6 h-6" />,
+      'steam': <Sparkles className="w-6 h-6" />,
+      'fold': <Package className="w-6 h-6" />,
+    };
+
+    // Try to match service name with icon keywords
+    const lowerName = serviceName.toLowerCase();
+    for (const [key, icon] of Object.entries(iconMap)) {
+      if (lowerName.includes(key)) {
+        return icon;
+      }
+    }
+
+    // Default icons based on index if no match found
+    const defaultIcons = [
+      <Shirt className="w-6 h-6" />,
+      <Sparkles className="w-6 h-6" />,
+      <Bed className="w-6 h-6" />,
+      <Layers className="w-6 h-6" />
+    ];
+
+    return defaultIcons[index % defaultIcons.length];
+  };
+
   // Get featured services (first 4)
-  const featuredServices = services.slice(0, 4).map(service => ({
+  const featuredServices = services.slice(0, 4).map((service, index) => ({
     id: service.id,
     name: service.name,
-    icon: <Shirt className="w-6 h-6" />, // Default icon
+    icon: getServiceIcon(service.name, index),
     description: service.description || ''
   }));
 
