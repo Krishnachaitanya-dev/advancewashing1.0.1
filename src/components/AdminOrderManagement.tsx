@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { useOrderUpdate } from '@/hooks/useOrderUpdate';
 import OrderStatusFilter from './OrderStatusFilter';
 import ServiceWeightCalculator from './ServiceWeightCalculator';
+import { getCleanServiceName } from '@/utils/serviceNameCleaner';
 import type { Order } from '@/hooks/useOrders';
 
 const AdminOrderManagement = () => {

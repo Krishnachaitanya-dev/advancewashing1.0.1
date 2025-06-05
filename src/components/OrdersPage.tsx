@@ -5,6 +5,7 @@ import { Clock, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useOrders } from '@/hooks/useOrders';
 import OrderDetailsModal from './OrderDetailsModal';
+import { getCleanServiceName } from '@/utils/serviceNameCleaner';
 import type { Order } from '@/hooks/useOrders';
 
 const OrdersPage = memo(() => {
@@ -159,7 +160,7 @@ const OrdersPage = memo(() => {
                     {order.order_items?.map((item) => (
                       <div key={item.id} className="flex justify-between text-white/80 text-sm">
                         <span>
-                          {item.services?.name} {item.item_name && `- ${item.item_name}`}
+                          {getCleanServiceName(item.services?.name || 'Service')} {item.item_name && `- ${item.item_name}`}
                         </span>
                         <span>Qty: {item.quantity}</span>
                       </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -195,18 +196,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       console.log('Attempting sign out');
-      await supabase.auth.signOut();
+      setLoading(true);
+      
+      // Clear local state first
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      
+      // Clear any cached data
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Supabase signout error:', error);
+        // Even if there's an error, we've cleared local state
+      }
+      
+      // Force reload to clear any remaining state
+      window.location.href = '/login';
+      
       toast({
         title: "Signed out",
         description: "You have been successfully signed out"
       });
     } catch (error: any) {
       console.error('Sign out error:', error);
+      // Force clear state even on error
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
+        title: "Signed out",
+        description: "Session cleared successfully"
       });
+      
+      // Force redirect on error too
+      window.location.href = '/login';
+    } finally {
+      setLoading(false);
     }
   };
 

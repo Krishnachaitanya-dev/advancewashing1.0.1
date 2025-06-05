@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Package, Truck, Clock, X } from 'lucide-react';
 import { Order } from '@/hooks/useOrders';
+import { getCleanServiceName } from '@/utils/serviceNameCleaner';
 
 interface OrderDetailsModalProps {
   order: Order | null;
@@ -79,40 +80,6 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
       month: 'short',
       year: 'numeric'
     });
-  };
-
-  const getCleanServiceName = (serviceName: string) => {
-    if (!serviceName) return 'Service';
-    
-    // Split by various separators and clean
-    const parts = serviceName.split(/\s*[-–—]\s*|\s*\|\s*|\s*,\s*/);
-    
-    // Remove duplicates and empty strings, then clean whitespace
-    const uniqueParts = [...new Set(parts)]
-      .map(part => part.trim())
-      .filter(part => part.length > 0);
-    
-    // If we have duplicates, just take the first unique part
-    if (uniqueParts.length > 1) {
-      // Check if parts are very similar (like "Bedsheets" and "Bedsheet")
-      const normalized = uniqueParts.map(part => part.toLowerCase().replace(/s$/, ''));
-      const reallyUnique = [];
-      
-      for (let i = 0; i < uniqueParts.length; i++) {
-        const current = normalized[i];
-        if (!reallyUnique.some(existing => 
-          existing.toLowerCase().replace(/s$/, '') === current ||
-          current.includes(existing.toLowerCase().replace(/s$/, '')) ||
-          existing.toLowerCase().replace(/s$/, '').includes(current)
-        )) {
-          reallyUnique.push(uniqueParts[i]);
-        }
-      }
-      
-      return reallyUnique.join(' - ');
-    }
-    
-    return uniqueParts[0] || 'Service';
   };
 
   // Group items by service name to avoid duplicates
