@@ -82,6 +82,11 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
     });
   };
 
+  const getCleanServiceName = (serviceName: string) => {
+    // Extract the main service name before any dash or parentheses
+    return serviceName.split(' - ')[0].trim();
+  };
+
   const steps = getStatusSteps();
   const currentStepIndex = getCurrentStepIndex();
 
@@ -156,7 +161,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               {order.order_items?.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {item.services?.name} {item.item_name && `(${item.item_name})`}
+                    {getCleanServiceName(item.services?.name || 'Service')}
                   </span>
                   <span className="text-gray-900 font-medium">
                     ₹{item.services?.base_price_per_kg ? (item.services.base_price_per_kg * (item.estimated_weight || 1)).toFixed(0) : '0'}

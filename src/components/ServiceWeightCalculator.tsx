@@ -1,6 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Calculator, Save } from 'lucide-react';
 
@@ -22,8 +22,8 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
   isUpdating
 }) => {
   const [itemWeights, setItemWeights] = useState<Record<string, number>>({});
-  const [calculatedWeight, setCalculatedWeight] = useState(0);
-  const [calculatedPrice, setCalculatedPrice] = useState(0);
+  const [calculatedWeight, setCalculatedWeight] = useState(currentFinalWeight || 0);
+  const [calculatedPrice, setCalculatedPrice] = useState(currentFinalPrice || 0);
 
   // Service-based weight guidelines
   const serviceWeightGuidelines = {
@@ -33,20 +33,27 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
     'dress': { min: 0.4, max: 0.8, unit: 'per piece' },
     'towel': { min: 0.3, max: 0.7, unit: 'per piece' },
     'blanket': { min: 1.0, max: 2.5, unit: 'per piece' },
+    'normal clothes': { min: 0.2, max: 0.5, unit: 'per piece' },
     'default': { min: 0.2, max: 1.0, unit: 'per piece' }
   };
 
   useEffect(() => {
-    // Initialize with estimated weights or guidelines
+    // Initialize with current weights if available, otherwise use estimated weights
     const initialWeights: Record<string, number> = {};
     orderItems.forEach(item => {
-      const serviceName = item.services?.name?.toLowerCase() || 'default';
-      const guidelines = serviceWeightGuidelines[serviceName] || serviceWeightGuidelines.default;
-      const avgWeight = (guidelines.min + guidelines.max) / 2;
-      initialWeights[item.id] = item.estimated_weight || (avgWeight * item.quantity);
+      if (currentFinalWeight && orderItems.length === 1) {
+        // If there's only one item and we have final weight, use it
+        initialWeights[item.id] = currentFinalWeight;
+      } else {
+        // Use estimated weight or calculate from guidelines
+        const serviceName = item.services?.name?.toLowerCase() || 'default';
+        const guidelines = serviceWeightGuidelines[serviceName] || serviceWeightGuidelines.default;
+        const avgWeight = (guidelines.min + guidelines.max) / 2;
+        initialWeights[item.id] = item.estimated_weight || (avgWeight * item.quantity);
+      }
     });
     setItemWeights(initialWeights);
-  }, [orderItems]);
+  }, [orderItems, currentFinalWeight]);
 
   useEffect(() => {
     // Calculate total weight and price
@@ -72,15 +79,22 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
   };
 
   const handleSave = async () => {
+    console.log('Saving weights:', { calculatedWeight, calculatedPrice });
     const success = await onSave(calculatedWeight, calculatedPrice);
     if (success) {
-      // Reset or keep current state
+      console.log('Weights saved successfully');
     }
   };
 
   const getServiceGuideline = (serviceName: string) => {
     const name = serviceName?.toLowerCase() || 'default';
-    return serviceWeightGuidelines[name] || serviceWeightGuidelines.default;
+    // Check for partial matches
+    for (const [key, value] of Object.entries(serviceWeightGuidelines)) {
+      if (name.includes(key)) {
+        return value;
+      }
+    }
+    return serviceWeightGuidelines.default;
   };
 
   return (
@@ -97,24 +111,22 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
           
           return (
             <div key={item.id} className="bg-white/5 rounded p-3">
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 space-y-2 sm:space-y-0">
                 <div className="flex-1">
                   <p className="text-white font-medium text-sm">{serviceName}</p>
-                  {item.item_name && (
-                    <p className="text-white/70 text-xs">{item.item_name}</p>
-                  )}
                   <p className="text-white/60 text-xs">
                     Quantity: {item.quantity} | Guideline: {guidelines.min}-{guidelines.max}kg {guidelines.unit}
                   </p>
                 </div>
-                <div className="ml-3">
+                <div className="w-full sm:w-24">
                   <Input
                     type="number"
                     step="0.1"
+                    min="0"
                     value={itemWeights[item.id] || ''}
                     onChange={(e) => handleWeightChange(item.id, e.target.value)}
                     placeholder="Weight (kg)"
-                    className="w-24 bg-white/10 border-white/20 text-white text-sm"
+                    className="bg-white/10 border-white/20 text-white text-sm"
                   />
                 </div>
               </div>
@@ -127,7 +139,7 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
       </div>
 
       <div className="border-t border-white/20 pt-3">
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
           <div className="text-white">
             <p className="font-medium">Total Weight: {calculatedWeight.toFixed(2)} kg</p>
             <p className="font-medium">Total Price: ₹{calculatedPrice.toFixed(2)}</p>
@@ -135,10 +147,10 @@ const ServiceWeightCalculator: React.FC<ServiceWeightCalculatorProps> = ({
           <Button
             onClick={handleSave}
             disabled={isUpdating}
-            className="bg-green-600 hover:bg-green-700 flex items-center space-x-2"
+            className="bg-green-600 hover:bg-green-700 flex items-center space-x-2 w-full sm:w-auto"
           >
             <Save className="w-4 h-4" />
-            <span>Save</span>
+            <span>Save Weights & Price</span>
           </Button>
         </div>
       </div>
