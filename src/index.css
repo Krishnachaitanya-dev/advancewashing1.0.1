@@ -1,5 +1,4 @@
 
-
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "leaflet/dist/leaflet.css";
 @tailwind base;
@@ -70,16 +69,17 @@
   body {
     @apply bg-background text-foreground;
     background: 
-      linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%),
-      radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom right, rgba(147, 197, 253, 0.1) 0%, transparent 50%);
+      linear-gradient(135deg, #2563eb 0%, #1e40af 25%, #1d4ed8 50%, #2563eb 75%, #3b82f6 100%),
+      radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at center, rgba(29, 78, 216, 0.1) 0%, transparent 70%);
     min-height: 100vh;
     font-family: "Inter", sans-serif;
     position: relative;
     overflow-x: hidden;
   }
   
-  /* Floating geometric elements */
+  /* Premium floating elements */
   body::before {
     content: '';
     position: fixed;
@@ -88,16 +88,16 @@
     width: 100%;
     height: 100%;
     background-image: 
-      radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 25%),
-      radial-gradient(circle at 75% 75%, rgba(147, 197, 253, 0.06) 0%, transparent 25%),
-      radial-gradient(circle at 50% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 30%),
-      radial-gradient(circle at 10% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 25%);
-    animation: float-elements 25s ease-in-out infinite;
+      radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 30%),
+      radial-gradient(circle at 80% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 30%),
+      radial-gradient(circle at 40% 60%, rgba(29, 78, 216, 0.08) 0%, transparent 35%),
+      radial-gradient(circle at 70% 30%, rgba(30, 64, 175, 0.06) 0%, transparent 25%);
+    animation: float-elements 20s ease-in-out infinite;
     pointer-events: none;
     z-index: -2;
   }
 
-  /* Premium glass pattern overlay */
+  /* Elegant geometric overlay */
   body::after {
     content: '';
     position: fixed;
@@ -106,13 +106,13 @@
     width: 100%;
     height: 100%;
     background: 
-      linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 25%, transparent 50%, rgba(255,255,255,0.02) 75%, transparent 100%),
-      linear-gradient(0deg, transparent 0%, rgba(255,255,255,0.01) 25%, transparent 50%, rgba(255,255,255,0.01) 75%, transparent 100%);
-    background-size: 60px 60px, 40px 40px;
-    animation: subtle-shift 30s linear infinite;
+      linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.03) 32%, transparent 34%),
+      linear-gradient(-45deg, transparent 30%, rgba(37, 99, 235, 0.02) 32%, transparent 34%);
+    background-size: 40px 40px, 60px 60px;
+    animation: subtle-shift 25s linear infinite;
     pointer-events: none;
     z-index: -1;
-    opacity: 0.7;
+    opacity: 0.8;
   }
 }
 
@@ -122,15 +122,15 @@
     opacity: 0.6;
   }
   25% {
-    transform: translate(-20px, -30px) scale(1.1) rotate(90deg);
+    transform: translate(-15px, -25px) scale(1.05) rotate(90deg);
     opacity: 0.4;
   }
   50% {
-    transform: translate(30px, -20px) scale(0.9) rotate(180deg);
+    transform: translate(25px, -15px) scale(0.95) rotate(180deg);
     opacity: 0.8;
   }
   75% {
-    transform: translate(-10px, 20px) scale(1.05) rotate(270deg);
+    transform: translate(-8px, 20px) scale(1.02) rotate(270deg);
     opacity: 0.5;
   }
 }
@@ -140,33 +140,33 @@
     transform: translate(0, 0);
   }
   100% {
-    transform: translate(20px, 20px);
+    transform: translate(15px, 15px);
   }
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(37, 99, 235, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .glass-card-dark {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Premium button effects */
 .premium-button {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.8) 100%);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 
@@ -191,4 +191,3 @@
   font-size: 10px !important;
   background: rgba(255, 255, 255, 0.8) !important;
 }
-
