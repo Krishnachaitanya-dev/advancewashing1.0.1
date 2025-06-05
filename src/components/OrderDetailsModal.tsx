@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -83,8 +82,37 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
   };
 
   const getCleanServiceName = (serviceName: string) => {
-    // Extract the main service name before any dash or parentheses
-    return serviceName.split(' - ')[0].trim();
+    if (!serviceName) return 'Service';
+    
+    // Split by various separators and clean
+    const parts = serviceName.split(/\s*[-–—]\s*|\s*\|\s*|\s*,\s*/);
+    
+    // Remove duplicates and empty strings, then clean whitespace
+    const uniqueParts = [...new Set(parts)]
+      .map(part => part.trim())
+      .filter(part => part.length > 0);
+    
+    // If we have duplicates, just take the first unique part
+    if (uniqueParts.length > 1) {
+      // Check if parts are very similar (like "Bedsheets" and "Bedsheet")
+      const normalized = uniqueParts.map(part => part.toLowerCase().replace(/s$/, ''));
+      const reallyUnique = [];
+      
+      for (let i = 0; i < uniqueParts.length; i++) {
+        const current = normalized[i];
+        if (!reallyUnique.some(existing => 
+          existing.toLowerCase().replace(/s$/, '') === current ||
+          current.includes(existing.toLowerCase().replace(/s$/, '')) ||
+          existing.toLowerCase().replace(/s$/, '').includes(current)
+        )) {
+          reallyUnique.push(uniqueParts[i]);
+        }
+      }
+      
+      return reallyUnique.join(' - ');
+    }
+    
+    return uniqueParts[0] || 'Service';
   };
 
   // Group items by service name to avoid duplicates

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -93,7 +92,52 @@ const AdminOrderManagement = () => {
     label: 'Delivered'
   }];
 
+  // Helper function to clean service names and remove duplicates more aggressively
+  const getCleanServiceName = (serviceName: string) => {
+    if (!serviceName) return 'Service';
+    
+    // Split by various separators and clean
+    const parts = serviceName.split(/\s*[-–—]\s*|\s*\|\s*|\s*,\s*/);
+    
+    // Remove duplicates and empty strings, then clean whitespace
+    const uniqueParts = [...new Set(parts)]
+      .map(part => part.trim())
+      .filter(part => part.length > 0);
+    
+    // If we have duplicates, just take the first unique part
+    if (uniqueParts.length > 1) {
+      // Check if parts are very similar (like "Bedsheets" and "Bedsheet")
+      const normalized = uniqueParts.map(part => part.toLowerCase().replace(/s$/, ''));
+      const reallyUnique = [];
+      
+      for (let i = 0; i < uniqueParts.length; i++) {
+        const current = normalized[i];
+        if (!reallyUnique.some(existing => 
+          existing.toLowerCase().replace(/s$/, '') === current ||
+          current.includes(existing.toLowerCase().replace(/s$/, '')) ||
+          existing.toLowerCase().replace(/s$/, '').includes(current)
+        )) {
+          reallyUnique.push(uniqueParts[i]);
+        }
+      }
+      
+      return reallyUnique.join(' - ');
+    }
+    
+    return uniqueParts[0] || 'Service';
+  };
+
+  // Check if order can be edited (only confirmed and picked_up statuses)
+  const canEditOrder = (status: string) => {
+    return status === 'confirmed' || status === 'picked_up';
+  };
+
   const handleEdit = (order: Order) => {
+    // Only allow editing for confirmed and picked_up orders
+    if (!canEditOrder(order.status)) {
+      return;
+    }
+    
     setEditingOrder(order.id);
     setEditData({
       status: order.status
@@ -140,14 +184,6 @@ const AdminOrderManagement = () => {
     });
   };
 
-  // Helper function to clean service names and remove duplicates
-  const getCleanServiceName = (serviceName: string) => {
-    // Split by " - " and take unique parts
-    const parts = serviceName.split(' - ');
-    const uniqueParts = [...new Set(parts)];
-    return uniqueParts.join(' - ');
-  };
-
   if (loading) {
     return <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-white text-lg">Loading orders...</div>
@@ -178,10 +214,10 @@ const AdminOrderManagement = () => {
                       <X className="w-4 h-4 mr-1" />
                       Cancel
                     </Button>
-                  </div> : <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto rounded-sm">
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>}
+                  </div> : canEditOrder(order.status) && <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto rounded-sm">
+                      <Edit className="w-4 h-4 mr-1" />
+                      Edit
+                    </Button>}
 
                 <Badge className={`${getStatusColor(order.status)} border-0 flex items-center space-x-1 whitespace-nowrap`}>
                   {getStatusIcon(order.status)}
@@ -208,7 +244,34 @@ const AdminOrderManagement = () => {
                   </Select>
                 </div>
 
-                <ServiceWeightCalculator orderId={order.id} orderItems={order.order_items || []} currentFinalWeight={order.final_weight || undefined} currentFinalPrice={order.final_price || undefined} onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} onStatusSave={() => handleSave(order.id)} isUpdating={isUpdating} />
+                {canEditOrder(order.status) && <ServiceWeightCalculator 
+                  orderId={order.id} 
+                  orderItems={order.order_items || []} 
+                  currentFinalWeight={order.final_weight || undefined} 
+                  currentFinalPrice={order.final_price || undefined} 
+                  onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} 
+                  onStatusSave={() => handleSave(order.id)} 
+                  isUpdating={isUpdating} 
+                />}
+
+                {!canEditOrder(order.status) && (
+                  <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3">
+                    <p className="text-yellow-200 text-sm">
+                      Weight editing is disabled for orders in "{order.status.replace('_', ' ')}" status. 
+                      Weight can only be modified for "Confirmed" and "Picked Up" orders.
+                    </p>
+                    <div className="mt-2">
+                      <Button
+                        onClick={() => handleSave(order.id)}
+                        disabled={isUpdating}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Save className="w-4 h-4 mr-1" />
+                        Save Status Only
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="text-white/80 text-sm">
                   <strong>Items:</strong> {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} pieces
