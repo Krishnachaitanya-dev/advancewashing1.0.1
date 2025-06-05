@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -7,11 +6,15 @@ import { Link } from 'react-router-dom';
 import { useServices } from '@/hooks/useServices';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/hooks/useAuth';
+import { useAndroidBackButton } from '@/hooks/useAndroidBackButton';
 
 const HomePage = () => {
   const { services, loading: servicesLoading } = useServices();
   const { orders, loading: ordersLoading } = useOrders();
   const { user } = useAuth();
+
+  // Handle Android back button
+  useAndroidBackButton();
 
   // Function to get appropriate icon for each service
   const getServiceIcon = (serviceName: string, index: number) => {

@@ -28,6 +28,13 @@ const config: CapacitorConfig = {
     // Add App plugin for better mobile handling
     App: {
       launchUrl: 'index.html'
+    },
+    // Add Geolocation plugin configuration
+    Geolocation: {
+      // These are the default values, but explicitly setting them
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 3600000
     }
   }
 };

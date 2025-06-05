@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocation } from '@/hooks/useLocation';
 
 interface SimpleMapProps {
   onAddressSelect: (address: any, coordinates?: { lat: number; lng: number }) => void;
@@ -15,6 +16,16 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [markerInstance, setMarkerInstance] = useState<any>(null);
   const [currentCoordinates, setCurrentCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  
+  // Use the native location hook
+  const { 
+    permissionState, 
+    currentPosition, 
+    isLoading: locationLoading, 
+    error: locationError,
+    requestPermissions,
+    getCurrentLocation
+  } = useLocation();
 
   // Initialize map when component mounts
   useEffect(() => {
@@ -33,7 +44,7 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
       });
 
       // Create map
-      const defaultPos = initialPosition || { lat: 20.5937, lng: 78.9629 }; // India center
+      const defaultPos = initialPosition || currentPosition || { lat: 20.5937, lng: 78.9629 }; // India center
       const map = L.map(mapRef.current).setView([defaultPos.lat, defaultPos.lng], 13);
 
       // Add tile layer
@@ -69,7 +80,18 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
         mapInstance.remove();
       }
     };
-  }, []);
+  }, [currentPosition]);
+
+  // Update map when current position changes
+  useEffect(() => {
+    if (currentPosition && mapInstance && markerInstance) {
+      mapInstance.setView([currentPosition.lat, currentPosition.lng], 16);
+      markerInstance.setLatLng([currentPosition.lat, currentPosition.lng]);
+      setCurrentCoordinates(currentPosition);
+      onCoordinatesChange?.(currentPosition);
+      reverseGeocode(currentPosition.lat, currentPosition.lng);
+    }
+  }, [currentPosition, mapInstance, markerInstance]);
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
@@ -153,41 +175,21 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
     }
   };
 
-  const getCurrentLocation = async () => {
-    if (!navigator.geolocation || !mapInstance || !markerInstance) return;
-    
-    setIsLoading(true);
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 60000 // 1 minute
-          }
-        );
-      });
-
-      const { latitude: lat, longitude: lng } = position.coords;
-      
-      // Update map view and marker
-      mapInstance.setView([lat, lng], 16);
-      markerInstance.setLatLng([lat, lng]);
-      
-      // Update coordinates
-      setCurrentCoordinates({ lat, lng });
-      onCoordinatesChange?.({ lat, lng });
-      
-      // Get address for this location
-      await reverseGeocode(lat, lng);
-    } catch (error) {
-      console.error('Error getting location:', error);
-    } finally {
-      setIsLoading(false);
+  const handleGetCurrentLocation = async () => {
+    // Check if we need to request permissions first
+    if (permissionState.status === 'denied' || permissionState.status === 'unknown') {
+      const granted = await requestPermissions();
+      if (!granted) {
+        return; // Permission denied, can't proceed
+      }
     }
+
+    // Get current location using native GPS
+    await getCurrentLocation();
   };
+
+  const shouldShowPermissionRequest = permissionState.status === 'unknown' || permissionState.status === 'denied';
+  const isGettingLocation = locationLoading || isLoading;
 
   return (
     <div className="glass-card overflow-hidden">
@@ -196,26 +198,53 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
           <p className="text-sm text-white/70">
             📍 Click on map to set location
           </p>
-          <Button
-            type="button"
-            size="sm"
-            onClick={getCurrentLocation}
-            disabled={isLoading}
-            className="bg-green-500 hover:bg-green-600 text-white text-xs"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                Locating...
-              </>
-            ) : (
-              <>
-                <MapPin className="mr-1 h-3 w-3" />
-                My Location
-              </>
-            )}
-          </Button>
+          
+          {shouldShowPermissionRequest ? (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleGetCurrentLocation}
+              disabled={isGettingLocation}
+              className="bg-orange-500 hover:bg-orange-600 text-white text-xs"
+            >
+              {isGettingLocation ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  Requesting...
+                </>
+              ) : (
+                <>
+                  <MapPin className="mr-1 h-3 w-3" />
+                  Allow Location
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleGetCurrentLocation}
+              disabled={isGettingLocation}
+              className="bg-green-500 hover:bg-green-600 text-white text-xs"
+            >
+              {isGettingLocation ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  Locating...
+                </>
+              ) : (
+                <>
+                  <MapPin className="mr-1 h-3 w-3" />
+                  My Location
+                </>
+              )}
+            </Button>
+          )}
         </div>
+        
+        {locationError && (
+          <p className="text-xs text-red-300 mt-1">{locationError}</p>
+        )}
       </div>
       
       <div 
@@ -224,7 +253,7 @@ const SimpleMap = ({ onAddressSelect, initialPosition, onCoordinatesChange }: Si
         style={{ minHeight: '256px' }}
       />
       
-      {isLoading && (
+      {isGettingLocation && (
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
           <div className="bg-white/90 px-3 py-2 rounded-lg flex items-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
