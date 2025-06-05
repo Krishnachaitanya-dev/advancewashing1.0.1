@@ -35,7 +35,7 @@ const AddressForm = ({
     pincode: '',
     phone: '',
     name: '',
-    label: 'Home',
+    label: 'home',
     ...initialData
   });
 
@@ -211,8 +211,8 @@ const AddressForm = ({
         <div>
           <Label className="text-white/90">Save as *</Label>
           <AddressLabelSelector
-            value={formData.label}
-            onChange={(label) => handleInputChange('label', label)}
+            selectedLabel={formData.label}
+            onLabelChange={(label) => handleInputChange('label', label)}
           />
         </div>
 
