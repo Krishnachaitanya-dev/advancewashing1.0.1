@@ -66,7 +66,7 @@ const ProfilePage = memo(() => {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Profile Header */}
         <div className="glass-card p-6">
           <div className="flex items-center space-x-4">
@@ -88,9 +88,9 @@ const ProfilePage = memo(() => {
         </div>
 
         {/* Account Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {accountMenuItems.map((item, index) => (
               <Link key={index} to={item.path}>
                 <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02]">
@@ -113,9 +113,9 @@ const ProfilePage = memo(() => {
         </div>
 
         {/* App Settings Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">App Settings</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {appMenuItems.map((item, index) => (
               <Link key={index} to={item.path}>
                 <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02]">
@@ -138,9 +138,9 @@ const ProfilePage = memo(() => {
         </div>
 
         {/* Support Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Support</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {supportMenuItems.map((item, index) => (
               <Link key={index} to={item.path}>
                 <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02]">
@@ -164,7 +164,11 @@ const ProfilePage = memo(() => {
 
         {/* Sign Out */}
         <div className="glass-card p-4">
-          <Button onClick={handleSignOut} variant="outline" className="w-full border-red-500/50 flex items-center justify-center space-x-2 text-zinc-50 bg-[#4469ef]/20 text-left px-0 mx-px my-0">
+          <Button 
+            onClick={handleSignOut} 
+            variant="outline" 
+            className="w-full border-white/30 flex items-center justify-center space-x-2 text-white bg-white/5 hover:bg-white/10 hover:border-white/40"
+          >
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </Button>
