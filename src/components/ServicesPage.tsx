@@ -24,12 +24,23 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
   'shoes': ShoppingBag
 };
 
+// Define color scheme for selected services
+const serviceColors = [
+  'bg-green-500',
+  'bg-pink-500', 
+  'bg-violet-500',
+  'bg-orange-500',
+  'bg-yellow-500',
+  'bg-cyan-500'
+];
+
 interface SelectedService {
   id: string;
   name: string;
   price: number;
   quantity: number;
   weight: number;
+  colorIndex: number;
 }
 
 const ServicesPage = memo(() => {
@@ -50,16 +61,27 @@ const ServicesPage = memo(() => {
       // Remove service
       setSelectedServices(prev => prev.filter(s => s.id !== service.id));
     } else {
-      // Add service with default values
+      // Add service with default values and assign next color
+      const colorIndex = selectedServices.length % serviceColors.length;
       const newService: SelectedService = {
-        id: service.id, // Keep as UUID string, don't convert to integer
+        id: service.id,
         name: service.name,
         price: service.base_price_per_kg,
         quantity: 1,
-        weight: 1
+        weight: 1,
+        colorIndex: colorIndex
       };
       setSelectedServices(prev => [...prev, newService]);
     }
+  };
+
+  const getServiceStyle = (serviceId: string) => {
+    const selectedService = selectedServices.find(s => s.id === serviceId);
+    if (selectedService) {
+      const colorClass = serviceColors[selectedService.colorIndex];
+      return `glass-card p-4 cursor-pointer transition-all duration-200 ${colorClass}`;
+    }
+    return 'glass-card p-4 cursor-pointer transition-all duration-200 hover:bg-white/10';
   };
 
   const isServiceSelected = (serviceId: string) => {
@@ -84,14 +106,14 @@ const ServicesPage = memo(() => {
 
     const total = calculateTotal();
     
-    // Navigate to pickup details with selected services - maintain UUID format
+    // Navigate to pickup details with selected services
     navigate('/pickup-details', {
       state: {
         selectedServices: selectedServices.map(service => ({
-          id: service.id, // Keep as UUID string, not integer
+          id: service.id,
           name: service.name,
           price: `₹${service.price}/kg`,
-          color: 'bg-blue-500'
+          color: serviceColors[service.colorIndex]
         })),
         total: total
       }
@@ -133,11 +155,7 @@ const ServicesPage = memo(() => {
               <div
                 key={service.id}
                 onClick={() => handleServiceSelect(service)}
-                className={`glass-card p-4 cursor-pointer transition-all duration-200 ${
-                  isSelected 
-                    ? 'ring-2 ring-green-400 bg-green-500/20' 
-                    : 'hover:bg-white/10'
-                }`}
+                className={getServiceStyle(service.id)}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
                   {/* Service Icon */}
@@ -154,13 +172,6 @@ const ServicesPage = memo(() => {
                   <div className="text-white/90 font-medium text-lg">
                     ₹{service.base_price_per_kg}/kg
                   </div>
-                  
-                  {/* Selection Indicator */}
-                  {isSelected && (
-                    <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    </div>
-                  )}
                 </div>
               </div>
             );
