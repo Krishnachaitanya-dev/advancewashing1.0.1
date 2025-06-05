@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { useSupabaseAddresses } from '@/hooks/useSupabaseAddresses';
 import AddressCard from './address/AddressCard';
 import AddressForm from './address/AddressForm';
 import { Address, AddressFormData } from '@/types/address';
+import type { AddressFormData as SupabaseAddressFormData } from '@/hooks/useSupabaseAddresses';
 
 type ViewMode = 'list' | 'add' | 'edit';
 
@@ -31,10 +31,25 @@ const convertSupabaseAddressToAddress = (supabaseAddr: any): Address => {
   };
 };
 
+// Helper function to convert AddressFormData to SupabaseAddressFormData
+const convertToSupabaseFormData = (formData: AddressFormData): SupabaseAddressFormData => {
+  return {
+    door_no: formData.doorNo,
+    street: formData.street,
+    landmark: formData.landmark,
+    city: formData.city,
+    state: formData.state,
+    pincode: formData.pincode,
+    phone: formData.phone,
+    name: formData.name,
+    label: formData.label
+  };
+};
+
 // Helper function to convert Address to AddressFormData
 const convertAddressToFormData = (address: Address): AddressFormData => {
   return {
-    door_no: address.doorNo,
+    doorNo: address.doorNo,
     street: address.street,
     landmark: address.landmark,
     city: address.city,
@@ -63,7 +78,8 @@ const AddressManagementPage = () => {
   const handleAddAddress = async (formData: AddressFormData) => {
     setFormLoading(true);
     try {
-      await addAddress(formData);
+      const supabaseFormData = convertToSupabaseFormData(formData);
+      await addAddress(supabaseFormData);
       setViewMode('list');
     } finally {
       setFormLoading(false);
@@ -74,7 +90,8 @@ const AddressManagementPage = () => {
     if (!editingAddress) return;
     setFormLoading(true);
     try {
-      await updateAddress(editingAddress.id, formData);
+      const supabaseFormData = convertToSupabaseFormData(formData);
+      await updateAddress(editingAddress.id, supabaseFormData);
       setViewMode('list');
       setEditingAddress(null);
     } finally {

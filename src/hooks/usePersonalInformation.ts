@@ -49,12 +49,14 @@ export const usePersonalInformation = () => {
           dateOfBirth: ''
         });
       } else if (profile) {
+        // Split the name field since the profiles table only has 'name', not separate first/last names
+        const nameParts = profile.name?.split(' ') || [];
         setPersonalInfo({
-          firstName: profile.first_name || user.user_metadata?.name?.split(' ')[0] || '',
-          lastName: profile.last_name || user.user_metadata?.name?.split(' ').slice(1).join(' ') || '',
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
           email: user.email || '',
           phone: profile.phone || user.user_metadata?.phone || '',
-          dateOfBirth: profile.date_of_birth || ''
+          dateOfBirth: '' // Not stored in profiles table
         });
       }
     } catch (error: any) {
@@ -74,14 +76,16 @@ export const usePersonalInformation = () => {
 
     setIsSaving(true);
     try {
+      // Combine first and last name since profiles table only has 'name' field
+      const fullName = `${updatedInfo.firstName} ${updatedInfo.lastName}`.trim();
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          first_name: updatedInfo.firstName,
-          last_name: updatedInfo.lastName,
+          email: user.email || '',
+          name: fullName,
           phone: updatedInfo.phone,
-          date_of_birth: updatedInfo.dateOfBirth || null,
           updated_at: new Date().toISOString()
         });
 
