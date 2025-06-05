@@ -31,18 +31,18 @@ const OrdersPage = memo(() => {
     switch (status) {
       case 'pending':
       case 'confirmed':
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="w-5 h-5" />;
       case 'picked_up':
       case 'in_process':
-        return <Package className="w-4 h-4" />;
+        return <Package className="w-5 h-5" />;
       case 'ready_for_delivery':
-        return <Truck className="w-4 h-4" />;
+        return <Truck className="w-5 h-5" />;
       case 'delivered':
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="w-5 h-5" />;
       case 'cancelled':
-        return <XCircle className="w-4 h-4" />;
+        return <XCircle className="w-5 h-5" />;
       default:
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="w-5 h-5" />;
     }
   };
 
@@ -91,8 +91,24 @@ const OrdersPage = memo(() => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
-      month: 'short'
+      month: 'short',
+      year: 'numeric'
     });
+  };
+
+  const groupedItems = (order: Order) => {
+    return order.order_items?.reduce((acc, item) => {
+      const displayName = getBestDisplayName(item.services?.name || 'Service', item.item_name);
+      if (!acc[displayName]) {
+        acc[displayName] = {
+          name: displayName,
+          quantity: 0,
+          pricePerKg: item.services?.base_price_per_kg || 0
+        };
+      }
+      acc[displayName].quantity += item.quantity;
+      return acc;
+    }, {} as Record<string, any>) || {};
   };
 
   if (loading) {
@@ -107,7 +123,7 @@ const OrdersPage = memo(() => {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {orders.length === 0 ? (
           <div className="glass-card p-8 text-center">
             <Package className="w-16 h-16 text-white/60 mx-auto mb-4" />
@@ -122,60 +138,89 @@ const OrdersPage = memo(() => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-4">
             {orders.map(order => (
-              <div 
-                key={order.id} 
-                className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-all duration-200 border border-white/10 hover:border-white/20 h-fit" 
-                onClick={() => handleOrderClick(order)}
-              >
-                <div className="flex justify-between items-start mb-3">
+              <div key={order.id} className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-all duration-200 border border-white/10 hover:border-white/20" onClick={() => handleOrderClick(order)}>
+                <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-white font-bold text-base">
+                    <h3 className="text-white font-bold text-lg">
                       {order.order_number}
                     </h3>
-                    <p className="text-white/70 text-xs">
-                      {formatDate(order.created_at)}
+                    <p className="text-white/70 text-sm mt-1">
+                      Ordered on {formatDate(order.created_at)}
                     </p>
                   </div>
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <div className={`flex items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium shadow-md ${getStatusColor(order.status)}`}>
                     {getStatusIcon(order.status)}
-                    <span className="hidden sm:inline">{formatStatus(order.status)}</span>
+                    <span>{formatStatus(order.status)}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className="bg-white/5 rounded p-2">
-                    <div className="text-white/60 text-xs font-medium">Items</div>
-                    <div className="text-white text-sm font-semibold">
-                      {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="text-white/60 text-xs font-medium uppercase tracking-wide mb-1">Items</div>
+                    <div className="text-white font-semibold">
+                      {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} pieces
                     </div>
                   </div>
                   
                   {order.final_weight && (
-                    <div className="bg-white/5 rounded p-2">
-                      <div className="text-white/60 text-xs font-medium">Weight</div>
-                      <div className="text-white text-sm font-semibold">{order.final_weight} kg</div>
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60 text-xs font-medium uppercase tracking-wide mb-1">Weight</div>
+                      <div className="text-white font-semibold">{order.final_weight} kg</div>
+                    </div>
+                  )}
+                  
+                  {order.final_price && order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery') ? (
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60 text-xs font-medium uppercase tracking-wide mb-1">Total</div>
+                      <div className="text-white font-bold text-lg text-green-400">₹{order.final_price}</div>
+                    </div>
+                  ) : (
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60 text-xs font-medium uppercase tracking-wide mb-1">Price</div>
+                      <div className="text-white/70 text-sm">Pending weighing</div>
+                    </div>
+                  )}
+                  
+                  {order.bookings?.pickup_time && (
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60 text-xs font-medium uppercase tracking-wide mb-1">Pickup</div>
+                      <div className="text-white text-sm">{formatDate(order.bookings.pickup_time)}</div>
                     </div>
                   )}
                 </div>
 
-                {order.final_price && order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery') ? (
-                  <div className="bg-green-500/20 rounded p-2 text-center">
-                    <div className="text-green-400 font-bold text-lg">₹{order.final_price}</div>
+                <div className="border-t border-white/20 pt-4">
+                  <h4 className="text-white font-medium text-sm mb-3 flex items-center">
+                    <Package className="w-4 h-4 mr-2" />
+                    Order Items
+                  </h4>
+                  <div className="space-y-2">
+                    {Object.values(groupedItems(order)).map((item: any, index) => (
+                      <div key={index} className="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                        <span className="text-white font-medium">
+                          {item.name}
+                        </span>
+                        <div className="text-right">
+                          <div className="text-white/80 text-sm">₹{item.pricePerKg}/kg</div>
+                          {(order.final_weight || order.estimated_weight) && (
+                            <div className="text-white/60 text-xs mt-1">
+                              Weight available after processing
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <div className="bg-white/5 rounded p-2 text-center">
-                    <div className="text-white/70 text-xs">Pending weighing</div>
-                  </div>
-                )}
+                </div>
 
                 {order.status === 'pending' && (
-                  <div className="mt-3 pt-2 border-t border-white/20">
+                  <div className="mt-4 pt-3 border-t border-white/20">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="w-full border-red-500/50 text-red-300 hover:bg-red-500/20 hover:border-red-400 text-xs" 
+                      className="border-red-500/50 text-red-300 hover:bg-red-500/20 hover:border-red-400" 
                       onClick={e => {
                         e.stopPropagation();
                         // Handle cancel order

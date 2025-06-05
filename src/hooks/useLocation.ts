@@ -30,26 +30,11 @@ export const useLocation = () => {
   const requestPermissions = async () => {
     try {
       setIsLoading(true);
-      setError(null);
-      
-      // First check current permissions
-      const currentPermissions = await Geolocation.checkPermissions();
-      
-      if (currentPermissions.location === 'granted') {
-        setPermissionState({
-          status: 'granted',
-          canRequest: true
-        });
-        return true;
-      }
-      
-      // Request permissions if not granted
       const permissions = await Geolocation.requestPermissions();
       setPermissionState({
         status: permissions.location as LocationPermissionState['status'],
         canRequest: permissions.location !== 'denied'
       });
-      
       return permissions.location === 'granted';
     } catch (err) {
       console.error('Error requesting permissions:', err);
@@ -65,17 +50,9 @@ export const useLocation = () => {
       setIsLoading(true);
       setError(null);
       
-      // Check and request permissions first
-      const hasPermission = await requestPermissions();
-      if (!hasPermission) {
-        setError('Location permission required');
-        return null;
-      }
-      
       const position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 300000
+        timeout: 10000
       });
 
       const newPosition: MapPosition = {
@@ -86,16 +63,9 @@ export const useLocation = () => {
 
       setCurrentPosition(newPosition);
       return newPosition;
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error getting location:', err);
-      
-      if (err.message?.includes('permission')) {
-        setError('Location permission denied. Please enable location access in settings.');
-      } else if (err.message?.includes('timeout')) {
-        setError('Location request timed out. Please try again.');
-      } else {
-        setError('Failed to get current location. Please try again.');
-      }
+      setError('Failed to get current location');
       return null;
     } finally {
       setIsLoading(false);

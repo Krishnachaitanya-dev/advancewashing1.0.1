@@ -2,7 +2,6 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { App as CapacitorApp } from '@capacitor/app';
 
 // Mobile-specific initialization
 const initMobileApp = () => {
@@ -33,19 +32,20 @@ const initMobileApp = () => {
   };
 
   addMaximumScaleToMetaViewport();
-
-  // Handle back button on mobile
-  CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-    if (!canGoBack) {
-      CapacitorApp.exitApp();
-    } else {
-      window.history.back();
-    }
-  });
 };
 
 // Initialize mobile-specific features
 initMobileApp();
+
+// Optional service worker registration (commented out for now)
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker.register('/sw.js')
+//       .catch((error) => {
+//         console.log('SW registration failed: ', error);
+//       });
+//   });
+// }
 
 const rootElement = document.getElementById("root");
 if (rootElement) {

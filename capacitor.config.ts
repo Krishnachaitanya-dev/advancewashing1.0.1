@@ -28,12 +28,6 @@ const config: CapacitorConfig = {
     // Add App plugin for better mobile handling
     App: {
       launchUrl: 'index.html'
-    },
-    // Add Geolocation plugin configuration
-    Geolocation: {
-      permissions: {
-        location: 'always'
-      }
     }
   }
 };
