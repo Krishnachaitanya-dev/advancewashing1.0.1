@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -42,15 +42,20 @@ const reverseGeocode = async (lat: number, lng: number) => {
   return null;
 };
 
-// Component to handle map events
-const MapEventHandler = ({ onPositionChange, onAddressChange, setMarkerPosition }: {
-  onPositionChange: (position: { lat: number; lng: number }) => void;
-  onAddressChange: (address: any) => void;
-  setMarkerPosition: (position: [number, number]) => void;
-}) => {
-  const map = useMap();
+const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
+  const [markerPosition, setMarkerPosition] = useState<[number, number]>([
+    initialPosition.lat, 
+    initialPosition.lng
+  ]);
 
   useEffect(() => {
+    console.log('Map position updated:', initialPosition);
+    setMarkerPosition([initialPosition.lat, initialPosition.lng]);
+  }, [initialPosition.lat, initialPosition.lng]);
+
+  const handleMapCreated = (map: L.Map) => {
+    console.log('Map created, setting up event listeners');
+    
     const handleClick = async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       console.log('Map clicked:', { lat, lng });
@@ -71,25 +76,7 @@ const MapEventHandler = ({ onPositionChange, onAddressChange, setMarkerPosition 
     };
 
     map.on('click', handleClick);
-
-    return () => {
-      map.off('click', handleClick);
-    };
-  }, [map, onPositionChange, onAddressChange, setMarkerPosition]);
-
-  return null;
-};
-
-const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: AddressMapProps) => {
-  const [markerPosition, setMarkerPosition] = useState<[number, number]>([
-    initialPosition.lat, 
-    initialPosition.lng
-  ]);
-
-  useEffect(() => {
-    console.log('Map position updated:', initialPosition);
-    setMarkerPosition([initialPosition.lat, initialPosition.lng]);
-  }, [initialPosition.lat, initialPosition.lng]);
+  };
 
   return (
     <div className="glass-card overflow-hidden">
@@ -99,17 +86,13 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
+          whenCreated={handleMapCreated}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={markerPosition} />
-          <MapEventHandler 
-            onPositionChange={onPositionChange}
-            onAddressChange={onAddressChange}
-            setMarkerPosition={setMarkerPosition}
-          />
         </MapContainer>
       </div>
       <div className="p-3 bg-white/5">
