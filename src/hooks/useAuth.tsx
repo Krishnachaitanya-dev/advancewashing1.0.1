@@ -24,20 +24,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('AuthProvider - Setting up auth state listener');
+    
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('AuthProvider - Initial session:', session, 'Error:', error);
       setSession(session);
       setUser(session?.user ?? null);
-      checkUserRole(session?.user);
+      if (session?.user) {
+        checkUserRole(session.user);
+      }
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('AuthProvider - Auth state change:', event, session);
         setSession(session);
         setUser(session?.user ?? null);
-        checkUserRole(session?.user);
+        if (session?.user) {
+          checkUserRole(session.user);
+        } else {
+          setIsAdmin(false);
+        }
         setLoading(false);
       }
     );
@@ -52,11 +62,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const { data: profile } = await supabase
+      console.log('Checking user role for:', user.id);
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
+
+      console.log('User role check result:', profile, error);
+      
+      if (error) {
+        console.error('Error checking user role:', error);
+        setIsAdmin(false);
+        return;
+      }
 
       setIsAdmin(profile?.role === 'admin');
     } catch (error) {
@@ -67,8 +86,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, userData: { name: string; phone?: string }) => {
     try {
+      console.log('Attempting sign up for:', email);
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -79,7 +100,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       });
 
+      console.log('Sign up result:', data, error);
+
       if (error) {
+        console.error('Sign up error:', error);
         toast({
           title: "Sign up failed",
           description: error.message,
@@ -94,6 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       return { success: true };
     } catch (error: any) {
+      console.error('Sign up exception:', error);
       const errorMessage = error.message || 'An unexpected error occurred';
       toast({
         title: "Sign up failed",
@@ -108,13 +133,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Attempting sign in for:', email);
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      console.log('Sign in result:', data, error);
+
       if (error) {
+        console.error('Sign in error:', error);
         toast({
           title: "Sign in failed",
           description: error.message,
@@ -129,6 +159,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       return { success: true };
     } catch (error: any) {
+      console.error('Sign in exception:', error);
       const errorMessage = error.message || 'An unexpected error occurred';
       toast({
         title: "Sign in failed",
@@ -143,12 +174,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
+      console.log('Attempting sign out');
       await supabase.auth.signOut();
       toast({
         title: "Signed out",
         description: "You have been successfully signed out"
       });
     } catch (error: any) {
+      console.error('Sign out error:', error);
       toast({
         title: "Error",
         description: error.message,

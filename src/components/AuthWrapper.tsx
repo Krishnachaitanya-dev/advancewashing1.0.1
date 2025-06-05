@@ -10,6 +10,8 @@ interface AuthWrapperProps {
 const AuthWrapper = ({ children }: AuthWrapperProps) => {
   const { user, loading } = useAuth();
 
+  console.log('AuthWrapper - User:', user, 'Loading:', loading);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center">

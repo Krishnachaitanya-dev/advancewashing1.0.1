@@ -4,34 +4,57 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const navigate = useNavigate();
+  const { user, signIn, signUp } = useAuth();
 
-  // Check if user is already logged in (for mobile app persistence)
+  // Redirect if already logged in
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (isLoggedIn === 'true') {
+    if (user) {
       navigate('/home', { replace: true });
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        const result = await signUp(email, password, { name, phone });
+        if (result.success) {
+          // Don't redirect immediately for sign up, let user check email
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+      } else {
+        const result = await signIn(email, password);
+        if (result.success) {
+          navigate('/home', { replace: true });
+        } else {
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
       setIsLoading(false);
-      // Store login state for mobile app
-      localStorage.setItem('isLoggedIn', 'true');
-      // Navigate to home page after successful login
-      navigate('/home', { replace: true });
-    }, 1000); // Reduced delay for better mobile UX
+    }
+  };
+
+  const toggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setName('');
+    setPhone('');
   };
 
   return (
@@ -50,16 +73,42 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Login Form */}
+      {/* Auth Form */}
       <div className="w-full max-w-sm space-y-6">
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Sign Up Fields */}
+          {isSignUp && (
+            <>
+              <div>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full Name"
+                  className="h-14 bg-white/95 border-0 rounded-xl px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-2 focus:ring-white/30 focus:outline-none shadow-xl backdrop-blur-sm"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone Number (Optional)"
+                  className="h-14 bg-white/95 border-0 rounded-xl px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-2 focus:ring-white/30 focus:outline-none shadow-xl backdrop-blur-sm"
+                />
+              </div>
+            </>
+          )}
+
           {/* Email Field */}
           <div>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email or phone"
+              placeholder="Email"
               className="h-14 bg-white/95 border-0 rounded-xl px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-2 focus:ring-white/30 focus:outline-none shadow-xl backdrop-blur-sm"
               required
             />
@@ -84,17 +133,19 @@ const LoginPage = () => {
             </button>
           </div>
 
-          {/* Forgot Password */}
-          <div className="text-right">
-            <button
-              type="button"
-              className="text-white/90 hover:text-white font-medium transition-colors text-base underline-offset-4 hover:underline"
-            >
-              Forgot password?
-            </button>
-          </div>
+          {/* Forgot Password - only show on login */}
+          {!isSignUp && (
+            <div className="text-right">
+              <button
+                type="button"
+                className="text-white/90 hover:text-white font-medium transition-colors text-base underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
 
-          {/* Login Button */}
+          {/* Submit Button */}
           <Button
             type="submit"
             disabled={isLoading}
@@ -103,20 +154,23 @@ const LoginPage = () => {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                Signing In...
+                {isSignUp ? 'Creating Account...' : 'Signing In...'}
               </div>
             ) : (
-              "Log in"
+              isSignUp ? 'Sign Up' : 'Log in'
             )}
           </Button>
         </form>
 
-        {/* Sign Up Link */}
+        {/* Toggle Sign Up/Login */}
         <div className="text-center mt-8">
           <p className="text-white/90 text-base">
-            Don't have an account?{' '}
-            <button className="text-white font-semibold hover:underline transition-all underline-offset-4">
-              Sign up
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button 
+              onClick={toggleMode}
+              className="text-white font-semibold hover:underline transition-all underline-offset-4"
+            >
+              {isSignUp ? 'Log in' : 'Sign up'}
             </button>
           </p>
         </div>
