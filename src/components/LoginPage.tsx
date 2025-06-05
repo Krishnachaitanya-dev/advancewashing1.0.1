@@ -35,22 +35,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-600 flex flex-col items-center justify-center p-6 relative">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex flex-col items-center justify-center p-6 relative">
       {/* Logo and Brand Section */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-12">
         {/* Logo */}
-        <div className="mb-6">
+        <div className="mb-8">
           <img 
             src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" 
             alt="AW Logo" 
-            className="w-20 h-20 mx-auto mb-4"
+            className="w-24 h-24 mx-auto mb-6 drop-shadow-lg"
           />
-          <h2 className="text-white text-2xl font-semibold">Advance Washing</h2>
+          <h1 className="text-white text-3xl font-semibold tracking-wide">Advance Washing</h1>
+          <p className="text-white/80 text-lg mt-2 font-light">Professional Laundry Services</p>
         </div>
-        
-        {/* Welcome Text */}
-        <h1 className="text-white text-4xl font-light mb-2">Welcome to</h1>
-        <h1 className="text-white text-4xl font-light">Advance Washing</h1>
       </div>
 
       {/* Login Form */}
@@ -63,7 +60,7 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email or phone"
-              className="h-14 bg-white/90 border-0 rounded-full px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
+              className="h-14 bg-white/95 border-0 rounded-xl px-6 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-2 focus:ring-white/30 focus:outline-none shadow-xl backdrop-blur-sm"
               required
             />
           </div>
@@ -75,7 +72,7 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="h-14 bg-white/90 border-0 rounded-full px-6 pr-14 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-0 focus:outline-none shadow-lg"
+              className="h-14 bg-white/95 border-0 rounded-xl px-6 pr-14 text-gray-700 placeholder:text-gray-500 text-lg focus:ring-2 focus:ring-white/30 focus:outline-none shadow-xl backdrop-blur-sm"
               required
             />
             <button
@@ -91,7 +88,7 @@ const LoginPage = () => {
           <div className="text-right">
             <button
               type="button"
-              className="text-white/90 hover:text-white font-medium transition-colors text-lg"
+              className="text-white/90 hover:text-white font-medium transition-colors text-base underline-offset-4 hover:underline"
             >
               Forgot password?
             </button>
@@ -101,7 +98,7 @@ const LoginPage = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-16 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-full shadow-xl transition-all duration-300 text-xl border-0"
+            className="w-full h-16 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl shadow-xl transition-all duration-300 text-xl border border-white/30 backdrop-blur-sm"
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
@@ -116,9 +113,9 @@ const LoginPage = () => {
 
         {/* Sign Up Link */}
         <div className="text-center mt-8">
-          <p className="text-white/90 text-lg">
+          <p className="text-white/90 text-base">
             Don't have an account?{' '}
-            <button className="text-white font-semibold hover:underline transition-all">
+            <button className="text-white font-semibold hover:underline transition-all underline-offset-4">
               Sign up
             </button>
           </p>
