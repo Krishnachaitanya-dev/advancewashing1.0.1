@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +9,6 @@ import { useOrderUpdate } from '@/hooks/useOrderUpdate';
 import OrderStatusFilter from './OrderStatusFilter';
 import ServiceWeightCalculator from './ServiceWeightCalculator';
 import type { Order } from '@/hooks/useOrders';
-
 const AdminOrderManagement = () => {
   const {
     orders,
@@ -41,7 +39,6 @@ const AdminOrderManagement = () => {
     });
     return counts;
   }, [orders]);
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -58,7 +55,6 @@ const AdminOrderManagement = () => {
         return <Clock className="w-4 h-4" />;
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -75,7 +71,6 @@ const AdminOrderManagement = () => {
         return 'bg-gray-600 text-gray-100';
     }
   };
-
   const statusOptions = [{
     value: 'confirmed',
     label: 'Confirmed'
@@ -92,26 +87,22 @@ const AdminOrderManagement = () => {
     value: 'delivered',
     label: 'Delivered'
   }];
-
   const handleEdit = (order: Order) => {
     setEditingOrder(order.id);
     setEditData({
       status: order.status
     });
   };
-
   const handleSave = async (orderId: string) => {
     const updateData: any = {
       status: editData.status
     };
-
     const success = await updateOrder(orderId, updateData);
     if (success) {
       setEditingOrder(null);
       refetch();
     }
   };
-
   const handleServiceWeightSave = async (orderId: string, weight: number, price: number) => {
     const success = await updateOrder(orderId, {
       final_weight: weight,
@@ -122,14 +113,12 @@ const AdminOrderManagement = () => {
     }
     return success;
   };
-
   const handleCancel = () => {
     setEditingOrder(null);
     setEditData({
       status: ''
     });
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -139,13 +128,11 @@ const AdminOrderManagement = () => {
       minute: '2-digit'
     });
   };
-
   if (loading) {
     return <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-white text-lg">Loading orders...</div>
       </div>;
   }
-
   return <div className="space-y-4 md:space-y-6 p-4 md:p-0">
       <OrderStatusFilter selectedStatus={selectedStatus} onStatusChange={setSelectedStatus} orderCounts={orderCounts} />
 
@@ -174,7 +161,7 @@ const AdminOrderManagement = () => {
                       <X className="w-4 h-4 mr-1" />
                       Cancel
                     </Button>
-                  </div> : <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                  </div> : <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto rounded-sm">
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
                   </Button>}
@@ -190,9 +177,9 @@ const AdminOrderManagement = () => {
                 <div className="w-full md:w-1/3">
                   <label className="block text-white/80 text-sm mb-2">Status</label>
                   <Select value={editData.status} onValueChange={value => setEditData(prev => ({
-                ...prev,
-                status: value
-              }))}>
+              ...prev,
+              status: value
+            }))}>
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
@@ -248,5 +235,4 @@ const AdminOrderManagement = () => {
       </div>
     </div>;
 };
-
 export default AdminOrderManagement;
