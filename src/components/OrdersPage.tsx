@@ -1,3 +1,4 @@
+
 import React, { memo, useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -95,7 +96,7 @@ const OrdersPage = memo(() => {
     });
   };
 
-  const groupedItems = order => {
+  const groupedItems = (order: Order) => {
     return order.order_items?.reduce((acc, item) => {
       const displayName = getBestDisplayName(item.services?.name || 'Service', item.item_name);
       if (!acc[displayName]) {
@@ -123,7 +124,8 @@ const OrdersPage = memo(() => {
   return (
     <AppLayout>
       <div className="space-y-6">
-        {orders.length === 0 ? <div className="glass-card p-8 text-center">
+        {orders.length === 0 ? (
+          <div className="glass-card p-8 text-center">
             <Package className="w-16 h-16 text-white/60 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Orders Yet</h3>
             <p className="text-white/80 mb-6">
@@ -134,8 +136,11 @@ const OrdersPage = memo(() => {
                 Schedule Pickup
               </Button>
             </Link>
-          </div> : <div className="space-y-4">
-            {orders.map(order => <div key={order.id} className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-all duration-200 border border-white/10 hover:border-white/20" onClick={() => handleOrderClick(order)}>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {orders.map(order => (
+              <div key={order.id} className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-all duration-200 border border-white/10 hover:border-white/20" onClick={() => handleOrderClick(order)}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-white font-bold text-lg">
