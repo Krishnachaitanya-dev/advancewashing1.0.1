@@ -12,7 +12,8 @@ import {
   Bed,
   Shield,
   Package,
-  ShoppingBag
+  ShoppingBag,
+  CheckCircle
 } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -26,12 +27,21 @@ const iconMap: { [key: string]: React.ComponentType<any> } = {
 
 // Define color scheme for selected services
 const serviceColors = [
-  'bg-green-500',
-  'bg-pink-500', 
-  'bg-violet-500',
-  'bg-orange-500',
-  'bg-yellow-500',
-  'bg-cyan-500'
+  'border-green-500',
+  'border-pink-500', 
+  'border-violet-500',
+  'border-orange-500',
+  'border-yellow-500',
+  'border-cyan-500'
+];
+
+const serviceBgColors = [
+  'bg-green-500/20',
+  'bg-pink-500/20', 
+  'bg-violet-500/20',
+  'bg-orange-500/20',
+  'bg-yellow-500/20',
+  'bg-cyan-500/20'
 ];
 
 interface SelectedService {
@@ -82,11 +92,12 @@ const ServicesPage = memo(() => {
     const selectedIndex = selectedServices.findIndex(s => s.id === serviceId);
     if (selectedIndex !== -1) {
       const colorIndex = selectedIndex % serviceColors.length;
-      const colorClass = serviceColors[colorIndex];
-      console.log(`Service ${serviceId} at index ${selectedIndex} gets color ${colorClass}`);
-      return `glass-card p-4 cursor-pointer transition-all duration-200 ${colorClass}`;
+      const borderClass = serviceColors[colorIndex];
+      const bgClass = serviceBgColors[colorIndex];
+      console.log(`Service ${serviceId} at index ${selectedIndex} gets border ${borderClass}`);
+      return `glass-card p-4 cursor-pointer transition-all duration-200 border-2 ${borderClass} ${bgClass} relative`;
     }
-    return 'glass-card p-4 cursor-pointer transition-all duration-200 hover:bg-white/10';
+    return 'glass-card p-4 cursor-pointer transition-all duration-200 hover:bg-white/10 border-2 border-transparent';
   };
 
   const isServiceSelected = (serviceId: string) => {
@@ -162,6 +173,13 @@ const ServicesPage = memo(() => {
                 onClick={() => handleServiceSelect(service)}
                 className={getServiceStyle(service.id)}
               >
+                {/* Selection Indicator */}
+                {isSelected && (
+                  <div className="absolute top-2 right-2">
+                    <CheckCircle className="w-6 h-6 text-white fill-current" />
+                  </div>
+                )}
+                
                 <div className="flex flex-col items-center text-center space-y-3">
                   {/* Service Icon */}
                   <div className="rounded-full p-3 bg-white/20">
