@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -15,6 +14,9 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Temporary admin emails list - remove this once database policies are fixed
+const ADMIN_EMAILS = ['admin@gmail.com'];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -61,6 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    // Temporary fallback for admin detection using email
+    // This should be removed once database policies are fixed
+    if (ADMIN_EMAILS.includes(user.email || '')) {
+      console.log('Admin detected via email fallback:', user.email);
+      setIsAdmin(true);
+      return;
+    }
+
     try {
       console.log('Checking user role for:', user.id);
       const { data: profile, error } = await supabase
@@ -73,21 +83,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Handle the infinite recursion error gracefully
       if (error && error.code === '42P17') {
-        console.warn('Database policy issue detected, defaulting to non-admin');
-        setIsAdmin(false);
+        console.warn('Database policy issue detected, using email fallback for admin detection');
+        // Use email-based fallback when database policies fail
+        setIsAdmin(ADMIN_EMAILS.includes(user.email || ''));
         return;
       }
       
       if (error) {
         console.error('Error checking user role:', error);
-        setIsAdmin(false);
+        // Use email-based fallback on any database error
+        setIsAdmin(ADMIN_EMAILS.includes(user.email || ''));
         return;
       }
 
       setIsAdmin(profile?.role === 'admin');
     } catch (error) {
       console.error('Error checking user role:', error);
-      setIsAdmin(false);
+      // Use email-based fallback on any exception
+      setIsAdmin(ADMIN_EMAILS.includes(user.email || ''));
     }
   };
 
