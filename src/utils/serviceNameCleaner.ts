@@ -1,3 +1,4 @@
+
 export const getCleanServiceName = (serviceName: string): string => {
   if (!serviceName) return 'Service';
   
@@ -21,13 +22,14 @@ export const getCleanServiceName = (serviceName: string): string => {
   
   console.log('Unique parts:', uniqueParts);
   
-  // If we have multiple parts, check for similar parts
+  // If we have multiple parts, check for similar parts more aggressively
   if (uniqueParts.length > 1) {
     const normalized = uniqueParts.map(part => ({
       original: part,
       normalized: part.toLowerCase()
         .replace(/s$/, '') // Remove trailing 's'
         .replace(/ing$/, '') // Remove 'ing'
+        .replace(/ed$/, '') // Remove 'ed'
         .replace(/[^a-z0-9]/g, '') // Keep only alphanumeric
     }));
     
@@ -38,7 +40,14 @@ export const getCleanServiceName = (serviceName: string): string => {
     const seenNormalized = new Set();
     
     for (const item of normalized) {
-      if (!seenNormalized.has(item.normalized)) {
+      // Check if this normalized version is already seen or similar to existing ones
+      const isSimilar = Array.from(seenNormalized).some(existing => {
+        const longer = existing.length > item.normalized.length ? existing : item.normalized;
+        const shorter = existing.length > item.normalized.length ? item.normalized : existing;
+        return longer.includes(shorter) && shorter.length > 2; // Only consider similar if meaningful length
+      });
+      
+      if (!isSimilar && !seenNormalized.has(item.normalized)) {
         seenNormalized.add(item.normalized);
         reallyUnique.push(item.original);
       }
@@ -46,11 +55,7 @@ export const getCleanServiceName = (serviceName: string): string => {
     
     console.log('Really unique parts:', reallyUnique);
     
-    // If we still have multiple unique parts, join them
-    if (reallyUnique.length > 1) {
-      return reallyUnique.join(' - ');
-    }
-    
+    // If we still have multiple unique parts, just take the first one to avoid duplication
     return reallyUnique[0] || 'Service';
   }
   

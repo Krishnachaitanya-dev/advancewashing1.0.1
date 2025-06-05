@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -115,15 +114,20 @@ export const useOrderCreation = () => {
 
       console.log('Booking created successfully:', booking);
 
-      // Generate order number
-      const orderNumber = `AW${Date.now()}`;
+      // Generate shorter order number - AW000X format
+      const { data: orderCountData } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true });
+      
+      const orderCount = orderCountData?.length || 0;
+      const orderNumber = `AW${String(orderCount + 1).padStart(4, '0')}`;
 
       // Create order with correct status
       const orderDataToInsert = {
         user_id: user.id,
         booking_id: booking.id,
         order_number: orderNumber,
-        status: 'confirmed', // This is fine for orders
+        status: 'confirmed',
         estimated_price: orderData.estimated_total,
         estimated_weight: orderData.items.reduce((sum, item) => sum + item.estimated_weight, 0)
       };

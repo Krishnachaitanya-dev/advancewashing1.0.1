@@ -141,9 +141,13 @@ const OrdersPage = memo(() => {
                     </div>
                   )}
                   
-                  {order.final_price && (
+                  {order.final_price && order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery') ? (
                     <div className="text-white/80 text-sm">
                       <strong>Total:</strong> ₹{order.final_price}
+                    </div>
+                  ) : (
+                    <div className="text-white/80 text-sm">
+                      <strong>Price:</strong> Will be calculated after weighing
                     </div>
                   )}
                   
@@ -157,12 +161,30 @@ const OrdersPage = memo(() => {
                 <div className="border-t border-white/20 pt-3">
                   <h4 className="text-white font-medium text-sm mb-2">Order Items:</h4>
                   <div className="space-y-1">
-                    {order.order_items?.map((item) => (
-                      <div key={item.id} className="flex justify-between text-white/80 text-sm">
+                    {Object.entries(
+                      order.order_items?.reduce((acc, item) => {
+                        const cleanName = getCleanServiceName(item.services?.name || 'Service');
+                        const key = `${cleanName}${item.item_name ? `-${item.item_name}` : ''}`;
+                        
+                        if (!acc[key]) {
+                          acc[key] = {
+                            name: cleanName,
+                            itemName: item.item_name,
+                            quantity: 0,
+                            pricePerKg: item.services?.base_price_per_kg || 0
+                          };
+                        }
+                        acc[key].quantity += item.quantity;
+                        return acc;
+                      }, {} as Record<string, any>) || {}
+                    ).map(([key, item]) => (
+                      <div key={key} className="flex justify-between text-white/80 text-sm">
                         <span>
-                          {getCleanServiceName(item.services?.name || 'Service')} {item.item_name && `- ${item.item_name}`}
+                          {item.name} {item.itemName && `- ${item.itemName}`}
                         </span>
-                        <span>Qty: {item.quantity}</span>
+                        <span>
+                          Qty: {item.quantity} | ₹{item.pricePerKg}/kg
+                        </span>
                       </div>
                     ))}
                   </div>

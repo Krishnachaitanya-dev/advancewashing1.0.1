@@ -82,30 +82,34 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
     });
   };
 
-  // Group items by service name to avoid duplicates
+  // Group items by service name to avoid duplicates - more aggressive grouping
   const groupedItems = order.order_items?.reduce((acc, item) => {
     const cleanName = getCleanServiceName(item.services?.name || 'Service');
+    const key = `${cleanName}${item.item_name ? `-${item.item_name}` : ''}`;
     
-    if (!acc[cleanName]) {
-      acc[cleanName] = {
+    if (!acc[key]) {
+      acc[key] = {
         name: cleanName,
+        itemName: item.item_name,
         totalQuantity: 0,
-        totalPrice: 0,
-        pricePerKg: item.services?.base_price_per_kg || 0
+        pricePerKg: item.services?.base_price_per_kg || 0,
+        estimatedWeight: 0,
+        finalWeight: 0
       };
     }
     
-    acc[cleanName].totalQuantity += item.quantity;
-    
-    // Use final weight if available, otherwise estimated weight
-    const itemWeight = item.final_weight || item.estimated_weight || 1;
-    acc[cleanName].totalPrice += itemWeight * (item.services?.base_price_per_kg || 0);
+    acc[key].totalQuantity += item.quantity;
+    acc[key].estimatedWeight += item.estimated_weight || 0;
+    acc[key].finalWeight += item.final_weight || 0;
     
     return acc;
   }, {} as Record<string, any>) || {};
 
   const steps = getStatusSteps();
   const currentStepIndex = getCurrentStepIndex();
+
+  // Calculate if we should show final pricing (only for completed orders with final weight)
+  const showFinalPricing = order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -178,26 +182,34 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               {Object.values(groupedItems).map((item: any, index) => (
                 <div key={index} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {item.name}
+                    {item.name} {item.itemName && `- ${item.itemName}`}
                   </span>
                   <span className="text-gray-900 font-medium">
-                    ₹{item.totalPrice.toFixed(0)}
+                    ₹{item.pricePerKg}/kg
                   </span>
                 </div>
               ))}
             </div>
             <div className="border-t mt-3 pt-2">
-              <div className="flex justify-between">
-                <span className="font-medium text-gray-900">Total</span>
-                <span className="font-bold text-blue-600 text-lg">
-                  ₹{order.final_price || order.estimated_price || '0'}
-                </span>
-              </div>
-              {order.final_weight && (
-                <div className="flex justify-between mt-1">
-                  <span className="text-sm text-gray-600">Weight</span>
-                  <span className="text-sm text-gray-900 font-medium">
-                    {order.final_weight} kg
+              {showFinalPricing ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900">Total</span>
+                    <span className="font-bold text-blue-600 text-lg">
+                      ₹{order.final_price}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-sm text-gray-600">Weight</span>
+                    <span className="text-sm text-gray-900 font-medium">
+                      {order.final_weight} kg
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-2">
+                  <span className="text-sm text-gray-600">
+                    Final price will be calculated after weighing
                   </span>
                 </div>
               )}
