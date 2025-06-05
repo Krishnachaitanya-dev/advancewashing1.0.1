@@ -1,29 +1,24 @@
-
-
 import React, { ReactNode, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, User, Package } from 'lucide-react';
-
 interface AppLayoutProps {
   children: ReactNode;
 }
-
-const AppLayout = memo(({ children }: AppLayoutProps) => {
+const AppLayout = memo(({
+  children
+}: AppLayoutProps) => {
   const location = useLocation();
-  
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-
-  return (
-    <div className="min-h-screen relative overflow-hidden">
+  return <div className="min-h-screen relative overflow-hidden">
       {/* Content container */}
       <div className="relative min-h-screen flex flex-col">
         {/* Header - premium glass effect */}
         <header className="p-4 flex items-center justify-between glass-card mx-4 mt-4 safe-area-top py-[8px] px-[60px]">
           <div className="flex items-center">
             <img src="/lovable-uploads/786946c3-52e3-4da5-b6cf-56e1dae12c59.png" alt="AW Logo" className="w-10 h-10 sm:w-12 sm:h-12 mr-2 sm:mr-3" loading="lazy" />
-            <h1 className="text-white text-lg sm:text-xl font-semibold">Advance Washing</h1>
+            <h1 className="text-white text-lg sm:text-xl font-semibold px-0 my-[10px]">Advance Washing</h1>
           </div>
         </header>
 
@@ -54,10 +49,7 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
           </div>
         </nav>
       </div>
-    </div>
-  );
+    </div>;
 });
-
 AppLayout.displayName = 'AppLayout';
 export default AppLayout;
-
