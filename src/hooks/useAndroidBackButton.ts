@@ -1,6 +1,8 @@
+
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { App, PluginListenerHandle } from '@capacitor/app';
+import { App } from '@capacitor/app';
+import { PluginListenerHandle } from '@capacitor/core';
 
 export const useAndroidBackButton = () => {
   const navigate = useNavigate();
