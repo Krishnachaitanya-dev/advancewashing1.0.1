@@ -40,7 +40,6 @@ interface SelectedService {
   price: number;
   quantity: number;
   weight: number;
-  colorIndex: number;
 }
 
 const ServicesPage = memo(() => {
@@ -49,6 +48,8 @@ const ServicesPage = memo(() => {
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  console.log('Current selected services:', selectedServices);
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,26 +60,30 @@ const ServicesPage = memo(() => {
     
     if (isSelected) {
       // Remove service
-      setSelectedServices(prev => prev.filter(s => s.id !== service.id));
+      const newSelectedServices = selectedServices.filter(s => s.id !== service.id);
+      setSelectedServices(newSelectedServices);
+      console.log('Service removed, new list:', newSelectedServices);
     } else {
-      // Add service with default values and assign next color
-      const colorIndex = selectedServices.length % serviceColors.length;
+      // Add service with default values
       const newService: SelectedService = {
         id: service.id,
         name: service.name,
         price: service.base_price_per_kg,
         quantity: 1,
-        weight: 1,
-        colorIndex: colorIndex
+        weight: 1
       };
-      setSelectedServices(prev => [...prev, newService]);
+      const newSelectedServices = [...selectedServices, newService];
+      setSelectedServices(newSelectedServices);
+      console.log('Service added, new list:', newSelectedServices);
     }
   };
 
   const getServiceStyle = (serviceId: string) => {
-    const selectedService = selectedServices.find(s => s.id === serviceId);
-    if (selectedService) {
-      const colorClass = serviceColors[selectedService.colorIndex];
+    const selectedIndex = selectedServices.findIndex(s => s.id === serviceId);
+    if (selectedIndex !== -1) {
+      const colorIndex = selectedIndex % serviceColors.length;
+      const colorClass = serviceColors[colorIndex];
+      console.log(`Service ${serviceId} at index ${selectedIndex} gets color ${colorClass}`);
       return `glass-card p-4 cursor-pointer transition-all duration-200 ${colorClass}`;
     }
     return 'glass-card p-4 cursor-pointer transition-all duration-200 hover:bg-white/10';
@@ -109,11 +114,11 @@ const ServicesPage = memo(() => {
     // Navigate to pickup details with selected services
     navigate('/pickup-details', {
       state: {
-        selectedServices: selectedServices.map(service => ({
+        selectedServices: selectedServices.map((service, index) => ({
           id: service.id,
           name: service.name,
           price: `₹${service.price}/kg`,
-          color: serviceColors[service.colorIndex]
+          color: serviceColors[index % serviceColors.length]
         })),
         total: total
       }
