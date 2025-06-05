@@ -53,8 +53,8 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
     setMarkerPosition([initialPosition.lat, initialPosition.lng]);
   }, [initialPosition.lat, initialPosition.lng]);
 
-  const handleMapCreated = (map: L.Map) => {
-    console.log('Map created, setting up event listeners');
+  const handleMapReady = (map: L.Map) => {
+    console.log('Map ready, setting up event listeners');
     
     const handleClick = async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
@@ -86,7 +86,7 @@ const AddressMap = ({ initialPosition, onPositionChange, onAddressChange }: Addr
           zoom={16}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
-          whenCreated={handleMapCreated}
+          whenReady={handleMapReady}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
