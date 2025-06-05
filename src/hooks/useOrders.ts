@@ -31,6 +31,7 @@ export interface Order {
     item_name: string | null;
     quantity: number;
     estimated_weight: number | null;
+    final_weight: number | null;
     services?: {
       name: string;
       base_price_per_kg: number;
