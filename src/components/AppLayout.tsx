@@ -1,23 +1,21 @@
+
 import React, { ReactNode, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, User, Package } from 'lucide-react';
+
 interface AppLayoutProps {
   children: ReactNode;
 }
-const AppLayout = memo(({
-  children
-}: AppLayoutProps) => {
+
+const AppLayout = memo(({ children }: AppLayoutProps) => {
   const location = useLocation();
+  
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-  return <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700 relative overflow-hidden">
-      {/* Background water effect - optimized for mobile */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="water-wave"></div>
-        <div className="water-wave water-wave-2"></div>
-      </div>
-      
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
       {/* Content container */}
       <div className="relative min-h-screen flex flex-col">
         {/* Header - optimized for mobile touch */}
@@ -55,7 +53,9 @@ const AppLayout = memo(({
           </div>
         </nav>
       </div>
-    </div>;
+    </div>
+  );
 });
+
 AppLayout.displayName = 'AppLayout';
 export default AppLayout;
