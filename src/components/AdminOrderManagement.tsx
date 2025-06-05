@@ -127,17 +127,12 @@ const AdminOrderManagement = () => {
     return uniqueParts[0] || 'Service';
   };
 
-  // Check if order can be edited (only confirmed and picked_up statuses)
-  const canEditOrder = (status: string) => {
+  // Check if weight can be edited (only confirmed and picked_up statuses)
+  const canEditWeight = (status: string) => {
     return status === 'confirmed' || status === 'picked_up';
   };
 
   const handleEdit = (order: Order) => {
-    // Only allow editing for confirmed and picked_up orders
-    if (!canEditOrder(order.status)) {
-      return;
-    }
-    
     setEditingOrder(order.id);
     setEditData({
       status: order.status
@@ -214,7 +209,7 @@ const AdminOrderManagement = () => {
                       <X className="w-4 h-4 mr-1" />
                       Cancel
                     </Button>
-                  </div> : canEditOrder(order.status) && <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto rounded-sm">
+                  </div> : <Button size="sm" onClick={() => handleEdit(order)} className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto rounded-sm">
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Button>}
@@ -244,32 +239,32 @@ const AdminOrderManagement = () => {
                   </Select>
                 </div>
 
-                {canEditOrder(order.status) && <ServiceWeightCalculator 
-                  orderId={order.id} 
-                  orderItems={order.order_items || []} 
-                  currentFinalWeight={order.final_weight || undefined} 
-                  currentFinalPrice={order.final_price || undefined} 
-                  onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} 
-                  onStatusSave={() => handleSave(order.id)} 
-                  isUpdating={isUpdating} 
-                />}
-
-                {!canEditOrder(order.status) && (
-                  <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3">
-                    <p className="text-yellow-200 text-sm">
-                      Weight editing is disabled for orders in "{order.status.replace('_', ' ')}" status. 
-                      Weight can only be modified for "Confirmed" and "Picked Up" orders.
-                    </p>
-                    <div className="mt-2">
-                      <Button
-                        onClick={() => handleSave(order.id)}
-                        disabled={isUpdating}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Save className="w-4 h-4 mr-1" />
-                        Save Status Only
-                      </Button>
+                {canEditWeight(order.status) ? (
+                  <ServiceWeightCalculator 
+                    orderId={order.id} 
+                    orderItems={order.order_items || []} 
+                    currentFinalWeight={order.final_weight || undefined} 
+                    currentFinalPrice={order.final_price || undefined} 
+                    onSave={(weight, price) => handleServiceWeightSave(order.id, weight, price)} 
+                    onStatusSave={() => handleSave(order.id)} 
+                    isUpdating={isUpdating} 
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3">
+                      <p className="text-yellow-200 text-sm">
+                        Weight editing is disabled for orders in "{order.status.replace('_', ' ')}" status. 
+                        Weight can only be modified for "Confirmed" and "Picked Up" orders.
+                      </p>
                     </div>
+                    <Button
+                      onClick={() => handleSave(order.id)}
+                      disabled={isUpdating}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Save className="w-4 h-4 mr-1" />
+                      Save Status
+                    </Button>
                   </div>
                 )}
               </div> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
