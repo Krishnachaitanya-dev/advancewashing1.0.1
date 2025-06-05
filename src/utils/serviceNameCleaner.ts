@@ -17,48 +17,55 @@ export const getCleanServiceName = (serviceName: string): string => {
   
   console.log('Cleaned parts:', cleanedParts);
   
-  // Remove exact duplicates
-  const uniqueParts = [...new Set(cleanedParts)];
+  // More aggressive duplicate removal - normalize and compare
+  const normalizedParts = cleanedParts.map(part => part.toLowerCase().replace(/\s+/g, ' ').trim());
   
-  console.log('Unique parts:', uniqueParts);
+  // Find the first unique part by checking if it's already included in previous parts
+  const uniqueParts = [];
+  const seen = new Set<string>();
   
-  // If we have multiple parts, check for similar parts more aggressively
-  if (uniqueParts.length > 1) {
-    const normalized = uniqueParts.map(part => ({
-      original: part,
-      normalized: part.toLowerCase()
-        .replace(/s$/, '') // Remove trailing 's'
-        .replace(/ing$/, '') // Remove 'ing'
-        .replace(/ed$/, '') // Remove 'ed'
-        .replace(/[^a-z0-9]/g, '') // Keep only alphanumeric
-    }));
+  for (let i = 0; i < normalizedParts.length; i++) {
+    const normalized = normalizedParts[i];
+    const original = cleanedParts[i];
     
-    console.log('Normalized parts:', normalized);
+    // Check if this normalized part is similar to any we've already seen
+    let isDuplicate = false;
     
-    // Keep only truly unique normalized parts
-    const reallyUnique = [];
-    const seenNormalized = new Set<string>();
-    
-    for (const item of normalized) {
-      // Check if this normalized version is already seen or similar to existing ones
-      const isSimilar = Array.from(seenNormalized).some((existing: string) => {
-        const longer = existing.length > item.normalized.length ? existing : item.normalized;
-        const shorter = existing.length > item.normalized.length ? item.normalized : existing;
-        return longer.includes(shorter) && shorter.length > 2; // Only consider similar if meaningful length
-      });
-      
-      if (!isSimilar && !seenNormalized.has(item.normalized)) {
-        seenNormalized.add(item.normalized);
-        reallyUnique.push(item.original);
+    for (const seenPart of seen) {
+      // Check for exact match or if one contains the other
+      if (normalized === seenPart || 
+          normalized.includes(seenPart) || 
+          seenPart.includes(normalized)) {
+        isDuplicate = true;
+        break;
       }
     }
     
-    console.log('Really unique parts:', reallyUnique);
-    
-    // If we still have multiple unique parts, just take the first one to avoid duplication
-    return reallyUnique[0] || 'Service';
+    if (!isDuplicate) {
+      seen.add(normalized);
+      uniqueParts.push(original);
+    }
   }
   
+  console.log('Unique parts after aggressive filtering:', uniqueParts);
+  
+  // If we still have multiple parts, try to find the most meaningful one
+  if (uniqueParts.length > 1) {
+    // Prefer parts that are not just service types like "Wash & Fold"
+    const meaningfulParts = uniqueParts.filter(part => 
+      !part.toLowerCase().includes('wash') &&
+      !part.toLowerCase().includes('fold') &&
+      !part.toLowerCase().includes('iron') &&
+      !part.toLowerCase().includes('steam')
+    );
+    
+    if (meaningfulParts.length > 0) {
+      console.log('Using meaningful part:', meaningfulParts[0]);
+      return meaningfulParts[0];
+    }
+  }
+  
+  // Return the first unique part or fallback
   const result = uniqueParts[0] || 'Service';
   console.log('Final result:', result);
   return result;
