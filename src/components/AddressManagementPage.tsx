@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -74,13 +75,15 @@ const AddressManagementPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleAddAddress = async (formData: AddressFormData) => {
     setFormLoading(true);
     try {
       const supabaseFormData = convertToSupabaseFormData(formData);
-      await addAddress(supabaseFormData);
+      await addAddress(supabaseFormData, selectedCoordinates || undefined);
       setViewMode('list');
+      setSelectedCoordinates(null);
     } finally {
       setFormLoading(false);
     }
@@ -91,9 +94,10 @@ const AddressManagementPage = () => {
     setFormLoading(true);
     try {
       const supabaseFormData = convertToSupabaseFormData(formData);
-      await updateAddress(editingAddress.id, supabaseFormData);
+      await updateAddress(editingAddress.id, supabaseFormData, selectedCoordinates || undefined);
       setViewMode('list');
       setEditingAddress(null);
+      setSelectedCoordinates(null);
     } finally {
       setFormLoading(false);
     }
@@ -101,6 +105,7 @@ const AddressManagementPage = () => {
 
   const handleEdit = (address: Address) => {
     setEditingAddress(address);
+    setSelectedCoordinates(address.coordinates || null);
     setViewMode('edit');
   };
 
@@ -113,6 +118,11 @@ const AddressManagementPage = () => {
   const handleCancel = () => {
     setViewMode('list');
     setEditingAddress(null);
+    setSelectedCoordinates(null);
+  };
+
+  const handleCoordinatesChange = (coords: { lat: number; lng: number }) => {
+    setSelectedCoordinates(coords);
   };
 
   if (viewMode === 'add') {
@@ -127,7 +137,12 @@ const AddressManagementPage = () => {
           </div>
 
           <div className="glass-card p-6">
-            <AddressForm onSubmit={handleAddAddress} onCancel={handleCancel} isLoading={formLoading} />
+            <AddressForm 
+              onSubmit={handleAddAddress} 
+              onCancel={handleCancel} 
+              isLoading={formLoading}
+              onCoordinatesChange={handleCoordinatesChange}
+            />
           </div>
         </div>
       </AppLayout>
@@ -152,7 +167,9 @@ const AddressManagementPage = () => {
               onSubmit={handleUpdateAddress} 
               onCancel={handleCancel} 
               initialData={initialFormData} 
-              isLoading={formLoading} 
+              isLoading={formLoading}
+              onCoordinatesChange={handleCoordinatesChange}
+              initialCoordinates={editingAddress.coordinates}
             />
           </div>
         </div>

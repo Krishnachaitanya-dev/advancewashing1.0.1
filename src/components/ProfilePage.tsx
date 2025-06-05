@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, CreditCard, Bell, Star, Shield, FileText, LogOut, ChevronRight } from 'lucide-react';
+import { User, Settings, MapPin, Bell, Star, Shield, FileText, LogOut, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -13,7 +13,7 @@ const ProfilePage = memo(() => {
     await signOut();
   };
 
-  const menuItems = [
+  const accountMenuItems = [
     {
       icon: <User className="w-5 h-5" />,
       label: 'Personal Information',
@@ -25,13 +25,10 @@ const ProfilePage = memo(() => {
       label: 'Address Management',
       path: '/address-management',
       description: 'Manage your delivery addresses'
-    },
-    {
-      icon: <CreditCard className="w-5 h-5" />,
-      label: 'Payment Methods',
-      path: '/payment-methods',
-      description: 'Manage payment options'
-    },
+    }
+  ];
+
+  const appMenuItems = [
     {
       icon: <Bell className="w-5 h-5" />,
       label: 'Notification Settings',
@@ -43,7 +40,10 @@ const ProfilePage = memo(() => {
       label: 'Settings',
       path: '/settings',
       description: 'App preferences and settings'
-    },
+    }
+  ];
+
+  const supportMenuItems = [
     {
       icon: <Star className="w-5 h-5" />,
       label: 'Rate Our App',
@@ -87,9 +87,56 @@ const ProfilePage = memo(() => {
           </div>
         </div>
 
-        {/* Menu Items - Clean Vertical List */}
+        {/* Account Section */}
         <div className="space-y-3">
-          {menuItems.map((item, index) => (
+          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
+          {accountMenuItems.map((item, index) => (
+            <Link key={index} to={item.path}>
+              <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-102">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-white/80">
+                      {item.icon}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium text-sm">{item.label}</p>
+                      <p className="text-white/60 text-xs">{item.description}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/60" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* App Settings Section */}
+        <div className="space-y-3">
+          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">App Settings</h3>
+          {appMenuItems.map((item, index) => (
+            <Link key={index} to={item.path}>
+              <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-102">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-white/80">
+                      {item.icon}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium text-sm">{item.label}</p>
+                      <p className="text-white/60 text-xs">{item.description}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/60" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Support Section */}
+        <div className="space-y-3">
+          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Support</h3>
+          {supportMenuItems.map((item, index) => (
             <Link key={index} to={item.path}>
               <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-102">
                 <div className="flex items-center justify-between">
