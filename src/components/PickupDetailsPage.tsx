@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,7 @@ import AddressCard from './address/AddressCard';
 import { Address } from '@/types/address';
 
 interface Service {
-  id: number;
+  id: string; // Changed from number to string to handle UUIDs
   name: string;
   price: string;
   color: string;
@@ -87,7 +86,7 @@ const PickupDetailsPage = () => {
       return;
     }
 
-    // Prepare order data with proper service_id handling
+    // Prepare order data with proper service_id handling - keep as UUID string
     const orderData = {
       pickup_date: selectedDate.toISOString().split('T')[0],
       pickup_time: selectedSlot,
@@ -95,7 +94,7 @@ const PickupDetailsPage = () => {
       address_id: selectedAddress.id,
       estimated_total: total,
       items: selectedServices.map((service: Service) => ({
-        service_id: service.id?.toString() || '1', // Ensure we have a valid string service_id, default to '1'
+        service_id: service.id, // Keep as UUID string, don't convert to string
         item_name: service.name,
         quantity: 1,
         estimated_weight: 1

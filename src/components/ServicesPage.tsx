@@ -1,3 +1,4 @@
+
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -51,7 +52,7 @@ const ServicesPage = memo(() => {
     } else {
       // Add service with default values
       const newService: SelectedService = {
-        id: service.id,
+        id: service.id, // Keep as UUID string, don't convert to integer
         name: service.name,
         price: service.base_price_per_kg,
         quantity: 1,
@@ -83,11 +84,11 @@ const ServicesPage = memo(() => {
 
     const total = calculateTotal();
     
-    // Navigate to pickup details with selected services
+    // Navigate to pickup details with selected services - maintain UUID format
     navigate('/pickup-details', {
       state: {
         selectedServices: selectedServices.map(service => ({
-          id: parseInt(service.id),
+          id: service.id, // Keep as UUID string, not integer
           name: service.name,
           price: `₹${service.price}/kg`,
           color: 'bg-blue-500'

@@ -86,13 +86,13 @@ export const useOrderCreation = () => {
       const pickupTimestamp = createPickupTimestamp(orderData.pickup_date, orderData.pickup_time);
       console.log('Pickup timestamp:', pickupTimestamp);
 
-      // Create booking with correct status value
+      // Create booking with correct status value - using 'scheduled' instead of 'confirmed'
       const bookingData = {
         user_id: user.id,
         address_id: orderData.address_id,
         pickup_time: pickupTimestamp,
         special_note: orderData.special_instructions || null,
-        status: 'confirmed' // Using 'confirmed' instead of 'pending'
+        status: 'scheduled' // Using 'scheduled' as per database constraint
       };
 
       console.log('Creating booking with data:', bookingData);
@@ -123,7 +123,7 @@ export const useOrderCreation = () => {
         user_id: user.id,
         booking_id: booking.id,
         order_number: orderNumber,
-        status: 'confirmed', // Using 'confirmed' instead of 'pending'
+        status: 'confirmed', // This is fine for orders
         estimated_price: orderData.estimated_total,
         estimated_weight: orderData.items.reduce((sum, item) => sum + item.estimated_weight, 0)
       };
@@ -148,12 +148,22 @@ export const useOrderCreation = () => {
 
       console.log('Order created successfully:', order);
 
+      // Get first available service ID as fallback
+      const { data: firstService } = await supabase
+        .from('services')
+        .select('id')
+        .eq('status', 'active')
+        .limit(1)
+        .single();
+
+      const defaultServiceId = firstService?.id || null;
+
       // Create order items with proper service_id validation
       const orderItems = orderData.items.map(item => {
-        // Ensure service_id is valid - if invalid, use a default service id of '1'
+        // Ensure service_id is valid UUID string - use default if invalid
         let validServiceId = item.service_id;
-        if (!validServiceId || validServiceId === 'NaN' || validServiceId === 'undefined') {
-          validServiceId = '1'; // Default service id
+        if (!validServiceId || validServiceId === 'NaN' || validServiceId === 'undefined' || validServiceId === '') {
+          validServiceId = defaultServiceId;
         }
 
         return {
