@@ -62,9 +62,9 @@ const LoginPage = () => {
       {/* Content container */}
       <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
         {/* Logo and Brand Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6">
           <div className="mb-8">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-2 shadow-2xl">
+            <div className="w-40 h-40 mx-auto mb-6">
               <img 
                 src="/lovable-uploads/6032e746-b4da-4840-9d68-2afbfb5e432d.png" 
                 alt="AW Logo" 
