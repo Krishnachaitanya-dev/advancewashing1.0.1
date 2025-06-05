@@ -114,13 +114,26 @@ export const useOrderCreation = () => {
 
       console.log('Booking created successfully:', booking);
 
-      // Generate shorter order number - AW000X format
-      const { data: orderCountData } = await supabase
+      // Generate unique order number - count all existing orders
+      const { count: orderCount, error: countError } = await supabase
         .from('orders')
         .select('id', { count: 'exact', head: true });
       
-      const orderCount = orderCountData?.length || 0;
-      const orderNumber = `AW${String(orderCount + 1).padStart(4, '0')}`;
+      if (countError) {
+        console.error('Error counting orders:', countError);
+        toast({
+          title: "Order Number Error",
+          description: `Failed to generate order number: ${countError.message}`,
+          variant: "destructive"
+        });
+        return { success: false };
+      }
+
+      // Generate order number starting from AW0001
+      const nextOrderNumber = (orderCount || 0) + 1;
+      const orderNumber = `AW${String(nextOrderNumber).padStart(4, '0')}`;
+      
+      console.log('Generated order number:', orderNumber, 'from count:', orderCount);
 
       // Create order with correct status
       const orderDataToInsert = {
