@@ -2,11 +2,10 @@
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Shirt, Zap, Bed, Shield, Package, ShoppingBag, Search } from 'lucide-react';
+import { Shirt, Zap, Bed, Shield, Package, ShoppingBag } from 'lucide-react';
 
 const iconMap: {
   [key: string]: React.ComponentType<any>;
@@ -20,8 +19,8 @@ const iconMap: {
 };
 
 // Define color scheme for selected services
-const serviceColors = ['text-green-400', 'text-pink-400', 'text-violet-400', 'text-orange-400', 'text-yellow-400', 'text-cyan-400'];
-const serviceBgColors = ['bg-green-400/20', 'bg-pink-400/20', 'bg-violet-400/20', 'bg-orange-400/20', 'bg-yellow-400/20', 'bg-cyan-400/20'];
+const serviceColors = ['bg-green-400/30', 'bg-pink-400/30', 'bg-violet-400/30', 'bg-orange-400/30', 'bg-yellow-400/30', 'bg-cyan-400/30'];
+const iconColors = ['text-green-400', 'text-pink-400', 'text-violet-400', 'text-orange-400', 'text-yellow-400', 'text-cyan-400'];
 
 interface SelectedService {
   id: string;
@@ -33,16 +32,9 @@ interface SelectedService {
 
 const ServicesPage = memo(() => {
   const { services, loading } = useServices();
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  console.log('Current selected services:', selectedServices);
-
-  const filteredServices = services.filter(service => 
-    service.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleServiceSelect = (service: any) => {
     const isSelected = selectedServices.find(s => s.id === service.id);
@@ -51,7 +43,6 @@ const ServicesPage = memo(() => {
       // Remove service
       const newSelectedServices = selectedServices.filter(s => s.id !== service.id);
       setSelectedServices(newSelectedServices);
-      console.log('Service removed, new list:', newSelectedServices);
     } else {
       // Add service with default values
       const newService: SelectedService = {
@@ -63,15 +54,14 @@ const ServicesPage = memo(() => {
       };
       const newSelectedServices = [...selectedServices, newService];
       setSelectedServices(newSelectedServices);
-      console.log('Service added, new list:', newSelectedServices);
     }
   };
 
   const getServiceStyle = (serviceId: string) => {
     const selectedIndex = selectedServices.findIndex(s => s.id === serviceId);
     if (selectedIndex !== -1) {
-      const colorIndex = selectedIndex % serviceBgColors.length;
-      const bgClass = serviceBgColors[colorIndex];
+      const colorIndex = selectedIndex % serviceColors.length;
+      const bgClass = serviceColors[colorIndex];
       return `glass-card p-3 cursor-pointer transition-all duration-300 ${bgClass} border-2 border-white/30 shadow-lg transform scale-105`;
     }
     return 'glass-card p-3 cursor-pointer transition-all duration-300 hover:bg-white/10 border-2 border-transparent hover:scale-102';
@@ -80,8 +70,8 @@ const ServicesPage = memo(() => {
   const getIconColor = (serviceId: string) => {
     const selectedIndex = selectedServices.findIndex(s => s.id === serviceId);
     if (selectedIndex !== -1) {
-      const colorIndex = selectedIndex % serviceColors.length;
-      return serviceColors[colorIndex];
+      const colorIndex = selectedIndex % iconColors.length;
+      return iconColors[colorIndex];
     }
     return 'text-white';
   };
@@ -115,7 +105,7 @@ const ServicesPage = memo(() => {
           id: service.id,
           name: service.name,
           price: `₹${service.price}/kg`,
-          color: serviceColors[index % serviceColors.length]
+          color: iconColors[index % iconColors.length]
         })),
         total: total
       }
@@ -134,24 +124,11 @@ const ServicesPage = memo(() => {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
-        {/* Search Bar - more compact */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
-          <Input
-            type="text"
-            placeholder="Search services..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-xl h-10"
-          />
-        </div>
-
-        {/* Services Grid - more compact */}
+      <div className="space-y-4 pt-3">
+        {/* Services Grid - compact with more rows for mobile */}
         <div className="grid grid-cols-2 gap-3">
-          {filteredServices.map(service => {
+          {services.map(service => {
             const IconComponent = iconMap[service.icon_name || 'Shirt'] || Shirt;
-            const isSelected = isServiceSelected(service.id);
             
             return (
               <div 
@@ -180,18 +157,8 @@ const ServicesPage = memo(() => {
           })}
         </div>
 
-        {/* Selected Services Count - compact info */}
-        {selectedServices.length > 0 && (
-          <div className="glass-card p-3 rounded-xl">
-            <div className="flex justify-between items-center text-white">
-              <span className="text-sm">Selected: {selectedServices.length} services</span>
-              <span className="text-sm font-medium">Est: ₹{calculateTotal()}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Schedule Pickup Button - more compact */}
-        <div className="pb-4">
+        {/* Schedule Pickup Button */}
+        <div className="pb-4 pt-2">
           <Button 
             onClick={handleSchedulePickup} 
             disabled={selectedServices.length === 0}
