@@ -142,7 +142,7 @@ const HomePage = () => {
           <h3 className="text-lg font-bold text-white mb-3">Active Orders</h3>
           
           {ordersLoading ? <div className="text-white/80 text-center py-4">Loading orders...</div> : activeOrders.length > 0 ? <div className="space-y-3">
-              {activeOrders.slice(0, 2).map(order => <div key={order.id} className="flex justify-between items-center p-3 bg-white/10 rounded-lg my-[5px]">
+              {activeOrders.slice(0, 2).map(order => <div key={order.id} className="flex justify-between items-center p-3 bg-white/10 rounded-lg my-[2px]">
                   <div>
                     <p className="text-white font-medium text-sm">
                       {order.order_number}
@@ -156,7 +156,7 @@ const HomePage = () => {
                   </div>
                 </div>)}
               <Link to="/orders">
-                <Button variant="outline" className="w-full border-white/20 bg-blue-900 hover:bg-blue-800 text-white">
+                <Button variant="outline" className="w-full border-white/20 bg-blue-900 hover:bg-blue-800 text-white py-0 my-[5px]">
                   View All Orders
                 </Button>
               </Link>
