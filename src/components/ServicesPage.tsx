@@ -1,3 +1,4 @@
+
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -42,12 +43,6 @@ const ServicesPage = memo(() => {
       // Remove service
       const newSelectedServices = selectedServices.filter(s => s.id !== service.id);
       setSelectedServices(newSelectedServices);
-      
-      // Show deselection notification
-      toast({
-        title: "Service removed",
-        description: `${service.name} has been removed`
-      });
     } else {
       // Add service with default values
       const newService: SelectedService = {
@@ -59,12 +54,6 @@ const ServicesPage = memo(() => {
       };
       const newSelectedServices = [...selectedServices, newService];
       setSelectedServices(newSelectedServices);
-      
-      // Show selection notification
-      toast({
-        title: "Service added",
-        description: `${service.name} has been added to your order`
-      });
     }
   };
 
@@ -108,12 +97,6 @@ const ServicesPage = memo(() => {
     }
 
     const total = calculateTotal();
-
-    // Show confirmation notification
-    toast({
-      title: "Order started!",
-      description: `Proceeding with ${selectedServices.length} services`
-    });
 
     // Navigate to pickup details with selected services
     navigate('/pickup-details', {

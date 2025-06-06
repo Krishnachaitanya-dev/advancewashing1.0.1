@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
 import { Shirt, Clock, Award, Sparkles, ChevronRight, Package, Bed, Star, Layers, Zap, Shield } from 'lucide-react';
@@ -7,7 +7,6 @@ import { useServices } from '@/hooks/useServices';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/hooks/useAuth';
 import { useAndroidBackButton } from '@/hooks/useAndroidBackButton';
-import { useToast } from '@/hooks/use-toast';
 
 const HomePage = () => {
   const {
@@ -21,22 +20,9 @@ const HomePage = () => {
   const {
     user
   } = useAuth();
-  const { toast } = useToast();
 
   // Handle Android back button
   useAndroidBackButton();
-
-  // Show welcome notification when component loads
-  useEffect(() => {
-    if (user) {
-      setTimeout(() => {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in"
-        });
-      }, 500);
-    }
-  }, [user, toast]);
 
   // Function to get appropriate icon for each service
   const getServiceIcon = (serviceName: string, index: number) => {
@@ -109,7 +95,6 @@ const HomePage = () => {
         return status;
     }
   };
-  
   return (
     <AppLayout>
       <div className="space-y-4">
