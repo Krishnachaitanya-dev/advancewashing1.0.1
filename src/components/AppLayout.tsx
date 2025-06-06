@@ -2,6 +2,7 @@
 import React, { ReactNode, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, User, Package } from 'lucide-react';
+import { NotificationToast } from '@/components/ui/notification-toast';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -79,6 +80,9 @@ const AppLayout = memo(({
             </Link>
           </div>
         </nav>
+
+        {/* Add the notification toast component */}
+        <NotificationToast />
       </div>
     </div>
   );

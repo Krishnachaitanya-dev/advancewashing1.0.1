@@ -43,6 +43,13 @@ const ServicesPage = memo(() => {
       // Remove service
       const newSelectedServices = selectedServices.filter(s => s.id !== service.id);
       setSelectedServices(newSelectedServices);
+      
+      // Show deselection notification
+      toast({
+        title: "Service removed",
+        description: `${service.name} has been removed`,
+        type: "info"
+      });
     } else {
       // Add service with default values
       const newService: SelectedService = {
@@ -54,6 +61,13 @@ const ServicesPage = memo(() => {
       };
       const newSelectedServices = [...selectedServices, newService];
       setSelectedServices(newSelectedServices);
+      
+      // Show selection notification
+      toast({
+        title: "Service added",
+        description: `${service.name} has been added to your order`,
+        type: "success"
+      });
     }
   };
 
@@ -91,12 +105,19 @@ const ServicesPage = memo(() => {
       toast({
         title: "No services selected",
         description: "Please select at least one service to proceed.",
-        variant: "destructive"
+        type: "error"
       });
       return;
     }
 
     const total = calculateTotal();
+
+    // Show confirmation notification
+    toast({
+      title: "Order started!",
+      description: `Proceeding with ${selectedServices.length} services`,
+      type: "success"
+    });
 
     // Navigate to pickup details with selected services
     navigate('/pickup-details', {
