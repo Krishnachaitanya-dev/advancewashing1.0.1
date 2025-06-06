@@ -107,8 +107,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
   const steps = getStatusSteps();
   const currentStepIndex = getCurrentStepIndex();
 
-  // Calculate if we should show final pricing (only for completed orders with final weight)
-  const showFinalPricing = order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery');
+  // Check if final weight exists, meaning pricing has been calculated
+  const hasFinalWeight = order.final_weight !== null && order.final_weight > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -190,7 +190,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
             </div>
             
             <div className="border-t mt-3 pt-3 bg-blue-50 rounded-lg p-3">
-              {showFinalPricing ? (
+              {hasFinalWeight ? (
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-900 text-sm">Total Amount</span>
