@@ -99,7 +99,7 @@ const OrdersPage = memo(() => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
-          <div className="text-white text-lg">Loading orders...</div>
+          <div className="text-blue-600 text-lg">Loading orders...</div>
         </div>
       </AppLayout>
     );
@@ -110,13 +110,13 @@ const OrdersPage = memo(() => {
       <div className="space-y-3">
         {orders.length === 0 ? (
           <div className="glass-card p-8 text-center">
-            <Package className="w-16 h-16 text-white/60 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No Orders Yet</h3>
-            <p className="text-white/80 mb-6">
+            <Package className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-blue-600 mb-2">No Orders Yet</h3>
+            <p className="text-blue-500 mb-6">
               Start by scheduling a pickup for your laundry
             </p>
             <Link to="/services">
-              <Button className="bg-blue-900 hover:bg-blue-800 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Schedule Pickup
               </Button>
             </Link>
@@ -124,13 +124,13 @@ const OrdersPage = memo(() => {
         ) : (
           <div className="space-y-3">
             {orders.map(order => (
-              <div key={order.id} className="glass-card p-3 cursor-pointer hover:bg-white/5 transition-all duration-200 border border-white/10 hover:border-white/20" onClick={() => handleOrderClick(order)}>
+              <div key={order.id} className="glass-card p-3 cursor-pointer hover:bg-blue-50 transition-all duration-200 border border-blue-200 hover:border-blue-300" onClick={() => handleOrderClick(order)}>
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex-1">
-                    <h3 className="text-white font-bold text-base">
+                    <h3 className="text-blue-600 font-bold text-base">
                       {order.order_number}
                     </h3>
-                    <p className="text-white/60 text-xs">
+                    <p className="text-blue-500 text-xs">
                       {formatDate(order.created_at)}
                     </p>
                   </div>
@@ -143,35 +143,35 @@ const OrdersPage = memo(() => {
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex space-x-4">
                     <div>
-                      <span className="text-white/60 text-xs">Items: </span>
-                      <span className="text-white font-medium">
+                      <span className="text-blue-500 text-xs">Items: </span>
+                      <span className="text-blue-600 font-medium">
                         {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
                       </span>
                     </div>
                     
                     {order.final_weight && (
                       <div>
-                        <span className="text-white/60 text-xs">Weight: </span>
-                        <span className="text-white font-medium">{order.final_weight}kg</span>
+                        <span className="text-blue-500 text-xs">Weight: </span>
+                        <span className="text-blue-600 font-medium">{order.final_weight}kg</span>
                       </div>
                     )}
                   </div>
 
                   <div className="text-right">
                     {order.final_price && order.final_weight && (order.status === 'delivered' || order.status === 'ready_for_delivery') ? (
-                      <div className="text-green-400 font-bold text-sm">₹{order.final_price}</div>
+                      <div className="text-green-600 font-bold text-sm">₹{order.final_price}</div>
                     ) : (
-                      <div className="text-white/50 text-xs">Pending</div>
+                      <div className="text-blue-400 text-xs">Pending</div>
                     )}
                   </div>
                 </div>
 
                 {order.status === 'pending' && (
-                  <div className="mt-2 pt-2 border-t border-white/10">
+                  <div className="mt-2 pt-2 border-t border-blue-200">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="border-red-500/50 text-red-300 hover:bg-red-500/20 hover:border-red-400 text-xs h-6 px-2" 
+                      className="border-red-500/50 text-red-600 hover:bg-red-50 hover:border-red-500 text-xs h-6 px-2" 
                       onClick={e => {
                         e.stopPropagation();
                         // Handle cancel order

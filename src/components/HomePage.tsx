@@ -98,14 +98,14 @@ const HomePage = () => {
       <div className="space-y-4">
         {/* Hero Section */}
         <div className="glass-card p-4">
-          <h2 className="text-lg font-bold text-white mb-2">
+          <h2 className="text-lg font-bold text-blue-600 mb-2">
             Welcome to Advance Washing
           </h2>
-          <p className="text-white/80 mb-4 text-sm">
+          <p className="text-blue-500 mb-4 text-sm">
             Professional laundry service at your doorstep
           </p>
           <Link to="/services">
-            <Button className="bg-blue-900 hover:bg-blue-800 text-white font-semibold w-full">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full">
               Schedule Pickup
             </Button>
           </Link>
@@ -114,23 +114,23 @@ const HomePage = () => {
         {/* Services Preview */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-bold text-white">Popular Services</h3>
+            <h3 className="text-lg font-bold text-blue-600">Popular Services</h3>
             <Link to="/services">
-              <Button variant="ghost" className="text-white flex items-center p-0 text-sm">
+              <Button variant="ghost" className="text-blue-600 flex items-center p-0 text-sm">
                 View All <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
           </div>
           
-          {servicesLoading ? <div className="text-white/80 text-center py-4">Loading services...</div> : <div className="grid grid-cols-2 gap-3">
+          {servicesLoading ? <div className="text-blue-500 text-center py-4">Loading services...</div> : <div className="grid grid-cols-2 gap-3">
               {featuredServices.map(service => <div key={service.id} className="glass-card p-3 flex flex-col items-center text-center">
-                  <div className="rounded-full p-2 mb-2 bg-slate-100">
+                  <div className="rounded-full p-2 mb-2 bg-blue-100">
                     {service.icon}
                   </div>
-                  <h4 className="text-white font-medium text-sm mb-1">
+                  <h4 className="text-blue-600 font-medium text-sm mb-1">
                     {service.name}
                   </h4>
-                  <p className="text-white/70 text-xs line-clamp-2">
+                  <p className="text-blue-500 text-xs line-clamp-2">
                     {service.description}
                   </p>
                 </div>)}
@@ -139,15 +139,15 @@ const HomePage = () => {
 
         {/* Current Status */}
         <div className="glass-card p-4">
-          <h3 className="text-lg font-bold text-white mb-3">Active Orders</h3>
+          <h3 className="text-lg font-bold text-blue-600 mb-3">Active Orders</h3>
           
-          {ordersLoading ? <div className="text-white/80 text-center py-4">Loading orders...</div> : activeOrders.length > 0 ? <div className="space-y-3">
-              {activeOrders.slice(0, 2).map(order => <div key={order.id} className="flex justify-between items-center p-3 bg-white/10 rounded-lg my-[2px]">
+          {ordersLoading ? <div className="text-blue-500 text-center py-4">Loading orders...</div> : activeOrders.length > 0 ? <div className="space-y-3">
+              {activeOrders.slice(0, 2).map(order => <div key={order.id} className="flex justify-between items-center p-3 bg-blue-50 rounded-lg my-[2px]">
                   <div>
-                    <p className="text-white font-medium text-sm">
+                    <p className="text-blue-600 font-medium text-sm">
                       {order.order_number}
                     </p>
-                    <p className="text-white/70 text-xs">
+                    <p className="text-blue-500 text-xs">
                       {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} items
                     </p>
                   </div>
@@ -156,14 +156,14 @@ const HomePage = () => {
                   </div>
                 </div>)}
               <Link to="/orders">
-                <Button variant="outline" className="w-full border-white/20 bg-blue-900 hover:bg-blue-800 text-white py-0 my-[5px]">
+                <Button variant="outline" className="w-full border-blue-300 bg-blue-600 hover:bg-blue-700 text-white py-0 my-[5px]">
                   View All Orders
                 </Button>
               </Link>
             </div> : <div className="text-center py-6">
-              <p className="text-white/80 mb-4">No active orders</p>
+              <p className="text-blue-500 mb-4">No active orders</p>
               <Link to="/services">
-                <Button className="bg-blue-900 hover:bg-blue-800 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                   Create Your First Order
                 </Button>
               </Link>

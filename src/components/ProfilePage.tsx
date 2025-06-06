@@ -51,14 +51,14 @@ const ProfilePage = memo(() => {
         {/* Profile Header */}
         <div className="glass-card p-6 py-[2px]">
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-blue-900/60 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-blue-600/60 rounded-full flex items-center justify-center">
               <User className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold text-blue-600">
                 {user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
               </h2>
-              <p className="text-white/80 text-sm">{user?.email}</p>
+              <p className="text-blue-500 text-sm">{user?.email}</p>
               {isAdmin && <span className="inline-block mt-1 px-2 py-1 bg-yellow-600/60 text-yellow-100 text-xs font-medium rounded">
                   Admin
                 </span>}
@@ -68,21 +68,21 @@ const ProfilePage = memo(() => {
 
         {/* Account Section */}
         <div className="space-y-4">
-          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
+          <h3 className="text-blue-500 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
           <div className="space-y-3">
             {accountMenuItems.map((item, index) => <Link key={index} to={item.path}>
-                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
+                <div className="glass-card p-4 hover:bg-blue-50 transition-all duration-200 hover:scale-[1.02] my-[5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="text-white/80">
+                      <div className="text-blue-600">
                         {item.icon}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{item.label}</p>
-                        <p className="text-white/60 text-xs">{item.description}</p>
+                        <p className="text-blue-600 font-medium text-sm">{item.label}</p>
+                        <p className="text-blue-500 text-xs">{item.description}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-white/60" />
+                    <ChevronRight className="w-4 h-4 text-blue-500" />
                   </div>
                 </div>
               </Link>)}
@@ -91,21 +91,21 @@ const ProfilePage = memo(() => {
 
         {/* Support Section */}
         <div className="space-y-4">
-          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Support</h3>
+          <h3 className="text-blue-500 text-sm font-medium uppercase tracking-wide px-2">Support</h3>
           <div className="space-y-3">
             {supportMenuItems.map((item, index) => <Link key={index} to={item.path}>
-                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
+                <div className="glass-card p-4 hover:bg-blue-50 transition-all duration-200 hover:scale-[1.02] my-[5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="text-white/80">
+                      <div className="text-blue-600">
                         {item.icon}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{item.label}</p>
-                        <p className="text-white/60 text-xs">{item.description}</p>
+                        <p className="text-blue-600 font-medium text-sm">{item.label}</p>
+                        <p className="text-blue-500 text-xs">{item.description}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-white/60" />
+                    <ChevronRight className="w-4 h-4 text-blue-500" />
                   </div>
                 </div>
               </Link>)}
@@ -114,14 +114,14 @@ const ProfilePage = memo(() => {
 
         {/* Sign Out */}
         <div className="glass-card p-4">
-          <Button onClick={handleSignOut} variant="outline" className="w-full border-white/30 flex items-center justify-center space-x-2 text-white bg-white/5 hover:bg-white/10 hover:border-white/40">
+          <Button onClick={handleSignOut} variant="outline" className="w-full border-blue-300 flex items-center justify-center space-x-2 text-blue-600 bg-blue-50 hover:bg-blue-100 hover:border-blue-400">
             <LogOut className="w-4 h-4" />
             <span>Sign Out</span>
           </Button>
         </div>
 
         {/* App Version */}
-        <div className="text-center text-white/60 text-xs pb-4">
+        <div className="text-center text-blue-500 text-xs pb-4">
           Advance Washing v1.0.0
         </div>
       </div>
