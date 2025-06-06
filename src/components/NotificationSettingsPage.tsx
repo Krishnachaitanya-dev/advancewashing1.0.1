@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Bell, Smartphone, Package, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 const NotificationSettingsPage = () => {
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
@@ -12,51 +10,40 @@ const NotificationSettingsPage = () => {
     pushNotifications: true,
     reviewReminders: true
   });
-
   const handleToggle = (setting: string) => {
     setNotifications(prev => ({
       ...prev,
       [setting]: !prev[setting as keyof typeof prev]
     }));
   };
-
-  const notificationSettings = [
-    {
-      id: 'orderUpdates',
-      title: 'Order Updates',
-      description: 'Get notified about order status changes',
-      icon: <Package className="w-5 h-5 text-white/70" />
-    },
-    {
-      id: 'promotions',
-      title: 'Promotions & Offers',
-      description: 'Receive special offers and discounts',
-      icon: <Star className="w-5 h-5 text-white/70" />
-    },
-    {
-      id: 'reviewReminders',
-      title: 'Review Reminders',
-      description: 'Reminders to review completed orders',
-      icon: <Star className="w-5 h-5 text-white/70" />
-    }
-  ];
-
-  const communicationMethods = [
-    {
-      id: 'pushNotifications',
-      title: 'Push Notifications',
-      description: 'Get app notifications on your device',
-      icon: <Smartphone className="w-5 h-5 text-white/70" />
-    }
-  ];
-
-  return (
-    <AppLayout>
+  const notificationSettings = [{
+    id: 'orderUpdates',
+    title: 'Order Updates',
+    description: 'Get notified about order status changes',
+    icon: <Package className="w-5 h-5 text-white/70" />
+  }, {
+    id: 'promotions',
+    title: 'Promotions & Offers',
+    description: 'Receive special offers and discounts',
+    icon: <Star className="w-5 h-5 text-white/70" />
+  }, {
+    id: 'reviewReminders',
+    title: 'Review Reminders',
+    description: 'Reminders to review completed orders',
+    icon: <Star className="w-5 h-5 text-white/70" />
+  }];
+  const communicationMethods = [{
+    id: 'pushNotifications',
+    title: 'Push Notifications',
+    description: 'Get app notifications on your device',
+    icon: <Smartphone className="w-5 h-5 text-white/70" />
+  }];
+  return <AppLayout>
       <div className="mb-6 flex items-center">
         <Link to="/profile" className="mr-4 text-white">
-          <ArrowLeft size={24} />
+          
         </Link>
-        <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
+        
       </div>
 
       <div className="space-y-6">
@@ -67,8 +54,7 @@ const NotificationSettingsPage = () => {
           </h3>
           
           <div className="space-y-3">
-            {notificationSettings.map(setting => (
-              <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            {notificationSettings.map(setting => <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                 <div className="flex items-center">
                   {setting.icon}
                   <div className="ml-3">
@@ -76,20 +62,10 @@ const NotificationSettingsPage = () => {
                     <p className="text-white/60 text-sm">{setting.description}</p>
                   </div>
                 </div>
-                <Button
-                  onClick={() => handleToggle(setting.id)}
-                  variant="outline"
-                  size="sm"
-                  className={`border-white/20 ${
-                    notifications[setting.id as keyof typeof notifications] 
-                      ? 'bg-green-600/20 text-green-400 border-green-500/20' 
-                      : 'text-white'
-                  }`}
-                >
+                <Button onClick={() => handleToggle(setting.id)} variant="outline" size="sm" className={`border-white/20 ${notifications[setting.id as keyof typeof notifications] ? 'bg-green-600/20 text-green-400 border-green-500/20' : 'text-white'}`}>
                   {notifications[setting.id as keyof typeof notifications] ? 'On' : 'Off'}
                 </Button>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
 
@@ -97,8 +73,7 @@ const NotificationSettingsPage = () => {
           <h3 className="text-white text-lg font-medium mb-4">Communication Methods</h3>
           
           <div className="space-y-3">
-            {communicationMethods.map(method => (
-              <div key={method.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            {communicationMethods.map(method => <div key={method.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                 <div className="flex items-center">
                   {method.icon}
                   <div className="ml-3">
@@ -106,20 +81,10 @@ const NotificationSettingsPage = () => {
                     <p className="text-white/60 text-sm">{method.description}</p>
                   </div>
                 </div>
-                <Button
-                  onClick={() => handleToggle(method.id)}
-                  variant="outline"
-                  size="sm"
-                  className={`border-white/20 ${
-                    notifications[method.id as keyof typeof notifications] 
-                      ? 'bg-green-600/20 text-green-400 border-green-500/20' 
-                      : 'text-white'
-                  }`}
-                >
+                <Button onClick={() => handleToggle(method.id)} variant="outline" size="sm" className={`border-white/20 ${notifications[method.id as keyof typeof notifications] ? 'bg-green-600/20 text-green-400 border-green-500/20' : 'text-white'}`}>
                   {notifications[method.id as keyof typeof notifications] ? 'Enabled' : 'Disabled'}
                 </Button>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
 
@@ -129,8 +94,6 @@ const NotificationSettingsPage = () => {
           </Button>
         </div>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>;
 };
-
 export default NotificationSettingsPage;
