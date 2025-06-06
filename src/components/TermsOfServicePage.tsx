@@ -1,18 +1,10 @@
-
 import React from 'react';
 import AppLayout from './AppLayout';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 const TermsOfServicePage = () => {
-  return (
-    <AppLayout>
-      <div className="mb-6 flex items-center">
-        <Link to="/profile" className="mr-4 text-white">
-          <ArrowLeft size={24} />
-        </Link>
-        <h1 className="text-2xl font-bold text-white">Terms of Service</h1>
-      </div>
+  return <AppLayout>
+      
 
       <div className="glass-card p-6">
         <div className="flex items-center mb-6">
@@ -111,8 +103,6 @@ const TermsOfServicePage = () => {
           </section>
         </div>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>;
 };
-
 export default TermsOfServicePage;
