@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Package, Truck, Clock } from 'lucide-react';
+import { CheckCircle, Package, Truck, Clock, FileText } from 'lucide-react';
 import { Order } from '@/hooks/useOrders';
 import { getBestDisplayName } from '@/utils/serviceNameCleaner';
 
@@ -110,6 +109,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
   // Check if final weight exists, meaning pricing has been calculated
   const hasFinalWeight = order.final_weight !== null && order.final_weight > 0;
 
+  // Get special instructions from booking
+  const specialInstructions = order.bookings?.special_note;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -134,6 +136,19 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, isOpen, on
               {order.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </Badge>
           </div>
+
+          {/* Special Instructions */}
+          {specialInstructions && (
+            <div className="border-t pt-3">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm flex items-center">
+                <FileText className="w-4 h-4 mr-1" />
+                Special Instructions
+              </h4>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-gray-700">{specialInstructions}</p>
+              </div>
+            </div>
+          )}
 
           {/* Status Timeline */}
           <div className="space-y-3">
