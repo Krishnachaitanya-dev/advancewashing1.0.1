@@ -1,18 +1,22 @@
+
 import React, { memo } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
-import { User, Settings, MapPin, Bell, Star, Shield, FileText, LogOut, ChevronRight } from 'lucide-react';
+import { User, MapPin, Star, Shield, FileText, LogOut, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+
 const ProfilePage = memo(() => {
   const {
     user,
     signOut,
     isAdmin
   } = useAuth();
+
   const handleSignOut = async () => {
     await signOut();
   };
+
   const accountMenuItems = [{
     icon: <User className="w-5 h-5" />,
     label: 'Personal Information',
@@ -24,17 +28,7 @@ const ProfilePage = memo(() => {
     path: '/address-management',
     description: 'Manage your delivery addresses'
   }];
-  const appMenuItems = [{
-    icon: <Bell className="w-5 h-5" />,
-    label: 'Notification Settings',
-    path: '/notification-settings',
-    description: 'Control your notifications'
-  }, {
-    icon: <Settings className="w-5 h-5" />,
-    label: 'Settings',
-    path: '/settings',
-    description: 'App preferences and settings'
-  }];
+
   const supportMenuItems = [{
     icon: <Star className="w-5 h-5" />,
     label: 'Rate Our App',
@@ -51,6 +45,7 @@ const ProfilePage = memo(() => {
     path: '/terms-of-service',
     description: 'App terms and conditions'
   }];
+
   return <AppLayout>
       <div className="space-y-6">
         {/* Profile Header */}
@@ -76,29 +71,6 @@ const ProfilePage = memo(() => {
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
           <div className="space-y-3">
             {accountMenuItems.map((item, index) => <Link key={index} to={item.path}>
-                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-white/80">
-                        {item.icon}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{item.label}</p>
-                        <p className="text-white/60 text-xs">{item.description}</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-white/60" />
-                  </div>
-                </div>
-              </Link>)}
-          </div>
-        </div>
-
-        {/* App Settings Section */}
-        <div className="space-y-4">
-          <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">App Settings</h3>
-          <div className="space-y-3">
-            {appMenuItems.map((item, index) => <Link key={index} to={item.path}>
                 <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -155,5 +127,6 @@ const ProfilePage = memo(() => {
       </div>
     </AppLayout>;
 });
+
 ProfilePage.displayName = 'ProfilePage';
 export default ProfilePage;
