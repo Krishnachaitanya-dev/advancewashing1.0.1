@@ -1,4 +1,3 @@
-
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -47,8 +46,7 @@ const ServicesPage = memo(() => {
       // Show deselection notification
       toast({
         title: "Service removed",
-        description: `${service.name} has been removed`,
-        type: "info"
+        description: `${service.name} has been removed`
       });
     } else {
       // Add service with default values
@@ -65,8 +63,7 @@ const ServicesPage = memo(() => {
       // Show selection notification
       toast({
         title: "Service added",
-        description: `${service.name} has been added to your order`,
-        type: "success"
+        description: `${service.name} has been added to your order`
       });
     }
   };
@@ -105,7 +102,7 @@ const ServicesPage = memo(() => {
       toast({
         title: "No services selected",
         description: "Please select at least one service to proceed.",
-        type: "error"
+        variant: "destructive"
       });
       return;
     }
@@ -115,8 +112,7 @@ const ServicesPage = memo(() => {
     // Show confirmation notification
     toast({
       title: "Order started!",
-      description: `Proceeding with ${selectedServices.length} services`,
-      type: "success"
+      description: `Proceeding with ${selectedServices.length} services`
     });
 
     // Navigate to pickup details with selected services

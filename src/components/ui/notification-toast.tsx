@@ -4,33 +4,31 @@ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastVi
 import { useToast } from '@/hooks/use-toast';
 import { Check, AlertCircle, Info } from 'lucide-react';
 
-type NotificationType = 'success' | 'error' | 'info';
-
-interface EmojiMap {
-  [key: string]: React.ReactNode;
-}
-
 export function NotificationToast() {
   const { toasts } = useToast();
 
-  // Map notification types to emojis/icons
-  const emojiMap: EmojiMap = {
-    success: <Check className="w-5 h-5 text-green-500" />,
-    error: <AlertCircle className="w-5 h-5 text-red-500" />,
-    info: <Info className="w-5 h-5 text-blue-500" />
+  // Map variants to emojis/icons
+  const getIcon = (variant: string | undefined, title: string) => {
+    // Determine icon based on title content and variant
+    if (title?.toLowerCase().includes('welcome') || title?.toLowerCase().includes('success') || title?.toLowerCase().includes('added')) {
+      return <Check className="w-5 h-5 text-green-500" />;
+    }
+    if (variant === 'destructive' || title?.toLowerCase().includes('error') || title?.toLowerCase().includes('no services')) {
+      return <AlertCircle className="w-5 h-5 text-red-500" />;
+    }
+    return <Info className="w-5 h-5 text-blue-500" />;
   };
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, variant, type, ...props }) {
-        // Default to 'info' if type is not provided
-        const notificationType = (type as NotificationType) || 'info';
-        const icon = emojiMap[notificationType] || emojiMap.info;
+      {toasts.map(function ({ id, title, description, variant, ...props }) {
+        const icon = getIcon(variant, title as string);
 
         return (
           <Toast 
             key={id} 
             {...props}
+            variant={variant}
             className="bg-white text-black rounded-xl border border-gray-100 shadow-lg"
           >
             <div className="flex items-start gap-3 p-2">
@@ -53,14 +51,4 @@ export function NotificationToast() {
       <ToastViewport className="p-4 md:p-6 z-50" />
     </ToastProvider>
   )
-}
-
-// Enhanced toast function with emoji support
-export function showNotification(
-  title: string, 
-  description?: string, 
-  type: NotificationType = 'info'
-) {
-  const { toast } = useToast();
-  toast({ title, description, type });
 }

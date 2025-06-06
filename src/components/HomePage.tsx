@@ -32,8 +32,7 @@ const HomePage = () => {
       setTimeout(() => {
         toast({
           title: "Welcome back!",
-          description: "You have successfully signed in",
-          type: "success"
+          description: "You have successfully signed in"
         });
       }, 500);
     }
