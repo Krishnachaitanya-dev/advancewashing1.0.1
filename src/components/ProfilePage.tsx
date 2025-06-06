@@ -76,7 +76,7 @@ const ProfilePage = memo(() => {
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">Account</h3>
           <div className="space-y-3">
             {accountMenuItems.map((item, index) => <Link key={index} to={item.path}>
-                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02]">
+                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="text-white/80">
@@ -99,7 +99,7 @@ const ProfilePage = memo(() => {
           <h3 className="text-white/70 text-sm font-medium uppercase tracking-wide px-2">App Settings</h3>
           <div className="space-y-3">
             {appMenuItems.map((item, index) => <Link key={index} to={item.path}>
-                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02]">
+                <div className="glass-card p-4 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] my-[5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="text-white/80">
