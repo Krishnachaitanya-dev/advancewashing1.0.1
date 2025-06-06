@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from './AppLayout';
 import { Button } from '@/components/ui/button';
@@ -125,7 +126,7 @@ const PickupDetailsPage = () => {
   if (addressesLoading) {
     return <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
-          <div className="text-white text-lg">Loading...</div>
+          <div className="text-blue-600 text-lg">Loading...</div>
         </div>
       </AppLayout>;
   }
@@ -133,19 +134,19 @@ const PickupDetailsPage = () => {
   return <AppLayout>
       <div className="space-y-3 my-0 py-0 mx-0">
         {/* Address Selection - more compact */}
-        <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h3 className="text-sm font-medium text-white mb-2">📍 Delivery Address</h3>
+        <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl p-3 border border-green-300/30">
+          <h3 className="text-sm font-medium text-green-700 mb-2">📍 Delivery Address</h3>
           
           {selectedAddress ? <div className="space-y-2">
               <AddressCard address={selectedAddress} onEdit={() => {}} onDelete={() => {}} onSetDefault={() => {}} showActions={false} />
               
-              {addresses.length > 1 && <Button variant="outline" onClick={() => setShowAddressSelection(!showAddressSelection)} className="w-full border-white/20 text-white hover:bg-white/10 flex items-center justify-between text-sm py-1.5">
+              {addresses.length > 1 && <Button variant="outline" onClick={() => setShowAddressSelection(!showAddressSelection)} className="w-full border-green-300 text-green-700 hover:bg-green-50 flex items-center justify-between text-sm py-1.5">
                   <span>Change Address</span>
                   <ChevronDown size={14} className={`transition-transform ${showAddressSelection ? 'rotate-180' : ''}`} />
                 </Button>}
             </div> : <div className="text-center py-3">
-              <MapPin size={24} className="mx-auto text-white/40 mb-1" />
-              <p className="text-white/70 mb-2 text-sm">No address found</p>
+              <MapPin size={24} className="mx-auto text-green-400 mb-1" />
+              <p className="text-green-600 mb-2 text-sm">No address found</p>
               <Button onClick={() => navigate('/address-management')} className="bg-green-500 hover:bg-green-600 text-white text-sm py-1.5">
                 Add Address
               </Button>
@@ -153,7 +154,7 @@ const PickupDetailsPage = () => {
 
           {/* Address Selection Dropdown - more compact */}
           {showAddressSelection && addresses.length > 1 && <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
-              <p className="text-xs text-white/70 mb-1">Select a different address:</p>
+              <p className="text-xs text-green-600 mb-1">Select a different address:</p>
               {addresses.filter(addr => addr.id !== selectedSupabaseAddress?.id).map(address => <div key={address.id} className="cursor-pointer">
                     <AddressCard address={convertSupabaseAddressToAddress(address)} onEdit={() => {}} onDelete={() => {}} onSetDefault={() => {}} showActions={false} onClick={handleAddressSelect} />
                   </div>)}
@@ -167,10 +168,10 @@ const PickupDetailsPage = () => {
                 <span className="text-yellow-900 text-xs font-bold">!</span>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-yellow-100 mb-0.5">
+                <h3 className="text-sm font-medium text-yellow-700 mb-0.5">
                   Minimum Order Information
                 </h3>
-                <p className="text-xs text-yellow-200">
+                <p className="text-xs text-yellow-600">
                   Our recommended minimum order value is ₹500 🚀
                 </p>
               </div>
@@ -178,36 +179,36 @@ const PickupDetailsPage = () => {
           </div>}
 
         {/* Pickup Date - more compact */}
-        <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h3 className="text-sm font-medium text-white mb-2">📅 Select Pickup Date</h3>
+        <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-3 border border-purple-300/30">
+          <h3 className="text-sm font-medium text-purple-700 mb-2">📅 Select Pickup Date</h3>
           <div className="bg-white rounded-lg p-2 shadow-lg">
             <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={date => date < new Date() || date > new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000)} className="rounded-md border-0 w-full text-sm" />
           </div>
         </div>
 
         {/* Time Slots - more compact */}
-        <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h3 className="text-sm font-medium text-white mb-2">⏰ Select Time Slot</h3>
+        <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-3 border border-blue-300/30">
+          <h3 className="text-sm font-medium text-blue-700 mb-2">⏰ Select Time Slot</h3>
           <div className="grid grid-cols-1 gap-2">
-            {timeSlots.map(slot => <Button key={slot} type="button" className={`text-xs py-2 rounded-lg transition-all duration-200 ${selectedSlot === slot ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transform scale-105' : 'bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:scale-102'}`} onClick={() => setSelectedSlot(slot)}>
+            {timeSlots.map(slot => <Button key={slot} type="button" className={`text-xs py-2 rounded-lg transition-all duration-200 ${selectedSlot === slot ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transform scale-105' : 'bg-white/10 border border-blue-300 text-blue-600 hover:bg-blue-50 hover:scale-102'}`} onClick={() => setSelectedSlot(slot)}>
                 {slot}
               </Button>)}
           </div>
         </div>
 
         {/* Special Instructions - more compact */}
-        <div className="bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h3 className="text-sm font-medium text-white mb-2">📝 Special Instructions (Optional)</h3>
-          <Textarea placeholder="Any specific instructions for pickup? (e.g., Gate number, specific timing, etc.)" value={instructions} onChange={e => setInstructions(e.target.value)} className="resize-none bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-lg min-h-[80px] focus:bg-white/20 transition-all duration-200 text-sm" />
+        <div className="bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-sm rounded-xl p-3 border border-pink-300/30">
+          <h3 className="text-sm font-medium text-pink-700 mb-2">📝 Special Instructions (Optional)</h3>
+          <Textarea placeholder="Any specific instructions for pickup? (e.g., Gate number, specific timing, etc.)" value={instructions} onChange={e => setInstructions(e.target.value)} className="resize-none bg-white/80 border-pink-300 text-pink-700 placeholder:text-pink-500 rounded-lg min-h-[80px] focus:bg-white transition-all duration-200 text-sm" />
         </div>
 
         {/* Order Summary - more compact */}
-        <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          <h3 className="text-sm font-medium text-white mb-2">📋 Order Summary</h3>
+        <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-3 border border-orange-300/30">
+          <h3 className="text-sm font-medium text-orange-700 mb-2">📋 Order Summary</h3>
           <div className="space-y-2">
-            {selectedServices.map((service: Service) => <div key={service.id} className="flex justify-between text-xs bg-white/10 rounded-lg p-2">
-                <span className="text-white/90">{service.name}</span>
-                <span className="text-white font-medium">{service.price}</span>
+            {selectedServices.map((service: Service) => <div key={service.id} className="flex justify-between text-xs bg-white/80 rounded-lg p-2">
+                <span className="text-orange-700">{service.name}</span>
+                <span className="text-orange-600 font-medium">{service.price}</span>
               </div>)}
           </div>
         </div>

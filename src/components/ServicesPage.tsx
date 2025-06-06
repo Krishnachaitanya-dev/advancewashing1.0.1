@@ -1,4 +1,3 @@
-
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -19,8 +18,8 @@ const iconMap: {
 };
 
 // Define color scheme for selected services
-const serviceColors = ['bg-green-400/30', 'bg-pink-400/30', 'bg-violet-400/30', 'bg-orange-400/30', 'bg-yellow-400/30', 'bg-cyan-400/30'];
-const iconColors = ['text-green-400', 'text-pink-400', 'text-violet-400', 'text-orange-400', 'text-yellow-400', 'text-cyan-400'];
+const serviceColors = ['bg-blue-100', 'bg-indigo-100', 'bg-cyan-100', 'bg-sky-100', 'bg-teal-100', 'bg-slate-100'];
+const iconColors = ['text-blue-600', 'text-indigo-600', 'text-cyan-600', 'text-sky-600', 'text-teal-600', 'text-slate-600'];
 
 interface SelectedService {
   id: string;
@@ -62,9 +61,9 @@ const ServicesPage = memo(() => {
     if (selectedIndex !== -1) {
       const colorIndex = selectedIndex % serviceColors.length;
       const bgClass = serviceColors[colorIndex];
-      return `glass-card p-3 cursor-pointer transition-all duration-300 ${bgClass} border-2 border-white/30 shadow-lg transform scale-105`;
+      return `glass-card p-3 cursor-pointer transition-all duration-300 ${bgClass} border-2 border-blue-300 shadow-lg transform scale-105`;
     }
-    return 'glass-card p-3 cursor-pointer transition-all duration-300 hover:bg-white/10 border-2 border-transparent hover:scale-102';
+    return 'glass-card p-3 cursor-pointer transition-all duration-300 hover:bg-blue-50 border-2 border-transparent hover:scale-102';
   };
 
   const getIconColor = (serviceId: string) => {
@@ -73,7 +72,7 @@ const ServicesPage = memo(() => {
       const colorIndex = selectedIndex % iconColors.length;
       return iconColors[colorIndex];
     }
-    return 'text-white';
+    return 'text-blue-600';
   };
 
   const isServiceSelected = (serviceId: string) => {
@@ -116,7 +115,7 @@ const ServicesPage = memo(() => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[200px]">
-          <div className="text-white text-lg">Loading services...</div>
+          <div className="text-blue-600 text-lg">Loading services...</div>
         </div>
       </AppLayout>
     );
@@ -138,17 +137,17 @@ const ServicesPage = memo(() => {
               >
                 <div className="flex flex-col items-center text-center space-y-2">
                   {/* Service Icon - colored when selected */}
-                  <div className="rounded-full p-2 bg-white/20 transition-all duration-300">
+                  <div className="rounded-full p-2 bg-blue-50 transition-all duration-300">
                     <IconComponent className={`w-6 h-6 transition-all duration-300 ${getIconColor(service.id)}`} />
                   </div>
                   
                   {/* Service Name - smaller text */}
-                  <h3 className="font-medium text-xs leading-tight text-white/90">
+                  <h3 className="font-medium text-xs leading-tight text-blue-600">
                     {service.name}
                   </h3>
                   
                   {/* Service Price - smaller */}
-                  <div className="font-medium text-sm text-white/90">
+                  <div className="font-medium text-sm text-blue-500">
                     ₹{service.base_price_per_kg}/kg
                   </div>
                 </div>

@@ -27,7 +27,7 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
               className="w-6 h-6 mr-2" 
               loading="lazy" 
             />
-            <h1 className="text-slate-700 text-base font-semibold py-px my-px">Advance Washing</h1>
+            <h1 className="text-blue-600 text-base font-semibold py-px my-px">Advance Washing</h1>
           </div>
         </header>
 
@@ -42,8 +42,8 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
             <Link 
               to="/" 
               className={`px-2 py-1 flex flex-col items-center min-h-[44px] justify-center ${
-                isActive('/') ? 'text-slate-700' : 'text-slate-500'
-              } transition-all duration-300 active:scale-95 hover:text-slate-600`}
+                isActive('/') ? 'text-blue-600' : 'text-blue-500'
+              } transition-all duration-300 active:scale-95 hover:text-blue-600`}
             >
               <Home size={16} />
               <span className="text-[10px] mt-0.5">Home</span>
@@ -51,8 +51,8 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
             <Link 
               to="/services" 
               className={`px-2 py-1 flex flex-col items-center min-h-[44px] justify-center ${
-                isActive('/services') ? 'text-slate-700' : 'text-slate-500'
-              } transition-all duration-300 active:scale-95 hover:text-slate-600`}
+                isActive('/services') ? 'text-blue-600' : 'text-blue-500'
+              } transition-all duration-300 active:scale-95 hover:text-blue-600`}
             >
               <ShoppingBag size={16} />
               <span className="text-[10px] mt-0.5">Services</span>
@@ -60,8 +60,8 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
             <Link 
               to="/orders" 
               className={`px-2 py-1 flex flex-col items-center min-h-[44px] justify-center ${
-                isActive('/orders') ? 'text-slate-700' : 'text-slate-500'
-              } transition-all duration-300 active:scale-95 hover:text-slate-600`}
+                isActive('/orders') ? 'text-blue-600' : 'text-blue-500'
+              } transition-all duration-300 active:scale-95 hover:text-blue-600`}
             >
               <Package size={16} />
               <span className="text-[10px] mt-0.5">Orders</span>
@@ -69,8 +69,8 @@ const AppLayout = memo(({ children }: AppLayoutProps) => {
             <Link 
               to="/profile" 
               className={`px-2 py-1 flex flex-col items-center min-h-[44px] justify-center ${
-                isActive('/profile') ? 'text-slate-700' : 'text-slate-500'
-              } transition-all duration-300 active:scale-95 hover:text-slate-600`}
+                isActive('/profile') ? 'text-blue-600' : 'text-blue-500'
+              } transition-all duration-300 active:scale-95 hover:text-blue-600`}
             >
               <User size={16} />
               <span className="text-[10px] mt-0.5">Profile</span>
