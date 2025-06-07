@@ -99,16 +99,17 @@ const HomePage = () => {
     <AppLayout>
       <div className="space-y-4">
         {/* Hero Section */}
-        <div className="glass-card p-4">
+        <div className="glass-card p-4 relative overflow-hidden">
+          <div className="absolute top-2 right-2 text-2xl opacity-20">🧺✨</div>
           <h2 className="text-lg font-bold text-blue-600 mb-2">
             Welcome to Advance Washing
           </h2>
           <p className="text-blue-500 mb-4 text-sm">
-            Professional laundry service at your doorstep
+            Professional laundry service at your doorstep 🚛💙
           </p>
           <Link to="/services">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full">
-              Schedule Pickup
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full premium-button">
+              Schedule Pickup 📅
             </Button>
           </Link>
         </div>
@@ -116,7 +117,7 @@ const HomePage = () => {
         {/* Services Preview */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-bold text-blue-600">Popular Services</h3>
+            <h3 className="text-lg font-bold text-blue-600">Popular Services ⭐</h3>
             <Link to="/services">
               <Button variant="ghost" className="text-blue-500 flex items-center p-0 text-sm hover:text-blue-600">
                 View All <ChevronRight className="w-4 h-4 ml-1" />
@@ -125,11 +126,11 @@ const HomePage = () => {
           </div>
           
           {servicesLoading ? (
-            <div className="text-blue-600 text-center py-4">Loading services...</div>
+            <div className="text-blue-600 text-center py-4">Loading services... ⏳</div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {featuredServices.map((service) => (
-                <div key={service.id} className="glass-card p-3 flex flex-col items-center text-center">
+              {featuredServices.map((service, index) => (
+                <div key={service.id} className="glass-card p-3 flex flex-col items-center text-center service-card">
                   <div className="rounded-full p-2 mb-2 bg-blue-50">
                     {service.icon}
                   </div>
@@ -146,40 +147,43 @@ const HomePage = () => {
         </div>
 
         {/* Current Status */}
-        <div className="glass-card p-4">
-          <h3 className="text-lg font-bold text-blue-600 mb-3">Active Orders</h3>
+        <div className="glass-card p-4 relative overflow-hidden">
+          <div className="absolute top-2 right-2 text-2xl opacity-20">📦🔄</div>
+          <h3 className="text-lg font-bold text-blue-600 mb-3">Active Orders 📋</h3>
           
           {ordersLoading ? (
-            <div className="text-blue-600 text-center py-4">Loading orders...</div>
+            <div className="text-blue-600 text-center py-4">Loading orders... ⏳</div>
           ) : activeOrders.length > 0 ? (
             <div className="space-y-3">
               {activeOrders.slice(0, 2).map((order) => (
-                <div key={order.id} className="flex justify-between items-center p-3 bg-blue-50 rounded-lg my-[2px]">
+                <div key={order.id} className="flex justify-between items-center p-3 bg-blue-50 rounded-lg my-[2px] relative overflow-hidden">
+                  <div className="absolute top-1 right-1 opacity-10 text-lg">🧾</div>
                   <div>
                     <p className="text-blue-600 font-medium text-sm">
                       {order.order_number}
                     </p>
                     <p className="text-blue-500 text-xs">
-                      {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} items
+                      {order.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0} items 👕
                     </p>
                   </div>
-                  <div className={`${getStatusColor(order.status)} text-white text-xs font-medium px-3 py-1 rounded-full`}>
+                  <div className={`${getStatusColor(order.status)} text-white text-xs font-medium px-3 py-1 rounded-full ${order.status.replace('_', '-')}`}>
                     {formatStatus(order.status)}
                   </div>
                 </div>
               ))}
               <Link to="/orders">
-                <Button variant="outline" className="w-full border-blue-300 bg-blue-600 hover:bg-blue-700 text-white py-0 my-[5px]">
-                  View All Orders
+                <Button variant="outline" className="w-full border-blue-300 bg-blue-600 hover:bg-blue-700 text-white py-0 my-[5px] premium-button">
+                  View All Orders 📋
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="text-center py-6">
-              <p className="text-blue-500 mb-4">No active orders</p>
+            <div className="text-center py-6 relative">
+              <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-5">🧺</div>
+              <p className="text-blue-500 mb-4">No active orders 📭</p>
               <Link to="/services">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Create Your First Order
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white premium-button">
+                  Create Your First Order 🎯
                 </Button>
               </Link>
             </div>

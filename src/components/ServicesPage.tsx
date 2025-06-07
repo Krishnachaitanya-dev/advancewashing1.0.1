@@ -1,3 +1,4 @@
+
 import React, { useState, memo } from 'react';
 import AppLayout from './AppLayout';
 import { useServices } from '@/hooks/useServices';
@@ -123,22 +124,31 @@ const ServicesPage = memo(() => {
 
   return (
     <AppLayout>
-      <div className="space-y-4 pt-3">
+      <div className="space-y-4 pt-3 relative">
+        <div className="absolute top-0 right-4 text-3xl opacity-10 animate-pulse">🧺✨</div>
+        
         {/* Services Grid - compact with more rows for mobile */}
         <div className="grid grid-cols-2 gap-3">
-          {services.map(service => {
+          {services.map((service, index) => {
             const IconComponent = iconMap[service.icon_name || 'Shirt'] || Shirt;
+            const emojiDecorations = ['🧺', '👕', '🛏️', '✨', '🧽', '🧴'];
             
             return (
               <div 
                 key={service.id} 
                 onClick={() => handleServiceSelect(service)} 
-                className={getServiceStyle(service.id)}
+                className={`${getServiceStyle(service.id)} service-card relative`}
               >
+                <div className="absolute top-1 right-1 text-lg opacity-20">
+                  {emojiDecorations[index % emojiDecorations.length]}
+                </div>
                 <div className="flex flex-col items-center text-center space-y-2">
                   {/* Service Icon - colored when selected */}
-                  <div className="rounded-full p-2 bg-blue-50 transition-all duration-300">
-                    <IconComponent className={`w-6 h-6 transition-all duration-300 ${getIconColor(service.id)}`} />
+                  <div className="rounded-full p-2 bg-blue-50 transition-all duration-300 relative overflow-hidden">
+                    {isServiceSelected(service.id) && (
+                      <div className="absolute inset-0 flex items-center justify-center text-lg opacity-30">⭐</div>
+                    )}
+                    <IconComponent className={`w-6 h-6 transition-all duration-300 ${getIconColor(service.id)} relative z-10`} />
                   </div>
                   
                   {/* Service Name - smaller text */}
@@ -148,7 +158,7 @@ const ServicesPage = memo(() => {
                   
                   {/* Service Price - smaller */}
                   <div className="font-medium text-sm text-blue-500">
-                    ₹{service.base_price_per_kg}/kg
+                    💰 ₹{service.base_price_per_kg}/kg
                   </div>
                 </div>
               </div>
@@ -161,9 +171,11 @@ const ServicesPage = memo(() => {
           <Button 
             onClick={handleSchedulePickup} 
             disabled={selectedServices.length === 0}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-medium text-base shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-medium text-base shadow-lg disabled:opacity-50 disabled:cursor-not-allowed premium-button relative overflow-hidden"
           >
-            Schedule Pickup {selectedServices.length > 0 && `(${selectedServices.length})`}
+            <span className="relative z-10">
+              🚛 Schedule Pickup {selectedServices.length > 0 && `(${selectedServices.length}) 📦`}
+            </span>
           </Button>
         </div>
       </div>
